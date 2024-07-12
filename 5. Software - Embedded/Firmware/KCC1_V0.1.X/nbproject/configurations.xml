@@ -34,7 +34,7 @@
         <targetDevice>PIC18F25K80</targetDevice>
         <targetHeader></targetHeader>
         <targetPluginBoard></targetPluginBoard>
-        <platformTool>PICkit3PlatformTool</platformTool>
+        <platformTool>noID</platformTool>
         <languageToolchain>XC8</languageToolchain>
         <languageToolchainVersion>2.45</languageToolchainVersion>
         <platform>3</platform>
@@ -47,7 +47,7 @@
       <compileType>
         <linkerTool>
           <linkerLibItems>
-            <linkerLibFileItem>../PIC18_Library_test/Firmware.X/dist/default/production/Firmware.X.a</linkerLibFileItem>
+            <linkerLibFileItem>../../../../../Rahul/PIC18F/PIC18_Library_test/Firmware.X/dist/default/production/Firmware.X.a</linkerLibFileItem>
           </linkerLibItems>
         </linkerTool>
         <archiverTool>
@@ -79,7 +79,7 @@
         <property key="define-macros" value=""/>
         <property key="disable-optimizations" value="true"/>
         <property key="extra-include-directories"
-                  value="..\PIC18_Library_test\Low_Level\Header;..\PIC18_Library_test\Device_Level\Header"/>
+                  value="..\..\..\..\..\Rahul\PIC18F\PIC18_Library_test\Low_Level\Header;..\..\..\..\..\Rahul\PIC18F\PIC18_Library_test\Device_Level\Header"/>
         <property key="favor-optimization-for" value="-speed,+space"/>
         <property key="garbage-collect-data" value="true"/>
         <property key="garbage-collect-functions" value="true"/>
