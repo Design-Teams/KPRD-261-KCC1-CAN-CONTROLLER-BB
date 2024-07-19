@@ -24,7 +24,7 @@
 #include "Internal_EEPROM.h"
 //#include "MP3.h"
 
-volatile uint16_t ms_count,can_count,Led_Count,blink_flag;
+volatile uint16_t ms_count,can_count,Led_Count,blink_flag,Watchdog_count;
 extern volatile uint32_t can_timeout;
 bool Red_Led,serial_diagnost;
 extern bool Yellow_led;

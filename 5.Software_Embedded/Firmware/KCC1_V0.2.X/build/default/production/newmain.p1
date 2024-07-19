@@ -1,24 +1,24 @@
 Version 4.0 HI-TECH Software Intermediate Code
-"22 ./DataProcess.h
-[; ;./DataProcess.h: 22: {
+"20 ./DataProcess.h
+[; ;./DataProcess.h: 20: {
 [s S1529 :1 `uc 1 :1 `uc 1 :1 `uc 1 :1 `uc 1 :1 `uc 1 :1 `uc 1 :1 `uc 1 :1 `uc 1 :1 `uc 1 :1 `uc 1 :1 `uc 1 :1 `uc 1 :1 `uc 1 :1 `uc 1 :1 `uc 1 :1 `uc 1 ]
 [n S1529 . Output_1 Output_2 Output_3 Output_4 Output_5 Output_6 Output_7 Output_8 Output_9 Output_10 Output_11 Output_12 Output_13 Output_14 Output_15 Output_16 ]
 [p mainexit ]
-"65
-[; ;./DataProcess.h: 65: void System_Initialize(void);
+"63
+[; ;./DataProcess.h: 63: void System_Initialize(void);
 [v _System_Initialize `(v ~T0 @X0 0 ef ]
 "28 ./main.h
 [; ;./main.h: 28: extern volatile uint32_t can_timeout;
 [v _can_timeout `Vul ~T0 @X0 0 e ]
-"56 ./DataProcess.h
-[; ;./DataProcess.h: 56: void Data_Process(void);
+"54 ./DataProcess.h
+[; ;./DataProcess.h: 54: void Data_Process(void);
 [v _Data_Process `(v ~T0 @X0 0 ef ]
-"59
-[; ;./DataProcess.h: 59: void Uart1_Send_Data(void);
-[v _Uart1_Send_Data `(v ~T0 @X0 0 ef ]
-"66
-[; ;./DataProcess.h: 66: void Can_Send_Data(void);
-[v _Can_Send_Data `(v ~T0 @X0 0 ef ]
+"57
+[; ;./DataProcess.h: 57: void Uart1_Data_Send(void);
+[v _Uart1_Data_Send `(v ~T0 @X0 0 ef ]
+"64
+[; ;./DataProcess.h: 64: void Can_Data_Send(void);
+[v _Can_Data_Send `(v ~T0 @X0 0 ef ]
 [t ~ __interrupt . k ]
 [t T5 __interrupt ]
 "36655 C:/Program Files/Microchip/MPLABX/v5.50/packs/Microchip/PIC18F-K_DFP/1.4.87/xc8\pic\include\proc\pic18f25k80.h
@@ -106,8 +106,8 @@ Version 4.0 HI-TECH Software Intermediate Code
 "31163
 [; ;C:/Program Files/Microchip/MPLABX/v5.50/packs/Microchip/PIC18F-K_DFP/1.4.87/xc8\pic\include\proc\pic18f25k80.h: 31163: extern volatile PIR1bits_t PIR1bits __attribute__((address(0xF9E)));
 [v _PIR1bits `VS1187 ~T0 @X0 0 e@3998 ]
-"60 ./DataProcess.h
-[; ;./DataProcess.h: 60: void EUSART1_Receive_ISR(void);
+"58 ./DataProcess.h
+[; ;./DataProcess.h: 58: void EUSART1_Receive_ISR(void);
 [v _EUSART1_Receive_ISR `(v ~T0 @X0 0 ef ]
 "31452 C:/Program Files/Microchip/MPLABX/v5.50/packs/Microchip/PIC18F-K_DFP/1.4.87/xc8\pic\include\proc\pic18f25k80.h
 [; ;C:/Program Files/Microchip/MPLABX/v5.50/packs/Microchip/PIC18F-K_DFP/1.4.87/xc8\pic\include\proc\pic18f25k80.h: 31452:     struct {
@@ -143,8 +143,8 @@ Version 4.0 HI-TECH Software Intermediate Code
 "31555
 [; ;C:/Program Files/Microchip/MPLABX/v5.50/packs/Microchip/PIC18F-K_DFP/1.4.87/xc8\pic\include\proc\pic18f25k80.h: 31555: extern volatile PIR3bits_t PIR3bits __attribute__((address(0xFA4)));
 [v _PIR3bits `VS1206 ~T0 @X0 0 e@4004 ]
-"61 ./DataProcess.h
-[; ;./DataProcess.h: 61: void EUSART2_Receive_ISR(void);
+"59 ./DataProcess.h
+[; ;./DataProcess.h: 59: void EUSART2_Receive_ISR(void);
 [v _EUSART2_Receive_ISR `(v ~T0 @X0 0 ef ]
 "51 newmain.c
 [p x RETEN  =  OFF       ]
@@ -171,7 +171,7 @@ Version 4.0 HI-TECH Software Intermediate Code
 "66
 [p x BORPWR  =  ZPBORMV  ]
 "69
-[p x WDTEN  =  OFF       ]
+[p x WDTEN  =  OFF ]
 "70
 [p x WDTPS  =  512       ]
 "73
@@ -1600,17 +1600,17 @@ Version 4.0 HI-TECH Software Intermediate Code
 "39 ../../../../../Rahul/PIC18F/PIC18_Library_test/Device_Level/Header\MC33996.h
 [; ;../../../../../Rahul/PIC18F/PIC18_Library_test/Device_Level/Header\MC33996.h: 39: uint16_t output;
 [v _output `us ~T0 @X0 1 e ]
-"41 ./DataProcess.h
-[; ;./DataProcess.h: 41: OP_HANDLE Doutput;
+"39 ./DataProcess.h
+[; ;./DataProcess.h: 39: OP_HANDLE Doutput;
 [v _Doutput `S1529 ~T0 @X0 1 e ]
-"45
-[; ;./DataProcess.h: 45: uint8_t can_buf[9],RxBuf[20],DADC[3],can_frame_no;
-[v _can_buf `uc ~T0 @X0 -> 9 `i e ]
-[v _RxBuf `uc ~T0 @X0 -> 20 `i e ]
+"43
+[; ;./DataProcess.h: 43: uint8_t CAN_TBuf[9],CAN_RBuf[9],DADC[3],can_frame_no;
+[v _CAN_TBuf `uc ~T0 @X0 -> 9 `i e ]
+[v _CAN_RBuf `uc ~T0 @X0 -> 9 `i e ]
 [v _DADC `uc ~T0 @X0 -> 3 `i e ]
 [v _can_frame_no `uc ~T0 @X0 1 e ]
-"46
-[; ;./DataProcess.h: 46: uint8_t digital_status,uart1_data_flag,uart2_data_flag,can1_data_flag,nrf_data_flag,NRFP_flag,NRFC_flag;
+"44
+[; ;./DataProcess.h: 44: uint8_t digital_status,uart1_data_flag,uart2_data_flag,can1_data_flag,nrf_data_flag,NRFP_flag,NRFC_flag;
 [v _digital_status `uc ~T0 @X0 1 e ]
 [v _uart1_data_flag `uc ~T0 @X0 1 e ]
 [v _uart2_data_flag `uc ~T0 @X0 1 e ]
@@ -1618,53 +1618,49 @@ Version 4.0 HI-TECH Software Intermediate Code
 [v _nrf_data_flag `uc ~T0 @X0 1 e ]
 [v _NRFP_flag `uc ~T0 @X0 1 e ]
 [v _NRFC_flag `uc ~T0 @X0 1 e ]
-"47
-[; ;./DataProcess.h: 47: uint8_t N_MSB,N_LSB,recv,N_Cap,N_Bat,ADC_PCnt[8],ADC_NCnt[8];;
-[v _N_MSB `uc ~T0 @X0 1 e ]
-[v _N_LSB `uc ~T0 @X0 1 e ]
-[v _recv `uc ~T0 @X0 1 e ]
-[v _N_Cap `uc ~T0 @X0 1 e ]
-[v _N_Bat `uc ~T0 @X0 1 e ]
+"45
+[; ;./DataProcess.h: 45: uint8_t CAN_RStatus,ADC_PCnt[8],ADC_NCnt[8];
+[v _CAN_RStatus `uc ~T0 @X0 1 e ]
 [v _ADC_PCnt `uc ~T0 @X0 -> 8 `i e ]
 [v _ADC_NCnt `uc ~T0 @X0 -> 8 `i e ]
-"48
-[; ;./DataProcess.h: 48: uint16_t digital_output;
+"46
+[; ;./DataProcess.h: 46: uint16_t digital_output;
 [v _digital_output `us ~T0 @X0 1 e ]
-"49
-[; ;./DataProcess.h: 49: uint16_t adc_result,ADC[10],NID,N_Load,N_ADC,temp_ADC[15];
-[v _adc_result `us ~T0 @X0 1 e ]
+"47
+[; ;./DataProcess.h: 47: uint16_t ADC[10],NID,N_Load,N_ADC,temp_ADC[15];
 [v _ADC `us ~T0 @X0 -> 10 `i e ]
 [v _NID `us ~T0 @X0 1 e ]
 [v _N_Load `us ~T0 @X0 1 e ]
 [v _N_ADC `us ~T0 @X0 1 e ]
 [v _temp_ADC `us ~T0 @X0 -> 15 `i e ]
-"50
-[; ;./DataProcess.h: 50: uint32_t CANRID,N_Serial,CANTID;
+"48
+[; ;./DataProcess.h: 48: uint32_t CANRID,N_Serial,CANTID;
 [v _CANRID `ul ~T0 @X0 1 e ]
 [v _N_Serial `ul ~T0 @X0 1 e ]
 [v _CANTID `ul ~T0 @X0 1 e ]
-"51
-[; ;./DataProcess.h: 51: volatile uint8_t Uart1_Frame_Flag,Uart2_Frame_Flag,uart1_index,uart2_index;
+"49
+[; ;./DataProcess.h: 49: volatile uint8_t Uart1_Frame_Flag,Uart2_Frame_Flag,uart1_index,uart2_index;
 [v _Uart1_Frame_Flag `Vuc ~T0 @X0 1 e ]
 [v _Uart2_Frame_Flag `Vuc ~T0 @X0 1 e ]
 [v _uart1_index `Vuc ~T0 @X0 1 e ]
 [v _uart2_index `Vuc ~T0 @X0 1 e ]
-"52
-[; ;./DataProcess.h: 52: volatile char Uart1_array[20],Uart2_array[20];
-[v _Uart1_array `Vuc ~T0 @X0 -> 20 `i e ]
-[v _Uart2_array `Vuc ~T0 @X0 -> 20 `i e ]
-"53
-[; ;./DataProcess.h: 53: volatile uint32_t can_timeout;
+"50
+[; ;./DataProcess.h: 50: char Uart1_array[25],Uart2_array[40];
+[v _Uart1_array `uc ~T0 @X0 -> 25 `i e ]
+[v _Uart2_array `uc ~T0 @X0 -> 40 `i e ]
+"51
+[; ;./DataProcess.h: 51: volatile uint32_t can_timeout;
 [v _can_timeout `Vul ~T0 @X0 1 e ]
-"54
-[; ;./DataProcess.h: 54: _Bool Yellow_led;
+"52
+[; ;./DataProcess.h: 52: _Bool Yellow_led;
 [v _Yellow_led `a ~T0 @X0 1 e ]
 "27 ./main.h
-[; ;./main.h: 27: volatile uint16_t ms_count,can_count,Led_Count,blink_flag;
+[; ;./main.h: 27: volatile uint16_t ms_count,can_count,Led_Count,blink_flag,Watchdog_count;
 [v _ms_count `Vus ~T0 @X0 1 e ]
 [v _can_count `Vus ~T0 @X0 1 e ]
 [v _Led_Count `Vus ~T0 @X0 1 e ]
 [v _blink_flag `Vus ~T0 @X0 1 e ]
+[v _Watchdog_count `Vus ~T0 @X0 1 e ]
 "29
 [; ;./main.h: 29: _Bool Red_Led,serial_diagnost;
 [v _Red_Led `a ~T0 @X0 1 e ]
@@ -1710,270 +1706,308 @@ Version 4.0 HI-TECH Software Intermediate Code
 [v _adc_count `us ~T0 @X0 1 a ]
 [e = _adc_count -> -> 0 `i `us ]
 "140
-[; ;newmain.c: 140:     System_Initialize();
-[e ( _System_Initialize ..  ]
+[; ;newmain.c: 140:     __asm(" clrwdt");
+[; <"  clrwdt ;# ">
 "141
-[; ;newmain.c: 141:     blink_flag = 1;
-[e = _blink_flag -> -> 1 `i `us ]
+[; ;newmain.c: 141:     System_Initialize();
+[e ( _System_Initialize ..  ]
 "142
-[; ;newmain.c: 142:     Led_Count = 500;
-[e = _Led_Count -> -> 500 `i `us ]
+[; ;newmain.c: 142:     __asm(" clrwdt");
+[; <"  clrwdt ;# ">
 "143
-[; ;newmain.c: 143:     can_timeout = 10000;
-[e = _can_timeout -> -> -> 10000 `i `l `ul ]
+[; ;newmain.c: 143:     blink_flag = 1;
+[e = _blink_flag -> -> 1 `i `us ]
 "144
-[; ;newmain.c: 144:     while(1)
-[e :U 1536 ]
+[; ;newmain.c: 144:     Led_Count = 500;
+[e = _Led_Count -> -> 500 `i `us ]
 "145
-[; ;newmain.c: 145:     {
-{
+[; ;newmain.c: 145:     can_timeout = 10000;
+[e = _can_timeout -> -> -> 10000 `i `l `ul ]
 "146
-[; ;newmain.c: 146:         Data_Process();
-[e ( _Data_Process ..  ]
+[; ;newmain.c: 146:     Watchdog_count = 800;
+[e = _Watchdog_count -> -> 800 `i `us ]
 "147
-[; ;newmain.c: 147:         if(can_count == 0)
-[e $ ! == -> _can_count `ui -> -> 0 `i `ui 1538  ]
+[; ;newmain.c: 147:     while(1)
+[e :U 1536 ]
 "148
-[; ;newmain.c: 148:         {
+[; ;newmain.c: 148:     {
 {
 "149
-[; ;newmain.c: 149:             if(serial_diagnost == 1)
-[e $ ! == -> _serial_diagnost `i -> 1 `i 1539  ]
+[; ;newmain.c: 149:         Data_Process();
+[e ( _Data_Process ..  ]
 "150
-[; ;newmain.c: 150:             {
-{
+[; ;newmain.c: 150:         if(can_count == 0)
+[e $ ! == -> _can_count `ui -> -> 0 `i `ui 1538  ]
 "151
-[; ;newmain.c: 151:                 Uart1_Send_Data();
-[e ( _Uart1_Send_Data ..  ]
+[; ;newmain.c: 151:         {
+{
 "152
-[; ;newmain.c: 152:             }
+[; ;newmain.c: 152:             if(serial_diagnost == 1)
+[e $ ! == -> _serial_diagnost `i -> 1 `i 1539  ]
+"153
+[; ;newmain.c: 153:             {
+{
+"154
+[; ;newmain.c: 154:                 Uart1_Data_Send();
+[e ( _Uart1_Data_Send ..  ]
+"155
+[; ;newmain.c: 155:             }
 }
 [e :U 1539 ]
-"154
-[; ;newmain.c: 154:             Can_Send_Data();
-[e ( _Can_Send_Data ..  ]
-"155
-[; ;newmain.c: 155:             can_count = 50;
+"157
+[; ;newmain.c: 157:             Can_Data_Send();
+[e ( _Can_Data_Send ..  ]
+"158
+[; ;newmain.c: 158:             can_count = 50;
 [e = _can_count -> -> 50 `i `us ]
-"156
-[; ;newmain.c: 156:         }
+"159
+[; ;newmain.c: 159:         }
 }
 [e :U 1538 ]
-"157
-[; ;newmain.c: 157:     }
+"160
+[; ;newmain.c: 160:         if(Watchdog_count == 0)
+[e $ ! == -> _Watchdog_count `ui -> -> 0 `i `ui 1540  ]
+"161
+[; ;newmain.c: 161:         {
+{
+"162
+[; ;newmain.c: 162:             Watchdog_count = 800;
+[e = _Watchdog_count -> -> 800 `i `us ]
+"163
+[; ;newmain.c: 163:             __asm(" clrwdt");
+[; <"  clrwdt ;# ">
+"164
+[; ;newmain.c: 164:         }
+}
+[e :U 1540 ]
+"165
+[; ;newmain.c: 165:     }
 }
 [e :U 1535 ]
 [e $U 1536  ]
 [e :U 1537 ]
-"158
-[; ;newmain.c: 158:      return;
+"166
+[; ;newmain.c: 166:      return;
 [e $UE 1534  ]
-"159
-[; ;newmain.c: 159: }
+"167
+[; ;newmain.c: 167: }
 [e :UE 1534 ]
 }
 [v $root$_INTERRUPT_InterruptManager `(v ~T0 @X0 0 e ]
-"168
-[; ;newmain.c: 168: void __attribute__((picinterrupt(("")))) INTERRUPT_InterruptManager (void)
+"176
+[; ;newmain.c: 176: void __attribute__((picinterrupt(("")))) INTERRUPT_InterruptManager (void)
 [v _INTERRUPT_InterruptManager `(v ~T5 @X0 1 ef ]
-"169
-[; ;newmain.c: 169: {
+"177
+[; ;newmain.c: 177: {
 {
 [e :U _INTERRUPT_InterruptManager ]
 [f ]
-"171
-[; ;newmain.c: 171:     if(INTCONbits.TMR0IE == 1 && INTCONbits.TMR0IF == 1)
-[e $ ! && == -> . . _INTCONbits 0 5 `i -> 1 `i == -> . . _INTCONbits 0 2 `i -> 1 `i 1541  ]
-"172
-[; ;newmain.c: 172:     {
-{
-"173
-[; ;newmain.c: 173:         TMR0_ISR();
-[e ( _TMR0_ISR ..  ]
-"174
-[; ;newmain.c: 174:         if(ms_count>0)
-[e $ ! > -> _ms_count `ui -> -> 0 `i `ui 1542  ]
-"175
-[; ;newmain.c: 175:         {
-{
-"176
-[; ;newmain.c: 176:             ms_count--;
-[e -- _ms_count -> -> 1 `i `Vus ]
-"177
-[; ;newmain.c: 177:         }
-}
-[e :U 1542 ]
-"178
-[; ;newmain.c: 178:         if(can_count>0)
-[e $ ! > -> _can_count `ui -> -> 0 `i `ui 1543  ]
 "179
-[; ;newmain.c: 179:         {
-{
+[; ;newmain.c: 179:     if(INTCONbits.TMR0IE == 1 && INTCONbits.TMR0IF == 1)
+[e $ ! && == -> . . _INTCONbits 0 5 `i -> 1 `i == -> . . _INTCONbits 0 2 `i -> 1 `i 1542  ]
 "180
-[; ;newmain.c: 180:             can_count--;
-[e -- _can_count -> -> 1 `i `Vus ]
+[; ;newmain.c: 180:     {
+{
 "181
-[; ;newmain.c: 181:         }
-}
-[e :U 1543 ]
+[; ;newmain.c: 181:         TMR0_ISR();
+[e ( _TMR0_ISR ..  ]
 "182
-[; ;newmain.c: 182:         if(Led_Count>0)
-[e $ ! > -> _Led_Count `ui -> -> 0 `i `ui 1544  ]
+[; ;newmain.c: 182:         if(Watchdog_count>0)
+[e $ ! > -> _Watchdog_count `ui -> -> 0 `i `ui 1543  ]
 "183
 [; ;newmain.c: 183:         {
 {
 "184
-[; ;newmain.c: 184:             Led_Count--;
-[e -- _Led_Count -> -> 1 `i `Vus ]
+[; ;newmain.c: 184:             Watchdog_count--;
+[e -- _Watchdog_count -> -> 1 `i `Vus ]
 "185
 [; ;newmain.c: 185:         }
 }
-[e :U 1544 ]
+[e :U 1543 ]
 "186
-[; ;newmain.c: 186:         if(can_timeout>0)
-[e $ ! > _can_timeout -> -> -> 0 `i `l `ul 1545  ]
+[; ;newmain.c: 186:         if(ms_count>0)
+[e $ ! > -> _ms_count `ui -> -> 0 `i `ui 1544  ]
 "187
 [; ;newmain.c: 187:         {
 {
 "188
-[; ;newmain.c: 188:             can_timeout--;
-[e -- _can_timeout -> -> 1 `i `Vul ]
+[; ;newmain.c: 188:             ms_count--;
+[e -- _ms_count -> -> 1 `i `Vus ]
 "189
 [; ;newmain.c: 189:         }
 }
-[e :U 1545 ]
+[e :U 1544 ]
 "190
-[; ;newmain.c: 190:         if((blink_flag == 1) &&(Led_Count == 0))
-[e $ ! && == -> _blink_flag `ui -> -> 1 `i `ui == -> _Led_Count `ui -> -> 0 `i `ui 1546  ]
+[; ;newmain.c: 190:         if(can_count>0)
+[e $ ! > -> _can_count `ui -> -> 0 `i `ui 1545  ]
 "191
 [; ;newmain.c: 191:         {
 {
 "192
-[; ;newmain.c: 192:             if(Red_Led == 1)
-[e $ ! == -> _Red_Led `i -> 1 `i 1547  ]
+[; ;newmain.c: 192:             can_count--;
+[e -- _can_count -> -> 1 `i `Vus ]
 "193
-[; ;newmain.c: 193:             {
-{
+[; ;newmain.c: 193:         }
+}
+[e :U 1545 ]
 "194
-[; ;newmain.c: 194:                 LATCbits.LATC0 = 0;
-[e = . . _LATCbits 0 0 -> -> 0 `i `uc ]
+[; ;newmain.c: 194:         if(Led_Count>0)
+[e $ ! > -> _Led_Count `ui -> -> 0 `i `ui 1546  ]
 "195
-[; ;newmain.c: 195:                 LATAbits.LATA2 =~LATAbits.LATA2;
-[e = . . _LATAbits 0 2 -> ~ -> . . _LATAbits 0 2 `i `uc ]
+[; ;newmain.c: 195:         {
+{
 "196
-[; ;newmain.c: 196:             }
-}
-[e $U 1548  ]
+[; ;newmain.c: 196:             Led_Count--;
+[e -- _Led_Count -> -> 1 `i `Vus ]
 "197
-[; ;newmain.c: 197:             else
-[e :U 1547 ]
-"198
-[; ;newmain.c: 198:             {
-{
-"199
-[; ;newmain.c: 199:                 LATAbits.LATA2 = 0;
-[e = . . _LATAbits 0 2 -> -> 0 `i `uc ]
-"200
-[; ;newmain.c: 200:                 LATCbits.LATC0 =~ LATCbits.LATC0;
-[e = . . _LATCbits 0 0 -> ~ -> . . _LATCbits 0 0 `i `uc ]
-"201
-[; ;newmain.c: 201:             }
-}
-[e :U 1548 ]
-"202
-[; ;newmain.c: 202:             if(Yellow_led == 1)
-[e $ ! == -> _Yellow_led `i -> 1 `i 1549  ]
-"203
-[; ;newmain.c: 203:             {
-{
-"204
-[; ;newmain.c: 204:                LATAbits.LATA1 =~ LATAbits.LATA1;
-[e = . . _LATAbits 0 1 -> ~ -> . . _LATAbits 0 1 `i `uc ]
-"205
-[; ;newmain.c: 205:             }
-}
-[e $U 1550  ]
-"206
-[; ;newmain.c: 206:             else
-[e :U 1549 ]
-"207
-[; ;newmain.c: 207:             {
-{
-"208
-[; ;newmain.c: 208:                 LATAbits.LATA1 = 0;
-[e = . . _LATAbits 0 1 -> -> 0 `i `uc ]
-"209
-[; ;newmain.c: 209:             }
-}
-[e :U 1550 ]
-"210
-[; ;newmain.c: 210:             Led_Count = 500;
-[e = _Led_Count -> -> 500 `i `us ]
-"211
-[; ;newmain.c: 211:         }
+[; ;newmain.c: 197:         }
 }
 [e :U 1546 ]
+"198
+[; ;newmain.c: 198:         if(can_timeout>0)
+[e $ ! > _can_timeout -> -> -> 0 `i `l `ul 1547  ]
+"199
+[; ;newmain.c: 199:         {
+{
+"200
+[; ;newmain.c: 200:             can_timeout--;
+[e -- _can_timeout -> -> 1 `i `Vul ]
+"201
+[; ;newmain.c: 201:         }
+}
+[e :U 1547 ]
+"202
+[; ;newmain.c: 202:         if((blink_flag == 1) &&(Led_Count == 0))
+[e $ ! && == -> _blink_flag `ui -> -> 1 `i `ui == -> _Led_Count `ui -> -> 0 `i `ui 1548  ]
+"203
+[; ;newmain.c: 203:         {
+{
+"204
+[; ;newmain.c: 204:             if(Red_Led == 1)
+[e $ ! == -> _Red_Led `i -> 1 `i 1549  ]
+"205
+[; ;newmain.c: 205:             {
+{
+"206
+[; ;newmain.c: 206:                 LATCbits.LATC0 = 0;
+[e = . . _LATCbits 0 0 -> -> 0 `i `uc ]
+"207
+[; ;newmain.c: 207:                 LATAbits.LATA2 =~LATAbits.LATA2;
+[e = . . _LATAbits 0 2 -> ~ -> . . _LATAbits 0 2 `i `uc ]
+"208
+[; ;newmain.c: 208:             }
+}
+[e $U 1550  ]
+"209
+[; ;newmain.c: 209:             else
+[e :U 1549 ]
+"210
+[; ;newmain.c: 210:             {
+{
+"211
+[; ;newmain.c: 211:                 LATAbits.LATA2 = 0;
+[e = . . _LATAbits 0 2 -> -> 0 `i `uc ]
 "212
-[; ;newmain.c: 212:     }
-}
-[e $U 1551  ]
+[; ;newmain.c: 212:                 LATCbits.LATC0 =~ LATCbits.LATC0;
+[e = . . _LATCbits 0 0 -> ~ -> . . _LATCbits 0 0 `i `uc ]
 "213
-[; ;newmain.c: 213:     else if(INTCONbits.PEIE == 1)
-[e :U 1541 ]
-[e $ ! == -> . . _INTCONbits 1 6 `i -> 1 `i 1552  ]
+[; ;newmain.c: 213:             }
+}
+[e :U 1550 ]
 "214
-[; ;newmain.c: 214:     {
-{
+[; ;newmain.c: 214:             if(Yellow_led == 1)
+[e $ ! == -> _Yellow_led `i -> 1 `i 1551  ]
 "215
-[; ;newmain.c: 215:         if(PIE1bits.RC1IE == 1 && PIR1bits.RC1IF == 1)
-[e $ ! && == -> . . _PIE1bits 0 5 `i -> 1 `i == -> . . _PIR1bits 0 5 `i -> 1 `i 1553  ]
+[; ;newmain.c: 215:             {
+{
 "216
-[; ;newmain.c: 216:         {
-{
+[; ;newmain.c: 216:                LATAbits.LATA1 =~ LATAbits.LATA1;
+[e = . . _LATAbits 0 1 -> ~ -> . . _LATAbits 0 1 `i `uc ]
 "217
-[; ;newmain.c: 217:           EUSART1_Receive_ISR();
-[e ( _EUSART1_Receive_ISR ..  ]
+[; ;newmain.c: 217:             }
+}
+[e $U 1552  ]
 "218
-[; ;newmain.c: 218:           PIR1bits.RC1IF = 0;
-[e = . . _PIR1bits 0 5 -> -> 0 `i `uc ]
+[; ;newmain.c: 218:             else
+[e :U 1551 ]
 "219
-[; ;newmain.c: 219:         }
-}
-[e $U 1554  ]
+[; ;newmain.c: 219:             {
+{
 "220
-[; ;newmain.c: 220:         else if(PIE3bits.RC2IE == 1 && PIR3bits.RC2IF == 1)
-[e :U 1553 ]
-[e $ ! && == -> . . _PIE3bits 0 5 `i -> 1 `i == -> . . _PIR3bits 0 5 `i -> 1 `i 1555  ]
+[; ;newmain.c: 220:                 LATAbits.LATA1 = 0;
+[e = . . _LATAbits 0 1 -> -> 0 `i `uc ]
 "221
-[; ;newmain.c: 221:         {
-{
-"222
-[; ;newmain.c: 222:            EUSART2_Receive_ISR();
-[e ( _EUSART2_Receive_ISR ..  ]
-"223
-[; ;newmain.c: 223:            PIR3bits.RC2IF = 0;
-[e = . . _PIR3bits 0 5 -> -> 0 `i `uc ]
-"224
-[; ;newmain.c: 224:         }
-}
-[e $U 1556  ]
-"225
-[; ;newmain.c: 225:         else
-[e :U 1555 ]
-"226
-[; ;newmain.c: 226:         {
-{
-"228
-[; ;newmain.c: 228:         }
-}
-[e :U 1556 ]
-[e :U 1554 ]
-"229
-[; ;newmain.c: 229:     }
+[; ;newmain.c: 221:             }
 }
 [e :U 1552 ]
-[e :U 1551 ]
+"222
+[; ;newmain.c: 222:             Led_Count = 500;
+[e = _Led_Count -> -> 500 `i `us ]
+"223
+[; ;newmain.c: 223:         }
+}
+[e :U 1548 ]
+"224
+[; ;newmain.c: 224:     }
+}
+[e $U 1553  ]
+"225
+[; ;newmain.c: 225:     else if(INTCONbits.PEIE == 1)
+[e :U 1542 ]
+[e $ ! == -> . . _INTCONbits 1 6 `i -> 1 `i 1554  ]
+"226
+[; ;newmain.c: 226:     {
+{
+"227
+[; ;newmain.c: 227:         if(PIE1bits.RC1IE == 1 && PIR1bits.RC1IF == 1)
+[e $ ! && == -> . . _PIE1bits 0 5 `i -> 1 `i == -> . . _PIR1bits 0 5 `i -> 1 `i 1555  ]
+"228
+[; ;newmain.c: 228:         {
+{
+"229
+[; ;newmain.c: 229:           EUSART1_Receive_ISR();
+[e ( _EUSART1_Receive_ISR ..  ]
 "230
-[; ;newmain.c: 230: }
-[e :UE 1540 ]
+[; ;newmain.c: 230:           PIR1bits.RC1IF = 0;
+[e = . . _PIR1bits 0 5 -> -> 0 `i `uc ]
+"231
+[; ;newmain.c: 231:         }
+}
+[e $U 1556  ]
+"232
+[; ;newmain.c: 232:         else if(PIE3bits.RC2IE == 1 && PIR3bits.RC2IF == 1)
+[e :U 1555 ]
+[e $ ! && == -> . . _PIE3bits 0 5 `i -> 1 `i == -> . . _PIR3bits 0 5 `i -> 1 `i 1557  ]
+"233
+[; ;newmain.c: 233:         {
+{
+"234
+[; ;newmain.c: 234:            EUSART2_Receive_ISR();
+[e ( _EUSART2_Receive_ISR ..  ]
+"235
+[; ;newmain.c: 235:            PIR3bits.RC2IF = 0;
+[e = . . _PIR3bits 0 5 -> -> 0 `i `uc ]
+"236
+[; ;newmain.c: 236:         }
+}
+[e $U 1558  ]
+"237
+[; ;newmain.c: 237:         else
+[e :U 1557 ]
+"238
+[; ;newmain.c: 238:         {
+{
+"240
+[; ;newmain.c: 240:         }
+}
+[e :U 1558 ]
+[e :U 1556 ]
+"241
+[; ;newmain.c: 241:     }
+}
+[e :U 1554 ]
+[e :U 1553 ]
+"242
+[; ;newmain.c: 242: }
+[e :UE 1541 ]
 }

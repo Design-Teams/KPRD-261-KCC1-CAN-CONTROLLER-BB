@@ -32,7 +32,7 @@ inline void MC33996_RST(bool stat)
 
 inline void Soft_Uart_Tx(bool stat)
 {
-//    SUart_Tx = stat;
+    RS485_Ctrl = stat;
 }
 
 /*=============================================================================
@@ -83,15 +83,16 @@ void System_Initialize(void)
     CM1CON = 0x00;
     TRISCbits.TRISC0 = 0;
     LATBbits.LATB2 = 1;
-     
+     CLRWDT();
     OSCILLATOR_Initialize();            // Oscillator initialize
     TMR0_Initialize(1);                 // Timer0 initialize with 1 ms
     EUSART1_Initialize(44236800,57600); // EUSART1 Initialize
     EUSART2_Initialize(44236800,9600);  // EUSART2 Initialize
     //Soft_Uart_Initialize();             // Soft Uart Initialize
     LATBbits.LATB2 = 1;
-    
+    CLRWDT();
     //Delay_Ms(200);
+    CLRWDT();
     read = Eeprom_Read(5);  // Read eeprom
     if(read != 'R')        // if valid data not found then set default parameter
     {
@@ -139,7 +140,7 @@ void System_Initialize(void)
     {
         EUSART1_String("User Setting\r\n"); 
     }
-      
+     CLRWDT(); 
     Init_Ecan(CAN_Speed,true,(uint16_t)CANTID);
     INTCONbits.PEIE = 1;               // Peripheral Interrupt Enable
     INTCONbits.GIE  = 1;               // Global Interrupt Enable
@@ -151,44 +152,58 @@ void System_Initialize(void)
     TRISAbits.TRISA3 = 1;
     TMR0_StartTimer();                 // Start Timer0
     MC_RST = 1;
-    Delay_Ms(2000);
+    CLRWDT();
+    Delay_Ms(500);
+    CLRWDT();
+    Delay_Ms(500);
+    CLRWDT();
+    Delay_Ms(500);
+    CLRWDT();
+    Delay_Ms(500);
    
     if(MC33996_SPI_Check() == 1)        // MC33996 output ic SPI integrity check 
     {
       EUSART1_String("SPI Check OK\r\n"); 
       LATCbits.LATC0 = 1; // G LED Pin
       Delay_Ms(300);
+      CLRWDT();
       LATCbits.LATC0 = 0; // G LED Pin
     }
     else
     {
         EUSART1_String("SPI Check error\r\n"); 
         LATAbits.LATA2 = 1; // R LED Pin
-        Delay_Ms(1000);
+        Delay_Ms(500);
+        CLRWDT();
+        Delay_Ms(500);
+        CLRWDT();
         LATAbits.LATA2 = 1; // R LED Pin
     }
     
     MC33996_Init();                         //MC33996 Initialization
     Delay_Ms(100);
+    CLRWDT();
     MC33972_Init();                         //MC33972 Initialization
     EUSART1_String("MSDI init done\r\n"); 
     Delay_Ms(500);
- 
+    CLRWDT();
     LATBbits.LATB3   = 0;
 	TRISBbits.TRISB2 = 0; // CAN Tx
 	TRISBbits.TRISB3 = 1;
-    sprintf(buf,"KCC1_V1.0 CANID = %d,CANSpeed = %d\r\n",(uint16_t)CANTID,CAN_Speed);
+    sprintf(buf,"KCC1_V0.2 CANID = %d,CANSpeed = %d\r\n",(uint16_t)CANTID,CAN_Speed);
     EUSART1_String(buf);
     
     
     LATAbits.LATA1 = 1; // LED Pin
     Delay_Ms(300);
+    CLRWDT();
     LATAbits.LATA1 = 0;
      Delay_Ms(30);
     LATAbits.LATA2 = 1; // LED Pin
     Delay_Ms(300);
     LATAbits.LATA2 = 0;
-    Check_CAN_Status();
+    CAN_Request_Send();
+    CLRWDT();
 }
 /*=============================================================================
  * Function     : Uart1_Data_Handler.
@@ -205,9 +220,10 @@ void Uart1_Data_Handler(void)
     if(memcmp(((char*)Uart1_array+1),",OD,",4) == 0)          //Output data {,OD,digital_output,mp3_stat,track_num,}
     {
         uart1_data_flag = true;
+        //EUSART1_String("In OD loop\n");
         token = strtok((char*)Uart1_array, ",");
         token = strtok(NULL,",");
-        for(k=0; k<3; k++)
+        for(k=0; k<1; k++)
         {
             token = strtok(NULL,",");
             sprintf(token_buf[k],"%s",token);
@@ -244,7 +260,6 @@ void Uart1_Data_Handler(void)
         N_Serial = (uint32_t)(atol(token_buf[0]));
         
     }
-    
 }
 /*=============================================================================
  * Function     : Uart2_Data_Handler.
@@ -256,7 +271,7 @@ void Uart1_Data_Handler(void)
 
 void Uart2_Data_Handler(void)
 {
-    char* token,token_buf[5][10],lbuf[5];
+    char* token,token_buf[6][10],lbuf[5];
     uint8_t k;
     
     if(memcmp(((char*)Uart2_array+1),",LP,",4) == 0)          //Output data {,OD,digital_output,mp3_stat,track_num,}
@@ -264,105 +279,102 @@ void Uart2_Data_Handler(void)
         nrf_data_flag = true;
         token = strtok((char*)Uart2_array, ",");
         token = strtok(NULL,",");
-        for(k=0; k<4; k++)
+        for(k=0; k<6; k++)
         {
             token = strtok(NULL,",");
             sprintf(token_buf[k],"%s",token);
         }
-        memset(can_buf,0x00,8*sizeof(uint8_t));
+        memset(CAN_TBuf,0x00,8*sizeof(uint8_t));
         CANRID = 0;
         N_Load = 0;
         N_ADC  = 0;
-        CANRID     = (uint16_t)(atol(token_buf[0]));
-        N_Load     = (uint16_t)(atol(token_buf[1]));
-        N_ADC      = (uint16_t)(atol(token_buf[2]));
-        can_buf[4] = (uint8_t)(atol(token_buf[3]));
-        can_buf[5] = (uint8_t)(atol(token_buf[4]));
-        
-        can_buf[0] = (uint8_t)((N_Load & 0xFF00)>>8);
-        can_buf[1] = (uint8_t)((N_Load & 0x00FF)>>0);
-        can_buf[2] = (uint8_t)((N_ADC & 0xFF00)>>8);
-        can_buf[3] = (uint8_t)((N_ADC & 0x00FF)>>0);
+        CANRID     = (uint16_t)(atol(token_buf[0]));//Hook Type Main/Aux
+        N_Load     = (uint16_t)(atol(token_buf[1]));//Calibrated Load
+        N_ADC      = (uint16_t)(atol(token_buf[2]));//Load Adc Count
+        CAN_TBuf[4] = (uint8_t)(atol(token_buf[3]));//Load Status safe/approch/overload
+        CAN_TBuf[5] = (uint8_t)(((atol(token_buf[4]))& 0xFF00)>>8);//Battery adc count
+        CAN_TBuf[6] = (uint8_t)(((atol(token_buf[4]))& 0x00FF)>>0);
+        CAN_TBuf[7] = (uint8_t)(atol(token_buf[5]));//temperature
+        CAN_TBuf[0] = (uint8_t)((N_Load & 0xFF00)>>8);
+        CAN_TBuf[1] = (uint8_t)((N_Load & 0x00FF)>>0);
+        CAN_TBuf[2] = (uint8_t)((N_ADC & 0xFF00)>>8);
+        CAN_TBuf[3] = (uint8_t)((N_ADC & 0x00FF)>>0);
         
     }
 }
 /*=============================================================================
- * Function     : Can_Send_Data.
+ * Function     : Can_Data_Send.
  * Description  : send data on can bus
  * Parameters   : void 
  * Return       : Void.
- * Example      : Can_Send_Data();
+ * Example      : Can_Data_Send();
 ===========================================================================================================================*/
-void Can_Send_Data(void)
+void Can_Data_Send(void)
 {
     if(can_frame_no == 0)
     {
-        //CANRID = 100;
-        can_buf[0] = 0x01;
-        can_buf[1] = (uint8_t)((ADC[0]&0xFF00)>>8);
-        can_buf[2] = (uint8_t)((ADC[0]&0x00FF)>>0);
-        can_buf[3] = (uint8_t)((ADC[1]&0xFF00)>>8);
-        can_buf[4] = (uint8_t)((ADC[1]&0x00FF)>>0);
-        can_buf[5] = (uint8_t)((ADC[2]&0xFF00)>>8);
-        can_buf[6] = (uint8_t)((ADC[2]&0x00FF)>>0);
-        can_buf[7] = DADC[0];
-        ECanWriteMessage(0,CANTID,8,0,can_buf);
+        CAN_TBuf[0] = 0x01;
+        CAN_TBuf[1] = (uint8_t)((ADC[0]&0xFF00)>>8);
+        CAN_TBuf[2] = (uint8_t)((ADC[0]&0x00FF)>>0);
+        CAN_TBuf[3] = (uint8_t)((ADC[1]&0xFF00)>>8);
+        CAN_TBuf[4] = (uint8_t)((ADC[1]&0x00FF)>>0);
+        CAN_TBuf[5] = (uint8_t)((ADC[2]&0xFF00)>>8);
+        CAN_TBuf[6] = (uint8_t)((ADC[2]&0x00FF)>>0);
+        CAN_TBuf[7] = DADC[0];
+        ECanWriteMessage(0,CANTID,8,0,CAN_TBuf);
         can_frame_no++;
     }
     else if(can_frame_no == 1)
     {
-       //CANRID = 100;
-        can_buf[0] = 0x02;
-        can_buf[1] = (uint8_t)((ADC[3]&0xFF00)>>8);
-        can_buf[2] = (uint8_t)((ADC[3]&0x00FF)>>0);
-        can_buf[3] = (uint8_t)((ADC[4]&0xFF00)>>8);
-        can_buf[4] = (uint8_t)((ADC[4]&0x00FF)>>0);
-        can_buf[5] = (uint8_t)((ADC[5]&0xFF00)>>8);
-        can_buf[6] = (uint8_t)((ADC[5]&0x00FF)>>0);
-        can_buf[7] = DADC[1];
-        ECanWriteMessage(0,CANTID,8,0,can_buf); 
+        CAN_TBuf[0] = 0x02;
+        CAN_TBuf[1] = (uint8_t)((ADC[3]&0xFF00)>>8);
+        CAN_TBuf[2] = (uint8_t)((ADC[3]&0x00FF)>>0);
+        CAN_TBuf[3] = (uint8_t)((ADC[4]&0xFF00)>>8);
+        CAN_TBuf[4] = (uint8_t)((ADC[4]&0x00FF)>>0);
+        CAN_TBuf[5] = (uint8_t)((ADC[5]&0xFF00)>>8);
+        CAN_TBuf[6] = (uint8_t)((ADC[5]&0x00FF)>>0);
+        CAN_TBuf[7] = DADC[1];
+        ECanWriteMessage(0,CANTID,8,0,CAN_TBuf); 
         can_frame_no++;
     }
     else if(can_frame_no == 2)
     {
-       //CANRID = 100;
-        can_buf[0] = 0x03;
-        can_buf[1] = (uint8_t)((ADC[7]&0xFF00)>>8);
-        can_buf[2] = (uint8_t)((ADC[7]&0x00FF)>>0);
-        can_buf[3] = (uint8_t)((ADC[6]&0xFF00)>>8);
-        can_buf[4] = (uint8_t)((ADC[6]&0x00FF)>>0);
-        can_buf[5] = (uint8_t)((ADC[9]&0xFF00)>>8);
-        can_buf[6] = (uint8_t)((ADC[9]&0x00FF)>>0);
-        can_buf[7] = DADC[2];
-        ECanWriteMessage(0,CANTID,8,0,can_buf); 
+        CAN_TBuf[0] = 0x03;
+        CAN_TBuf[1] = (uint8_t)((ADC[7]&0xFF00)>>8);
+        CAN_TBuf[2] = (uint8_t)((ADC[7]&0x00FF)>>0);
+        CAN_TBuf[3] = (uint8_t)((ADC[6]&0xFF00)>>8);
+        CAN_TBuf[4] = (uint8_t)((ADC[6]&0x00FF)>>0);
+        CAN_TBuf[5] = (uint8_t)((ADC[9]&0xFF00)>>8);
+        CAN_TBuf[6] = (uint8_t)((ADC[9]&0x00FF)>>0);
+        CAN_TBuf[7] = DADC[2];
+        ECanWriteMessage(0,CANTID,8,0,CAN_TBuf); 
         can_frame_no++;
     }
     else if(can_frame_no == 3)
     {
-       //CANRID = 100;
-        can_buf[0] = 0x04;
-        can_buf[1] = (uint8_t)((ADC[8]&0xFF00)>>8);
-        can_buf[2] = (uint8_t)((ADC[8]&0x00FF)>>0);
-        can_buf[3] = 0;
-        can_buf[4] = 0;
-        can_buf[5] = 0;
-        can_buf[6] = 0;
-        can_buf[7] = 0;
-        ECanWriteMessage(0,CANTID,8,0,can_buf); 
+        CAN_TBuf[0] = 0x04;
+        CAN_TBuf[1] = (uint8_t)((ADC[8]&0xFF00)>>8);
+        CAN_TBuf[2] = (uint8_t)((ADC[8]&0x00FF)>>0);
+        CAN_TBuf[3] = 0;
+        CAN_TBuf[4] = 0;
+        CAN_TBuf[5] = 0;
+        CAN_TBuf[6] = 0;
+        CAN_TBuf[7] = 0;
+        ECanWriteMessage(0,CANTID,8,0,CAN_TBuf); 
         can_frame_no = 0;
     }
 }
 
-void Check_CAN_Status(void)
+void CAN_Request_Send(void)
 {
-    memset(can_buf,0x00,8*sizeof(uint8_t));
-    can_buf[0] = 'S';
-    can_buf[1] = 'T';
-    can_buf[2] = 'A';
-    can_buf[3] = 'T';   
-    ECanWriteMessage(0,CANTID,8,0,can_buf);  // Put request on CAN bus
+    memset(CAN_TBuf,0x00,8*sizeof(uint8_t));
+    CAN_TBuf[0] = 'S';
+    CAN_TBuf[1] = 'T';
+    CAN_TBuf[2] = 'A';
+    CAN_TBuf[3] = 'T';   
+    ECanWriteMessage(0,CANTID,8,0,CAN_TBuf);  // Put request on CAN bus
     Delay_Ms(100);
-    memset(can_buf,0x00,8*sizeof(uint8_t)); 
+    memset(CAN_TBuf,0x00,8*sizeof(uint8_t)); 
     Yellow_led = false;
     can_timeout = 10000;
 }
@@ -378,9 +390,9 @@ void Check_CAN_Status(void)
 //{
 //    char disp[25]={0};
 //    
-//    sprintf(disp,"{,CD,%d,%d,%d,%d,%d",(uint16_t)CANRID,RxBuf[0],RxBuf[1],RxBuf[2],RxBuf[3]); 
+//    sprintf(disp,"{,CD,%d,%d,%d,%d,%d",(uint16_t)CANRID,CAN_RBuf[0],CAN_RBuf[1],CAN_RBuf[2],CAN_RBuf[3]); 
 //    EUSART1_String(disp); 
-//    sprintf(disp,",%d,%d,%d,%d,}\n",RxBuf[4],RxBuf[5],RxBuf[6],RxBuf[7]); 
+//    sprintf(disp,",%d,%d,%d,%d,}\n",CAN_RBuf[4],CAN_RBuf[5],CAN_RBuf[6],CAN_RBuf[7]); 
 //    EUSART1_String(disp);
 //}
 /*=============================================================================
@@ -393,23 +405,21 @@ void Check_CAN_Status(void)
 
 void Data_Process(void)
 {
-    uint8_t channel = 0,can_timer = 0;
+    uint8_t channel = 0;
     char temp_buf[20]={0};
     float F_temp=0.0;
-    memset(temp_ADC,0x00,17*sizeof(uint16_t));           // Clear buffer
+    memset(temp_ADC,0x00,15*sizeof(uint16_t));           // Clear buffer
     memset(DADC,0x00,3*sizeof(uint16_t));
     MC33972_Read_ADC(Analog_Ch0);                   // Set MSDI analog channel
     Delay_Ms(1);
-    adc_result = Get_Adc_Data(3);                   // Read voltage
-    ADC[0] = (uint16_t)((adc_result*0.00735)*10);   // Convert ADC value into actual Voltage
+    ADC[0] = Get_Adc_Data(3);                   // Read voltage
+    ADC[0] = (uint16_t)((ADC[0]*0.00735)*10);
     Delay_Ms(1);
     for(channel=7;channel<22;channel++)            // Read Multiple Analog Channel
     {
         MC33972_Read_ADC(Analog_Ch0+channel);
         Delay_Ms(1);
-        adc_result=Get_Adc_Data(3);
-        temp_ADC[channel-7]=adc_result;                // Store adc value to ADC buffer from 0 location
-        adc_result = 0;
+        temp_ADC[channel-7]=Get_Adc_Data(3);                // Store adc value to ADC buffer from 0 location
     }
         
     F_temp = (float)(temp_ADC[5]/0.85); //12
@@ -772,59 +782,58 @@ void Data_Process(void)
     
     if(can_timeout == 0)         // Checking whether Master on CAN Bus is connected or not
     {
-        Check_CAN_Status();
+        CAN_Request_Send();
     }
-    recv = Read_ECan(0,&CANRID,8,0,RxBuf);    // Read CAN Bus
-    if(recv)            // Check data on CAN is present
+    CAN_RStatus = Read_ECan(0,&CANRID,8,0,CAN_RBuf);    // Read CAN Bus
+    if(CAN_RStatus)            // Check data on CAN is present
     {
         if(CANRID == CANTID)  // Check CAN ID
         {
-            if((RxBuf[0]=='O') && (RxBuf[1]=='D')) // Check OD String
+            if((CAN_RBuf[0]=='O') && (CAN_RBuf[1]=='D')) // Check OD String
             {
-                digital_output = (uint16_t)((RxBuf[2]<<8)|(RxBuf[3]<<0));
+                digital_output = (uint16_t)((CAN_RBuf[2]<<8)|(CAN_RBuf[3]<<0));
                 Digital_Output_Handler();  // Take action as per output signal
             }
-            else if((RxBuf[0]=='D') && (RxBuf[1]=='M'))
+            else if((CAN_RBuf[0]=='D') && (CAN_RBuf[1]=='M'))
             {
                Red_Led = true; 
             }
-            else if((RxBuf[0]=='N') && (RxBuf[1]=='M'))
+            else if((CAN_RBuf[0]=='N') && (CAN_RBuf[1]=='M'))
             {
                Red_Led = false; 
             }
-            else if((RxBuf[0]=='O') && (RxBuf[1]=='K')) // Check Valid Response
+            else if((CAN_RBuf[0]=='O') && (CAN_RBuf[1]=='K')) // Check Valid Response
             {
                 Yellow_led = true;  
                 can_timeout = 60000;
             }
-            else if((RxBuf[0]=='T') && (RxBuf[1]=='M'))  // MAIN 
+            else if((CAN_RBuf[0]=='T') && (CAN_RBuf[1]=='M'))  // MAIN 
             {
                 Eeprom_Write(2,1);
                 CANTID = 409;
             }
-            else if((RxBuf[0]=='T') && (RxBuf[1]=='A'))  // AUX
+            else if((CAN_RBuf[0]=='T') && (CAN_RBuf[1]=='A'))  // AUX
             {
                 Eeprom_Write(2,2);
                 CANTID = 410;
             }
-            else if((RxBuf[0]=='C') && (RxBuf[1]=='S'))  // CAN Speed 
+            else if((CAN_RBuf[0]=='C') && (CAN_RBuf[1]=='S'))  // CAN Speed 
             {
-                if(RxBuf[2] == 1)
+                if(CAN_RBuf[2] == 1)
                 {
                    Eeprom_Write(1,1); 
                 }
-                else if(RxBuf[2] == 2)
+                else if(CAN_RBuf[2] == 2)
                 {
                    Eeprom_Write(1,2); 
                 }
-                else if(RxBuf[2] == 3)
+                else if(CAN_RBuf[2] == 3)
                 {
                    Eeprom_Write(1,3); 
                 }
-                else if(RxBuf[2] == 4)
+                else if(CAN_RBuf[2] == 4)
                 {
                    Eeprom_Write(1,4); 
-                   EUSART1_String("CAN Speed 500\r\n");
                 }
             }
             else
@@ -836,10 +845,12 @@ void Data_Process(void)
     }
     if(Uart1_Frame_Flag == 1)
     {
+        //EUSART1_String("uart flag\n");
         Uart1_Data_Handler();            // Check UART received data
         if(uart1_data_flag == true)
         {
             Digital_Output_Handler();   // Control OUTPUTS
+            //EUSART1_String("Digital output\n");
             uart1_data_flag = false;
         }
         Uart1_Frame_Flag = 0;
@@ -849,19 +860,24 @@ void Data_Process(void)
         Uart2_Data_Handler();           // Check UART received data
         if(uart2_data_flag == true)
         {
-          Uart1_Send_Data(); 
+          Uart1_Data_Send(); 
           uart2_data_flag = false;
         }
         if(nrf_data_flag == 1)
         {
-            ECanWriteMessage(0,CANRID,8,0,can_buf);
+            ECanWriteMessage(0,CANRID,8,0,CAN_TBuf);
+            for(channel=0;channel<38;channel++)
+            {
+                EUSART1_Write(Uart2_array[channel]);
+            }
+            EUSART1_String("\n");
             if(serial_diagnost == true)
             {
               EUSART1_String("{,LP,");
-              sprintf(temp_buf,"%d,%d,%d,%d,%d,%d,%d,%d,%d,}\n",(uint16_t)CANRID,can_buf[0],can_buf[1],can_buf[2],can_buf[3],can_buf[4],can_buf[5],can_buf[6],can_buf[7]);  
+              sprintf(temp_buf,"%d,%d,%d,%d,%d,%d,%d,%d,%d,}\n",(uint16_t)CANRID,CAN_TBuf[0],CAN_TBuf[1],CAN_TBuf[2],CAN_TBuf[3],CAN_TBuf[4],CAN_TBuf[5],CAN_TBuf[6],CAN_TBuf[7]);  
               EUSART1_String(temp_buf);
             }
-            memset(can_buf,0x00,8*sizeof(uint8_t));
+            memset(CAN_TBuf,0x00,8*sizeof(uint8_t));
             nrf_data_flag = false;
         }
         Uart2_Frame_Flag = 0;
@@ -888,6 +904,7 @@ void Data_Process(void)
         EUSART2_Write((uint8_t)(N_Serial%10)+0x30);
         EUSART2_Write('\n');
         Delay_Ms(100);
+        CLRWDT();
         EUSART2_String("B4");
         EUSART2_Write((uint8_t)(N_Serial/10000)+0x30);
         EUSART2_Write((uint8_t)((N_Serial%10000)/1000)+0x30);
@@ -908,27 +925,17 @@ void Data_Process(void)
 }
 
 /*=============================================================================
- * Function     : Uart1_Send_Data.
+ * Function     : Uart1_Data_Send.
  * Description  : Send data on UART1
  * Parameters   : void 
  * Return       : Void.
- * Example      : Uart1_Send_Data();
+ * Example      : Uart1_Data_Send();
 ===========================================================================================================================*/
 
-void Uart1_Send_Data(void)
+void Uart1_Data_Send(void)
 {
     char disp[25]={0};
-     
-//    if(uart2_data_flag == true)
-//    {
-//      sprintf(disp,"{,ND,%d,%d,}\n",N_MSB,N_LSB); 
-//      EUSART1_String(disp);  
-//    }
-//    if(nrf_data_flag == 1)
-//    {
-//        sprintf(disp,"{,LP,%d,%d,%d,%d,}\n",NID,N_Load,N_Cap,N_Bat);
-//        EUSART1_String(disp);
-//    }
+
     sprintf(disp,"{,AD,%d,%d,%d,%d,%d,",ADC[0],ADC[1],ADC[2],ADC[3],ADC[4]);
     EUSART1_String(disp);
     sprintf(disp,"%d,%d,%d,%d,%d,",ADC[5],ADC[7],ADC[6],ADC[9],ADC[8]); 
@@ -948,9 +955,13 @@ void Uart1_Send_Data(void)
 
 void EUSART1_Receive_ISR(void)
 {
-    uint8_t RxdData;
+    uint8_t RxdData=0;
     RxdData = RCREG1;
-    if(RxdData != '\n' && uart1_index<40)
+    if(uart1_index>24)
+    {
+        uart1_index = 0;
+    }
+    else if(RxdData != '\n' && uart1_index<25)
     {
         Uart1_array[uart1_index++] = RxdData;
     }
@@ -972,9 +983,13 @@ void EUSART1_Receive_ISR(void)
 
 void EUSART2_Receive_ISR(void)
 {
-    uint8_t RxdData;
+    uint8_t RxdData = 0;
     RxdData = RCREG2;
-    if(RxdData != '\n' && uart2_index<40)
+    if(uart2_index>38)
+    {
+        uart2_index = 0;
+    }
+    else if(RxdData != '\n' && uart2_index<38)
     {
         Uart2_array[uart2_index++] = RxdData;
     }

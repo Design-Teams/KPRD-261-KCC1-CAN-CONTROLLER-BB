@@ -66,7 +66,7 @@ Description             : To read Analog & digital inputs,control digital output
 #pragma config BORPWR = ZPBORMV // BORMV Power level (ZPBORMV instead of BORMV is selected)
 
 // CONFIG2H
-#pragma config WDTEN = OFF      // Watchdog Timer (WDT disabled in hardware; SWDTEN bit disabled)
+#pragma config WDTEN = OFF//NOSLP      // Watchdog Timer (WDT disabled in hardware; SWDTEN bit disabled)
 #pragma config WDTPS = 512      // Watchdog Postscaler (1:512)
 
 // CONFIG3H
@@ -137,10 +137,13 @@ void Delay_Ms(uint16_t delay)
 void main(void) 
 {
     uint16_t adc_count = 0;
+    CLRWDT();
     System_Initialize();
+    CLRWDT();
     blink_flag = true;
     Led_Count = 500;
     can_timeout = 10000;
+    Watchdog_count = 800;
     while(1)
     {
         Data_Process();
@@ -148,11 +151,16 @@ void main(void)
         {
             if(serial_diagnost == true)
             {
-                Uart1_Send_Data();
+                Uart1_Data_Send();
             }
             
-            Can_Send_Data();
+            Can_Data_Send();
             can_count = 50;
+        }
+        if(Watchdog_count == 0)
+        {
+            Watchdog_count = 800;
+            CLRWDT();
         }
     }
      return;
@@ -171,6 +179,10 @@ void __interrupt() INTERRUPT_InterruptManager (void)
     if(INTCONbits.TMR0IE == 1 && INTCONbits.TMR0IF == 1)
     {
         TMR0_ISR();
+        if(Watchdog_count>0)
+        {
+            Watchdog_count--;
+        }
         if(ms_count>0)
         {
             ms_count--;

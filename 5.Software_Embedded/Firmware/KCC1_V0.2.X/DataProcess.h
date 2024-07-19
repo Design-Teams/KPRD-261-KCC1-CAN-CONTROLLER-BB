@@ -12,8 +12,6 @@
 #define OUTPUT_ON  1
 #define OUTPUT_OFF 0
 
-#define CANADD 410
-
 #define ADC_Offset 80
 
 #define ADC_Offset_Count 5
@@ -42,29 +40,29 @@ OP_HANDLE Doutput;
 
 extern bool Red_Led,serial_diagnost;
 //bool diagnost_mode;
-uint8_t  can_buf[9],RxBuf[20],DADC[3],can_frame_no;//,adc_overflow;
+uint8_t  CAN_TBuf[9],CAN_RBuf[9],DADC[3],can_frame_no;//,adc_overflow;
 uint8_t  digital_status,uart1_data_flag,uart2_data_flag,can1_data_flag,nrf_data_flag,NRFP_flag,NRFC_flag;
-uint8_t  N_MSB,N_LSB,recv,N_Cap,N_Bat,ADC_PCnt[8],ADC_NCnt[8];;
+uint8_t  CAN_RStatus,ADC_PCnt[8],ADC_NCnt[8];//,N_Cap,N_Bat,N_MSB,N_LSB,
 uint16_t digital_output;
-uint16_t adc_result,ADC[10],NID,N_Load,N_ADC,temp_ADC[15];
+uint16_t ADC[10],NID,N_Load,N_ADC,temp_ADC[15];//adc_result,
 uint32_t CANRID,N_Serial,CANTID;
 volatile uint8_t Uart1_Frame_Flag,Uart2_Frame_Flag,uart1_index,uart2_index;
-volatile char Uart1_array[20],Uart2_array[20];
+char Uart1_array[25],Uart2_array[40];
 volatile uint32_t can_timeout;
 bool Yellow_led;
 
 void Data_Process(void);
 void Uart1_Data_Handler(void);
 void Uart2_Data_Handler(void);
-void Uart1_Send_Data(void);
+void Uart1_Data_Send(void);
 void EUSART1_Receive_ISR(void);
 void EUSART2_Receive_ISR(void);
 void Digital_Output_Handler(void);
 //void Can_to_Uart_Data(void);
 void OSCILLATOR_Initialize(void);
 void System_Initialize(void);
-void Can_Send_Data(void);
-void Check_CAN_Status(void);
+void Can_Data_Send(void);
+void CAN_Request_Send(void);
 #ifdef	__cplusplus
 extern "C" {
 #endif
