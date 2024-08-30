@@ -153,9 +153,8 @@ void main(void)
             {
                 Uart1_Data_Send();
             }
-            
             Can_Data_Send();
-            can_count = 50;
+            can_count = 500;
         }
         if(Watchdog_count == 0)
         {
@@ -229,14 +228,18 @@ void __interrupt() INTERRUPT_InterruptManager (void)
           EUSART1_Receive_ISR();
           PIR1bits.RC1IF = 0;
         } 
-        else if(PIE3bits.RC2IE == 1 && PIR3bits.RC2IF == 1)
+        if(PIE3bits.RC2IE == 1 && PIR3bits.RC2IF == 1)
         {
            EUSART2_Receive_ISR();
            PIR3bits.RC2IF = 0;
         } 
-        else
+        if(PIE5bits.RXB1IE == 1 && PIR5bits.RXB1IF == 1)
         {
-        //Unhandled Interrupt
-        }
+            ECAN_RXB1I_ISR();
+        } 
+        if(PIE5bits.RXB0IE == 1 && PIR5bits.RXB0IF == 1)
+        {
+            ECAN_RXB0I_ISR();
+        } 
     }
 }

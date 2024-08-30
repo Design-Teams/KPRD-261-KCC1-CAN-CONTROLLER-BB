@@ -1,4 +1,4 @@
-# 1 "DataProcess.c"
+# 1 "CRC.c"
 # 1 "<built-in>" 1
 # 1 "<built-in>" 3
 # 288 "<built-in>" 3
@@ -6,7 +6,7 @@
 # 1 "<built-in>" 2
 # 1 "C:/Program Files/Microchip/MPLABX/v5.50/packs/Microchip/PIC18F-K_DFP/1.4.87/xc8\\pic\\include\\language_support.h" 1 3
 # 2 "<built-in>" 2
-# 1 "DataProcess.c" 2
+# 1 "CRC.c" 2
 # 1 "./main.h" 1
 # 12 "./main.h"
 # 1 "C:/Program Files/Microchip/MPLABX/v5.50/packs/Microchip/PIC18F-K_DFP/1.4.87/xc8\\pic\\include\\xc.h" 1 3
@@ -20058,10 +20058,10 @@ extern __attribute__((nonreentrant)) void _delay3(unsigned char);
 
 
 
-# 1 "../../../../../Rahul/PIC18F/PIC18_Library_test/Low_Level/Header\\Timer0.h" 1
-# 21 "../../../../../Rahul/PIC18F/PIC18_Library_test/Low_Level/Header\\Timer0.h"
-# 1 "../../../../../Rahul/PIC18F/PIC18_Library_test/Low_Level/Header/Library_Header.h" 1
-# 23 "../../../../../Rahul/PIC18F/PIC18_Library_test/Low_Level/Header/Library_Header.h"
+# 1 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Low_Level/Header\\Timer0.h" 1
+# 21 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Low_Level/Header\\Timer0.h"
+# 1 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Low_Level/Header/Library_Header.h" 1
+# 23 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Low_Level/Header/Library_Header.h"
 # 1 "C:\\Program Files\\Microchip\\xc8\\v2.45\\pic\\include\\c99\\stdint.h" 1 3
 # 26 "C:\\Program Files\\Microchip\\xc8\\v2.45\\pic\\include\\c99\\stdint.h" 3
 # 1 "C:\\Program Files\\Microchip\\xc8\\v2.45\\pic\\include\\c99\\bits/alltypes.h" 1 3
@@ -20146,10 +20146,10 @@ typedef int32_t int_fast32_t;
 typedef uint16_t uint_fast16_t;
 typedef uint32_t uint_fast32_t;
 # 149 "C:\\Program Files\\Microchip\\xc8\\v2.45\\pic\\include\\c99\\stdint.h" 2 3
-# 23 "../../../../../Rahul/PIC18F/PIC18_Library_test/Low_Level/Header/Library_Header.h" 2
+# 23 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Low_Level/Header/Library_Header.h" 2
 
 # 1 "C:\\Program Files\\Microchip\\xc8\\v2.45\\pic\\include\\c99\\stdbool.h" 1 3
-# 24 "../../../../../Rahul/PIC18F/PIC18_Library_test/Low_Level/Header/Library_Header.h" 2
+# 24 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Low_Level/Header/Library_Header.h" 2
 
 # 1 "C:\\Program Files\\Microchip\\xc8\\v2.45\\pic\\include\\c99\\string.h" 1 3
 # 25 "C:\\Program Files\\Microchip\\xc8\\v2.45\\pic\\include\\c99\\string.h" 3
@@ -20208,7 +20208,7 @@ size_t strxfrm_l (char *restrict, const char *restrict, size_t, locale_t);
 
 
 void *memccpy (void *restrict, const void *restrict, int, size_t);
-# 25 "../../../../../Rahul/PIC18F/PIC18_Library_test/Low_Level/Header/Library_Header.h" 2
+# 25 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Low_Level/Header/Library_Header.h" 2
 
 # 1 "C:\\Program Files\\Microchip\\xc8\\v2.45\\pic\\include\\c99\\stdio.h" 1 3
 # 24 "C:\\Program Files\\Microchip\\xc8\\v2.45\\pic\\include\\c99\\stdio.h" 3
@@ -20362,8 +20362,8 @@ char *ctermid(char *);
 
 
 char *tempnam(const char *, const char *);
-# 26 "../../../../../Rahul/PIC18F/PIC18_Library_test/Low_Level/Header/Library_Header.h" 2
-# 21 "../../../../../Rahul/PIC18F/PIC18_Library_test/Low_Level/Header\\Timer0.h" 2
+# 26 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Low_Level/Header/Library_Header.h" 2
+# 21 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Low_Level/Header\\Timer0.h" 2
 
 
 
@@ -20371,72 +20371,108 @@ char *tempnam(const char *, const char *);
 
 
 volatile uint16_t timer0ReloadVal;
-# 38 "../../../../../Rahul/PIC18F/PIC18_Library_test/Low_Level/Header\\Timer0.h"
+# 38 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Low_Level/Header\\Timer0.h"
 void TMR0_Initialize(uint16_t delay);
-# 47 "../../../../../Rahul/PIC18F/PIC18_Library_test/Low_Level/Header\\Timer0.h"
+# 47 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Low_Level/Header\\Timer0.h"
 void TMR0_StartTimer(void);
-# 56 "../../../../../Rahul/PIC18F/PIC18_Library_test/Low_Level/Header\\Timer0.h"
+# 56 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Low_Level/Header\\Timer0.h"
 void TMR0_ISR(void);
 # 15 "./main.h" 2
 
-# 1 "../../../../../Rahul/PIC18F/PIC18_Library_test/Low_Level/Header\\EUSART.h" 1
-# 36 "../../../../../Rahul/PIC18F/PIC18_Library_test/Low_Level/Header\\EUSART.h"
+# 1 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Low_Level/Header\\EUSART.h" 1
+# 36 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Low_Level/Header\\EUSART.h"
  void EUSART1_Initialize(uint32_t oscillator,uint32_t baudrate);
-# 46 "../../../../../Rahul/PIC18F/PIC18_Library_test/Low_Level/Header\\EUSART.h"
+# 46 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Low_Level/Header\\EUSART.h"
 void EUSART1_Write(uint8_t txData);
-# 57 "../../../../../Rahul/PIC18F/PIC18_Library_test/Low_Level/Header\\EUSART.h"
+# 57 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Low_Level/Header\\EUSART.h"
 void EUSART1_String(char *txData);
-# 70 "../../../../../Rahul/PIC18F/PIC18_Library_test/Low_Level/Header\\EUSART.h"
+# 70 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Low_Level/Header\\EUSART.h"
 void EUSART2_Initialize(uint32_t oscillator,uint32_t baudrate);
-# 81 "../../../../../Rahul/PIC18F/PIC18_Library_test/Low_Level/Header\\EUSART.h"
+# 81 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Low_Level/Header\\EUSART.h"
 void EUSART2_Write(uint8_t txData);
-# 92 "../../../../../Rahul/PIC18F/PIC18_Library_test/Low_Level/Header\\EUSART.h"
+# 92 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Low_Level/Header\\EUSART.h"
 void EUSART2_String(char *txData);
-# 103 "../../../../../Rahul/PIC18F/PIC18_Library_test/Low_Level/Header\\EUSART.h"
+# 103 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Low_Level/Header\\EUSART.h"
 void Soft_Uart_Initialize(void);
-# 114 "../../../../../Rahul/PIC18F/PIC18_Library_test/Low_Level/Header\\EUSART.h"
+# 114 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Low_Level/Header\\EUSART.h"
 void Soft_UART_Write(uint8_t Data);
-# 125 "../../../../../Rahul/PIC18F/PIC18_Library_test/Low_Level/Header\\EUSART.h"
+# 125 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Low_Level/Header\\EUSART.h"
 void Soft_UART_Array(uint8_t *array, uint8_t length);
-# 137 "../../../../../Rahul/PIC18F/PIC18_Library_test/Low_Level/Header\\EUSART.h"
+# 137 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Low_Level/Header\\EUSART.h"
 extern __attribute__((inline)) void Soft_Uart_Tx(_Bool stat);
 # 16 "./main.h" 2
 
-# 1 "./ECAN_Filter.h" 1
-# 40 "./ECAN_Filter.h"
-void Init_Ecan(uint16_t bitrate,_Bool filter,uint16_t filter_id);
-# 65 "./ECAN_Filter.h"
-unsigned char Read_ECan(uint8_t* Ext,uint32_t* CanId,uint8_t Dlc,uint8_t Rtr, uint8_t* Data);
-# 79 "./ECAN_Filter.h"
-void ECanIdWrite(uint8_t Ext,uint32_t CanId);
-# 92 "./ECAN_Filter.h"
-void ECAN_WriteDlcRtr(uint8_t Dlc,uint8_t Rtr);
-# 106 "./ECAN_Filter.h"
-void ECAN_WriteData(uint8_t Dlc,uint8_t *Data);
-# 122 "./ECAN_Filter.h"
-void ECanWriteMessage(uint8_t Ext,uint32_t CanId,uint8_t Dlc, uint8_t Rtr, uint8_t *Data);
+# 1 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Low_Level/Header\\ecan.h" 1
+# 61 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Low_Level/Header\\ecan.h"
+typedef struct
+{
+    uint8_t idType;
+    uint8_t dlc;
+    uint8_t data0;
+    uint8_t data1;
+    uint8_t data2;
+    uint8_t data3;
+    uint8_t data4;
+    uint8_t data5;
+    uint8_t data6;
+    uint8_t data7;
+    uint32_t id;
+}uCAN_MSG;
+# 88 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Low_Level/Header\\ecan.h"
+volatile uint8_t can_flag;
+
+uint8_t Check_CAN_Interrupt(void);
+# 116 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Low_Level/Header\\ecan.h"
+void ECAN_Initialize(uint16_t bitrate,_Bool filter,uint32_t filter_id);
+# 138 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Low_Level/Header\\ecan.h"
+void CAN_sleep(void);
+# 159 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Low_Level/Header\\ecan.h"
+uint8_t CAN_transmit(uCAN_MSG *tempCanMsg);
+# 183 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Low_Level/Header\\ecan.h"
+uint8_t CAN_receive(uCAN_MSG *tempCanMsg);
+# 205 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Low_Level/Header\\ecan.h"
+uint8_t CAN_messagesInBuffer(void);
+# 229 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Low_Level/Header\\ecan.h"
+uint8_t CAN_isBusOff(void);
+# 253 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Low_Level/Header\\ecan.h"
+uint8_t CAN_isRXErrorPassive(void);
+# 277 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Low_Level/Header\\ecan.h"
+uint8_t CAN_isTXErrorPassive(void);
+# 317 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Low_Level/Header\\ecan.h"
+void ECAN_SetRXB0InterruptHandler(void (*handler)(void));
+# 332 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Low_Level/Header\\ecan.h"
+void ECAN_RXB0I_ISR(void);
+# 372 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Low_Level/Header\\ecan.h"
+void ECAN_SetRXB1InterruptHandler(void (*handler)(void));
+# 387 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Low_Level/Header\\ecan.h"
+void ECAN_RXB1I_ISR(void);
+# 427 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Low_Level/Header\\ecan.h"
+void ECAN_SetWakeUpInterruptHandler(void (*handler)(void));
+# 442 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Low_Level/Header\\ecan.h"
+void ECAN_WAKI_ISR(void);
 # 17 "./main.h" 2
 
-# 1 "../../../../../Rahul/PIC18F/PIC18_Library_test/Low_Level/Header\\SPI.h" 1
-# 40 "../../../../../Rahul/PIC18F/PIC18_Library_test/Low_Level/Header\\SPI.h"
-void SPI_Init_Master(uint8_t mode);
-# 52 "../../../../../Rahul/PIC18F/PIC18_Library_test/Low_Level/Header\\SPI.h"
-uint8_t SPI_Exchange(uint8_t data);
-# 65 "../../../../../Rahul/PIC18F/PIC18_Library_test/Low_Level/Header\\SPI.h"
-void SPI_Write_Cmd(uint8_t cmd, uint16_t data);
-# 18 "./main.h" 2
 
-# 1 "../../../../../Rahul/PIC18F/PIC18_Library_test/Low_Level/Header\\InternalADC.h" 1
-# 29 "../../../../../Rahul/PIC18F/PIC18_Library_test/Low_Level/Header\\InternalADC.h"
-void ADC_Initialize(void);
-# 40 "../../../../../Rahul/PIC18F/PIC18_Library_test/Low_Level/Header\\InternalADC.h"
-uint16_t Get_Adc_Data(uint8_t channel);
-# 52 "../../../../../Rahul/PIC18F/PIC18_Library_test/Low_Level/Header\\InternalADC.h"
-uint16_t Read_adc(uint8_t channel);
+# 1 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Low_Level/Header\\SPI.h" 1
+# 40 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Low_Level/Header\\SPI.h"
+void SPI_Init_Master(uint8_t mode);
+# 52 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Low_Level/Header\\SPI.h"
+uint8_t SPI_Exchange(uint8_t data);
+# 65 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Low_Level/Header\\SPI.h"
+void SPI_Write_Cmd(uint8_t cmd, uint16_t data);
 # 19 "./main.h" 2
 
-# 1 "../../../../../Rahul/PIC18F/PIC18_Library_test/Device_Level/Header\\MC33972.h" 1
-# 23 "../../../../../Rahul/PIC18F/PIC18_Library_test/Device_Level/Header\\MC33972.h"
+# 1 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Low_Level/Header\\InternalADC.h" 1
+# 29 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Low_Level/Header\\InternalADC.h"
+void ADC_Initialize(void);
+# 41 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Low_Level/Header\\InternalADC.h"
+uint16_t Get_Adc_Data(uint8_t channel,uint16_t samples);
+# 53 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Low_Level/Header\\InternalADC.h"
+uint16_t Read_adc(uint8_t channel);
+# 20 "./main.h" 2
+
+# 1 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Device_Level/Header\\MC33972.h" 1
+# 23 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Device_Level/Header\\MC33972.h"
 typedef enum
 {
     Reset_Cmd = 0x7F,
@@ -20444,32 +20480,32 @@ typedef enum
     Analog_Cmd = 0x06,
     Switch_Bat = 0x01,
 }MC_Init;
-# 42 "../../../../../Rahul/PIC18F/PIC18_Library_test/Device_Level/Header\\MC33972.h"
+# 42 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Device_Level/Header\\MC33972.h"
 void MC33972_Init(void);
-# 52 "../../../../../Rahul/PIC18F/PIC18_Library_test/Device_Level/Header\\MC33972.h"
+# 52 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Device_Level/Header\\MC33972.h"
 void MC33972_Read_ADC(uint16_t channel);
 
 extern __attribute__((inline)) void MC33972_CS(_Bool stat);
-# 20 "./main.h" 2
+# 21 "./main.h" 2
 
-# 1 "../../../../../Rahul/PIC18F/PIC18_Library_test/Device_Level/Header\\MC33996.h" 1
-# 39 "../../../../../Rahul/PIC18F/PIC18_Library_test/Device_Level/Header\\MC33996.h"
+# 1 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Device_Level/Header\\MC33996.h" 1
+# 39 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Device_Level/Header\\MC33996.h"
 uint16_t output;
-# 52 "../../../../../Rahul/PIC18F/PIC18_Library_test/Device_Level/Header\\MC33996.h"
+# 52 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Device_Level/Header\\MC33996.h"
 void MC33996_Digitalwrite(uint8_t pin, uint8_t status);
-# 62 "../../../../../Rahul/PIC18F/PIC18_Library_test/Device_Level/Header\\MC33996.h"
+# 62 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Device_Level/Header\\MC33996.h"
 void MC33996_Init(void);
-# 74 "../../../../../Rahul/PIC18F/PIC18_Library_test/Device_Level/Header\\MC33996.h"
+# 74 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Device_Level/Header\\MC33996.h"
 uint8_t MC33996_SPI_Check(void);
 
 extern __attribute__((inline)) void MC33996_CS(_Bool stat);
 
 extern __attribute__((inline)) void MC33996_RST(_Bool stat);
-# 21 "./main.h" 2
+# 22 "./main.h" 2
 
 
 # 1 "./DataProcess.h" 1
-# 19 "./DataProcess.h"
+# 21 "./DataProcess.h"
 typedef struct
 {
     uint8_t Output_1:1;
@@ -20490,16 +20526,26 @@ typedef struct
     uint8_t Output_16:1;
 }OP_HANDLE;
 
+typedef struct
+{
+    uint8_t CAN_Buf[9];
+    uint32_t CANID;
+}CAN_data;
+
 OP_HANDLE Doutput;
+
+CAN_data CAN_Txpara,CAN_Rxpara;
+
+uCAN_MSG ECAN_TxMSG,ECAN_RxMSG;
 
 extern _Bool Red_Led,serial_diagnost;
 
-uint8_t CAN_TBuf[9],CAN_RBuf[9],DADC[3],can_frame_no;
+uint8_t DADC[3];
 uint8_t digital_status,uart1_data_flag,uart2_data_flag,can1_data_flag,nrf_data_flag,NRFP_flag,NRFC_flag;
 uint8_t CAN_RStatus,ADC_PCnt[8],ADC_NCnt[8];
 uint16_t digital_output;
 uint16_t ADC[10],NID,N_Load,N_ADC,temp_ADC[15];
-uint32_t CANRID,N_Serial,CANTID;
+uint32_t N_Serial;
 volatile uint8_t Uart1_Frame_Flag,Uart2_Frame_Flag,uart1_index,uart2_index;
 char Uart1_array[25],Uart2_array[40];
 volatile uint32_t can_timeout;
@@ -20517,9 +20563,9 @@ void OSCILLATOR_Initialize(void);
 void System_Initialize(void);
 void Can_Data_Send(void);
 void CAN_Request_Send(void);
-# 23 "./main.h" 2
+# 24 "./main.h" 2
 
-# 1 "../../../../../Rahul/PIC18F/PIC18_Library_test/Low_Level/Header\\Internal_EEPROM.h" 1
+# 1 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Low_Level/Header\\Internal_EEPROM.h" 1
 
 
 
@@ -20529,1072 +20575,26 @@ uint8_t Eeprom_Read(uint16_t Addr);
 void Eeprom_Write(uint16_t Addr,uint8_t Data);
 void Eeprom_Write_Array(uint16_t Addr,uint8_t *Data, uint8_t length);
 void Eeprom_Read_Array(uint16_t Addr,uint8_t *Data, uint8_t length);
-# 24 "./main.h" 2
+# 25 "./main.h" 2
 
 
+# 1 "./CRC.h" 1
+# 11 "./CRC.h"
+uint16_t Check_Sum(uint16_t CRC_data);
+# 27 "./main.h" 2
 
 volatile uint16_t ms_count,can_count,Led_Count,blink_flag,Watchdog_count;
 extern volatile uint32_t can_timeout;
 _Bool Red_Led,serial_diagnost;
 extern _Bool Yellow_led;
 void Delay_Ms(uint16_t delay);
-# 1 "DataProcess.c" 2
-# 19 "DataProcess.c"
-__attribute__((inline)) void MC33972_CS(_Bool stat)
+# 1 "CRC.c" 2
+# 10 "CRC.c"
+uint16_t Check_Sum(uint16_t CRC_data)
 {
-    LATAbits.LATA0 = stat;
-}
-__attribute__((inline)) void MC33996_CS(_Bool stat)
-{
-    LATCbits.LATC2 = stat;
-}
+    uint16_t cs;
 
-__attribute__((inline)) void MC33996_RST(_Bool stat)
-{
-    LATCbits.LATC1 = stat;
-}
+    cs = ((0xffff-CRC_data)+ 1);
 
-__attribute__((inline)) void Soft_Uart_Tx(_Bool stat)
-{
-    LATBbits.LATB5 = stat;
-}
-# 46 "DataProcess.c"
-void OSCILLATOR_Initialize(void)
-{
-
-    OSCCON = 0x60;
-
-    OSCCON2 = 0x00;
-
-    OSCTUNE = 0x00;
-
-    REFOCON = 0x00;
-}
-# 66 "DataProcess.c"
-void System_Initialize(void)
-{
-    uint8_t read=0;
-    char buf[20]={0};
-    uint16_t CAN_Speed=0;
-    TRISA = 0x00;
-    TRISB = 0x00;
-    TRISC = 0x00;
-
-    LATA = 0x00;
-    LATB = 0x00;
-    LATC = 0x00;
-
-
-    TRISCbits.TRISC2 = 0;
-
-    LATCbits.LATC2 = 1;
-    CM1CON = 0x00;
-    TRISCbits.TRISC0 = 0;
-    LATBbits.LATB2 = 1;
-     __asm(" clrwdt");
-    OSCILLATOR_Initialize();
-    TMR0_Initialize(1);
-    EUSART1_Initialize(44236800,57600);
-    EUSART2_Initialize(44236800,9600);
-
-    LATBbits.LATB2 = 1;
-    __asm(" clrwdt");
-
-    __asm(" clrwdt");
-    read = Eeprom_Read(5);
-    if(read != 'R')
-    {
-      CANTID = 409;
-      Eeprom_Write(2,1);
-      CAN_Speed = 250;
-      Eeprom_Write(1,3);
-      Eeprom_Write(5,'R');
-    }
-    else
-    {
-       read = Eeprom_Read(1);
-       if(read == 1)
-       {
-           CAN_Speed = 100;
-       }
-       else if(read == 2)
-       {
-           CAN_Speed = 125;
-       }
-       else if(read == 3)
-       {
-           CAN_Speed = 250;
-       }
-       else if(read == 4)
-       {
-           CAN_Speed = 500;
-       }
-       read = Eeprom_Read(2);
-       if(read == 1)
-       {
-          CANTID = 409;
-       }
-       else if(read == 2)
-       {
-          CANTID = 410;
-       }
-
-    }
-    if((CANTID == 409)&&(CAN_Speed == 250))
-    {
-         EUSART1_String("Default Setting\r\n");
-    }
-    else
-    {
-        EUSART1_String("User Setting\r\n");
-    }
-     __asm(" clrwdt");
-    Init_Ecan(CAN_Speed,1,(uint16_t)CANTID);
-    INTCONbits.PEIE = 1;
-    INTCONbits.GIE = 1;
-
-    SPI_Init_Master(1);
-    ADC_Initialize();
-    ANCON0 = 0x08;
-    ANCON1 = 0x00;
-    TRISAbits.TRISA3 = 1;
-    TMR0_StartTimer();
-    LATCbits.LATC1 = 1;
-    __asm(" clrwdt");
-    Delay_Ms(500);
-    __asm(" clrwdt");
-    Delay_Ms(500);
-    __asm(" clrwdt");
-    Delay_Ms(500);
-    __asm(" clrwdt");
-    Delay_Ms(500);
-
-    if(MC33996_SPI_Check() == 1)
-    {
-      EUSART1_String("SPI Check OK\r\n");
-      LATCbits.LATC0 = 1;
-      Delay_Ms(300);
-      __asm(" clrwdt");
-      LATCbits.LATC0 = 0;
-    }
-    else
-    {
-        EUSART1_String("SPI Check error\r\n");
-        LATAbits.LATA2 = 1;
-        Delay_Ms(500);
-        __asm(" clrwdt");
-        Delay_Ms(500);
-        __asm(" clrwdt");
-        LATAbits.LATA2 = 1;
-    }
-
-    MC33996_Init();
-    Delay_Ms(100);
-    __asm(" clrwdt");
-    MC33972_Init();
-    EUSART1_String("MSDI init done\r\n");
-    Delay_Ms(500);
-    __asm(" clrwdt");
-    LATBbits.LATB3 = 0;
- TRISBbits.TRISB2 = 0;
- TRISBbits.TRISB3 = 1;
-    sprintf(buf,"KCC1_V0.2 CANID = %d,CANSpeed = %d\r\n",(uint16_t)CANTID,CAN_Speed);
-    EUSART1_String(buf);
-
-
-    LATAbits.LATA1 = 1;
-    Delay_Ms(300);
-    __asm(" clrwdt");
-    LATAbits.LATA1 = 0;
-     Delay_Ms(30);
-    LATAbits.LATA2 = 1;
-    Delay_Ms(300);
-    LATAbits.LATA2 = 0;
-    CAN_Request_Send();
-    __asm(" clrwdt");
-}
-# 216 "DataProcess.c"
-void Uart1_Data_Handler(void)
-{
-    char* token,token_buf[9][10];
-    uint8_t k;
-    if(memcmp(((char*)Uart1_array+1),",OD,",4) == 0)
-    {
-        uart1_data_flag = 1;
-
-        token = strtok((char*)Uart1_array, ",");
-        token = strtok(((void*)0),",");
-        for(k=0; k<1; k++)
-        {
-            token = strtok(((void*)0),",");
-            sprintf(token_buf[k],"%s",token);
-        }
-        digital_output = (uint16_t)(atol(token_buf[0]));
-
-    }
-    else if(memcmp(((char*)Uart1_array+1),",SD,",4) == 0)
-    {
-        serial_diagnost = 1;
-    }
-    else if(memcmp(((char*)Uart1_array+1),",SP,",4) == 0)
-    {
-        NRFP_flag = 1;
-        token = strtok((char*)Uart1_array, ",");
-        token = strtok(((void*)0),",");
-        for(k=0; k<1; k++)
-        {
-            token = strtok(((void*)0),",");
-            sprintf(token_buf[k],"%s",token);
-        }
-        N_Serial = (uint32_t)(atol(token_buf[0]));
-    }
-    else if(memcmp(((char*)Uart1_array+1),",SC,",4) == 0)
-    {
-        NRFC_flag = 1;
-        token = strtok((char*)Uart1_array, ",");
-        token = strtok(((void*)0),",");
-        for(k=0; k<1; k++)
-        {
-            token = strtok(((void*)0),",");
-            sprintf(token_buf[k],"%s",token);
-        }
-        N_Serial = (uint32_t)(atol(token_buf[0]));
-
-    }
-}
-# 272 "DataProcess.c"
-void Uart2_Data_Handler(void)
-{
-    char* token,token_buf[6][10],lbuf[5];
-    uint8_t k;
-
-    if(memcmp(((char*)Uart2_array+1),",LP,",4) == 0)
-    {
-        nrf_data_flag = 1;
-        token = strtok((char*)Uart2_array, ",");
-        token = strtok(((void*)0),",");
-        for(k=0; k<6; k++)
-        {
-            token = strtok(((void*)0),",");
-            sprintf(token_buf[k],"%s",token);
-        }
-        memset(CAN_TBuf,0x00,8*sizeof(uint8_t));
-        CANRID = 0;
-        N_Load = 0;
-        N_ADC = 0;
-        CANRID = (uint16_t)(atol(token_buf[0]));
-        N_Load = (uint16_t)(atol(token_buf[1]));
-        N_ADC = (uint16_t)(atol(token_buf[2]));
-        CAN_TBuf[4] = (uint8_t)(atol(token_buf[3]));
-        CAN_TBuf[5] = (uint8_t)(((atol(token_buf[4]))& 0xFF00)>>8);
-        CAN_TBuf[6] = (uint8_t)(((atol(token_buf[4]))& 0x00FF)>>0);
-        CAN_TBuf[7] = (uint8_t)(atol(token_buf[5]));
-        CAN_TBuf[0] = (uint8_t)((N_Load & 0xFF00)>>8);
-        CAN_TBuf[1] = (uint8_t)((N_Load & 0x00FF)>>0);
-        CAN_TBuf[2] = (uint8_t)((N_ADC & 0xFF00)>>8);
-        CAN_TBuf[3] = (uint8_t)((N_ADC & 0x00FF)>>0);
-
-    }
-}
-
-
-
-
-
-
-
-void Can_Data_Send(void)
-{
-    if(can_frame_no == 0)
-    {
-        CAN_TBuf[0] = 0x01;
-        CAN_TBuf[1] = (uint8_t)((ADC[0]&0xFF00)>>8);
-        CAN_TBuf[2] = (uint8_t)((ADC[0]&0x00FF)>>0);
-        CAN_TBuf[3] = (uint8_t)((ADC[1]&0xFF00)>>8);
-        CAN_TBuf[4] = (uint8_t)((ADC[1]&0x00FF)>>0);
-        CAN_TBuf[5] = (uint8_t)((ADC[2]&0xFF00)>>8);
-        CAN_TBuf[6] = (uint8_t)((ADC[2]&0x00FF)>>0);
-        CAN_TBuf[7] = DADC[0];
-        ECanWriteMessage(0,CANTID,8,0,CAN_TBuf);
-        can_frame_no++;
-    }
-    else if(can_frame_no == 1)
-    {
-        CAN_TBuf[0] = 0x02;
-        CAN_TBuf[1] = (uint8_t)((ADC[3]&0xFF00)>>8);
-        CAN_TBuf[2] = (uint8_t)((ADC[3]&0x00FF)>>0);
-        CAN_TBuf[3] = (uint8_t)((ADC[4]&0xFF00)>>8);
-        CAN_TBuf[4] = (uint8_t)((ADC[4]&0x00FF)>>0);
-        CAN_TBuf[5] = (uint8_t)((ADC[5]&0xFF00)>>8);
-        CAN_TBuf[6] = (uint8_t)((ADC[5]&0x00FF)>>0);
-        CAN_TBuf[7] = DADC[1];
-        ECanWriteMessage(0,CANTID,8,0,CAN_TBuf);
-        can_frame_no++;
-    }
-    else if(can_frame_no == 2)
-    {
-        CAN_TBuf[0] = 0x03;
-        CAN_TBuf[1] = (uint8_t)((ADC[7]&0xFF00)>>8);
-        CAN_TBuf[2] = (uint8_t)((ADC[7]&0x00FF)>>0);
-        CAN_TBuf[3] = (uint8_t)((ADC[6]&0xFF00)>>8);
-        CAN_TBuf[4] = (uint8_t)((ADC[6]&0x00FF)>>0);
-        CAN_TBuf[5] = (uint8_t)((ADC[9]&0xFF00)>>8);
-        CAN_TBuf[6] = (uint8_t)((ADC[9]&0x00FF)>>0);
-        CAN_TBuf[7] = DADC[2];
-        ECanWriteMessage(0,CANTID,8,0,CAN_TBuf);
-        can_frame_no++;
-    }
-    else if(can_frame_no == 3)
-    {
-        CAN_TBuf[0] = 0x04;
-        CAN_TBuf[1] = (uint8_t)((ADC[8]&0xFF00)>>8);
-        CAN_TBuf[2] = (uint8_t)((ADC[8]&0x00FF)>>0);
-        CAN_TBuf[3] = 0;
-        CAN_TBuf[4] = 0;
-        CAN_TBuf[5] = 0;
-        CAN_TBuf[6] = 0;
-        CAN_TBuf[7] = 0;
-        ECanWriteMessage(0,CANTID,8,0,CAN_TBuf);
-        can_frame_no = 0;
-    }
-}
-
-void CAN_Request_Send(void)
-{
-    memset(CAN_TBuf,0x00,8*sizeof(uint8_t));
-    CAN_TBuf[0] = 'S';
-    CAN_TBuf[1] = 'T';
-    CAN_TBuf[2] = 'A';
-    CAN_TBuf[3] = 'T';
-    ECanWriteMessage(0,CANTID,8,0,CAN_TBuf);
-    Delay_Ms(100);
-    memset(CAN_TBuf,0x00,8*sizeof(uint8_t));
-    Yellow_led = 0;
-    can_timeout = 10000;
-}
-# 406 "DataProcess.c"
-void Data_Process(void)
-{
-    uint8_t channel = 0;
-    char temp_buf[20]={0};
-    float F_temp=0.0;
-    memset(temp_ADC,0x00,15*sizeof(uint16_t));
-    memset(DADC,0x00,3*sizeof(uint16_t));
-    MC33972_Read_ADC(0x0001);
-    Delay_Ms(1);
-    ADC[0] = Get_Adc_Data(3);
-    ADC[0] = (uint16_t)((ADC[0]*0.00735)*10);
-    Delay_Ms(1);
-    for(channel=7;channel<22;channel++)
-    {
-        MC33972_Read_ADC(0x0001 +channel);
-        Delay_Ms(1);
-        temp_ADC[channel-7]=Get_Adc_Data(3);
-    }
-
-    F_temp = (float)(temp_ADC[5]/0.85);
-    F_temp/=10;
-    ADC[1] = (uint16_t)F_temp;
-# 441 "DataProcess.c"
-    if(temp_ADC[4]>(ADC[2]+80))
-    {
-        ADC_PCnt[0]+=1;
-        if(ADC_PCnt[0]>5)
-        {
-            ADC[2] = temp_ADC[4];
-            ADC_PCnt[0] = 0;
-        }
-    }
-    else if(ADC[2]>80)
-    {
-        if(temp_ADC[4]<(ADC[2]-80))
-        {
-            ADC_NCnt[0]+=1;
-            if(ADC_NCnt[0]>5)
-            {
-               ADC[2] = temp_ADC[4];
-               ADC_NCnt[0] = 0;
-            }
-        }
-        else
-        {
-           ADC[2] = temp_ADC[4];
-        }
-    }
-    else
-    {
-        ADC[2] = temp_ADC[4];
-    }
-
-
-    if(temp_ADC[3]>(ADC[3]+80))
-    {
-        ADC_PCnt[1]+=1;
-        if(ADC_PCnt[1]>5)
-        {
-            ADC[3] = temp_ADC[3];
-            ADC_PCnt[1] = 0;
-        }
-    }
-    else if(ADC[3]>80)
-    {
-        if(temp_ADC[3]<(ADC[3]-80))
-        {
-            ADC_NCnt[1]+=1;
-            if(ADC_NCnt[1]>5)
-            {
-               ADC[3] = temp_ADC[3];
-               ADC_NCnt[1] = 0;
-            }
-        }
-        else
-        {
-           ADC[3] = temp_ADC[3];
-        }
-    }
-    else
-    {
-        ADC[3] = temp_ADC[3];
-    }
-
-
-    if(temp_ADC[2]>(ADC[4]+80))
-    {
-        ADC_PCnt[2]+=1;
-        if(ADC_PCnt[2]>5)
-        {
-            ADC[4] = temp_ADC[2];
-            ADC_PCnt[2] = 0;
-        }
-    }
-    else if(ADC[4]>80)
-    {
-        if(temp_ADC[2]<(ADC[4]-80))
-        {
-            ADC_NCnt[2]+=1;
-            if(ADC_NCnt[2]>5)
-            {
-               ADC[4] = temp_ADC[2];
-               ADC_NCnt[2] = 0;
-            }
-        }
-        else
-        {
-           ADC[4] = temp_ADC[2];
-        }
-    }
-    else
-    {
-        ADC[4] = temp_ADC[2];
-    }
-
-
-    if(temp_ADC[1]>(ADC[5]+80))
-    {
-        ADC_PCnt[3]+=1;
-        if(ADC_PCnt[3]>5)
-        {
-            ADC[5] = temp_ADC[1];
-            ADC_PCnt[3] = 0;
-        }
-    }
-    else if(ADC[5]>80)
-    {
-        if(temp_ADC[1]<(ADC[5]-80))
-        {
-            ADC_NCnt[3]+=1;
-            if(ADC_NCnt[3]>5)
-            {
-               ADC[5] = temp_ADC[1];
-               ADC_NCnt[3] = 0;
-            }
-        }
-        else
-        {
-           ADC[5] = temp_ADC[1];
-        }
-    }
-    else
-    {
-        ADC[5] = temp_ADC[1];
-    }
-
-
-    if(temp_ADC[0]>(ADC[6]+80))
-    {
-        ADC_PCnt[4]+=1;
-        if(ADC_PCnt[4]>5)
-        {
-            ADC[6] = temp_ADC[0];
-            ADC_PCnt[4] = 0;
-        }
-    }
-    else if(ADC[6]>80)
-    {
-        if(temp_ADC[0]<(ADC[6]-80))
-        {
-            ADC_NCnt[4]+=1;
-            if(ADC_NCnt[4]>5)
-            {
-               ADC[6] = temp_ADC[0];
-               ADC_NCnt[4] = 0;
-            }
-        }
-        else
-        {
-           ADC[6] = temp_ADC[0];
-        }
-    }
-    else
-    {
-        ADC[6] = temp_ADC[0];
-    }
-
-
-    if(temp_ADC[7]>(ADC[7]+80))
-    {
-        ADC_PCnt[5]+=1;
-        if(ADC_PCnt[5]>5)
-        {
-            ADC[7] = temp_ADC[7];
-            ADC_PCnt[5] = 0;
-        }
-    }
-    else if(ADC[7]>80)
-    {
-        if(temp_ADC[7]<(ADC[7]-80))
-        {
-            ADC_NCnt[5]+=1;
-            if(ADC_NCnt[5]>5)
-            {
-               ADC[7] = temp_ADC[7];
-               ADC_NCnt[5] = 0;
-            }
-        }
-        else
-        {
-           ADC[7] = temp_ADC[7];
-        }
-    }
-    else
-    {
-        ADC[7] = temp_ADC[7];
-    }
-
-
-    if(temp_ADC[8]>(ADC[8]+80))
-    {
-        ADC_PCnt[6]+=1;
-        if(ADC_PCnt[6]>5)
-        {
-            ADC[8] = temp_ADC[8];
-            ADC_PCnt[6] = 0;
-        }
-    }
-    else if(ADC[8]>80)
-    {
-        if(temp_ADC[8]<(ADC[8]-80))
-        {
-            ADC_NCnt[6]+=1;
-            if(ADC_NCnt[6]>5)
-            {
-               ADC[8] = temp_ADC[8];
-               ADC_NCnt[6] = 0;
-            }
-        }
-        else
-        {
-           ADC[8] = temp_ADC[8];
-        }
-    }
-    else
-    {
-        ADC[8] = temp_ADC[8];
-    }
-
-
-    if(temp_ADC[9]>(ADC[9]+80))
-    {
-        ADC_PCnt[7]+=1;
-        if(ADC_PCnt[7]>5)
-        {
-            ADC[9] = temp_ADC[9];
-            ADC_PCnt[7] = 0;
-        }
-    }
-    else if(ADC[9]>80)
-    {
-        if(temp_ADC[9]<(ADC[9]-80))
-        {
-            ADC_NCnt[7]+=1;
-            if(ADC_NCnt[7]>5)
-            {
-               ADC[9] = temp_ADC[9];
-               ADC_NCnt[7] = 0;
-            }
-        }
-        else
-        {
-           ADC[9] = temp_ADC[9];
-        }
-    }
-    else
-    {
-        ADC[9] = temp_ADC[9];
-    }
-
-    if((temp_ADC[10]>1790) && (temp_ADC[10]<1995))
-    {
-       DADC[2] |=0x01;
-    }
-    else if((temp_ADC[10]>1000) && (temp_ADC[10]<1700))
-    {
-        DADC[2] &=~0x01;
-        DADC[0] &=~0x01;
-        DADC[1] &=~0x01;
-    }
-    else if(temp_ADC[10]<100)
-    {
-        DADC[0] |=0x01;
-    }
-    else if(temp_ADC[10]>3000)
-    {
-       DADC[1] |=0x01;
-    }
-
-    if((temp_ADC[11]>1790) && (temp_ADC[11]<1995))
-    {
-       DADC[2] |=0x02;
-    }
-    else if((temp_ADC[11]>1000) && (temp_ADC[11]<1700))
-    {
-        DADC[2] &=~0x02;
-        DADC[0] &=~0x02;
-        DADC[1] &=~0x02;
-    }
-    else if(temp_ADC[11]<100)
-    {
-        DADC[0] |=0x02;
-    }
-    else if(temp_ADC[11]>3000)
-    {
-        DADC[1] |=0x02;
-    }
-
-    if((temp_ADC[12]>1790) && (temp_ADC[12]<1995))
-    {
-        DADC[2] |=0x04;
-    }
-    else if((temp_ADC[12]>1000) && (temp_ADC[12]<1700))
-    {
-        DADC[2] &=~0x04;
-        DADC[0] &=~0x04;
-        DADC[1] &=~0x04;
-    }
-    else if(temp_ADC[12]<100)
-    {
-        DADC[0] |=0x04;
-    }
-    else if(temp_ADC[12]>3000)
-    {
-        DADC[1] |=0x04;
-    }
-
-    if((temp_ADC[13]>1790) && (temp_ADC[13]<1995))
-    {
-        DADC[2] |=0x08;
-    }
-    else if((temp_ADC[13]>1000) && (temp_ADC[13]<1700))
-    {
-        DADC[2] &=~0x08;
-        DADC[0] &=~0x08;
-        DADC[1] &=~0x08;
-    }
-   else if(temp_ADC[13]<100)
-    {
-        DADC[0] |=0x08;
-    }
-    else if(temp_ADC[13]>3000)
-    {
-        DADC[1] |=0x08;
-    }
-
-    if((temp_ADC[14]>1790) && (temp_ADC[14]<1995))
-    {
-        DADC[2] |=0x10;
-    }
-    else if((temp_ADC[14]>1000) && (temp_ADC[14]<1700))
-    {
-        DADC[2] &=~0x10;
-        DADC[0] &=~0x10;
-        DADC[1] &=~0x10;
-    }
-   else if(temp_ADC[14]<100)
-    {
-        DADC[0] |=0x10;
-    }
-    else if(temp_ADC[14]>3000)
-    {
-        DADC[1] |=0x10;
-    }
-
-    if(can_timeout == 0)
-    {
-        CAN_Request_Send();
-    }
-    CAN_RStatus = Read_ECan(0,&CANRID,8,0,CAN_RBuf);
-    if(CAN_RStatus)
-    {
-        if(CANRID == CANTID)
-        {
-            if((CAN_RBuf[0]=='O') && (CAN_RBuf[1]=='D'))
-            {
-                digital_output = (uint16_t)((CAN_RBuf[2]<<8)|(CAN_RBuf[3]<<0));
-                Digital_Output_Handler();
-            }
-            else if((CAN_RBuf[0]=='D') && (CAN_RBuf[1]=='M'))
-            {
-               Red_Led = 1;
-            }
-            else if((CAN_RBuf[0]=='N') && (CAN_RBuf[1]=='M'))
-            {
-               Red_Led = 0;
-            }
-            else if((CAN_RBuf[0]=='O') && (CAN_RBuf[1]=='K'))
-            {
-                Yellow_led = 1;
-                can_timeout = 60000;
-            }
-            else if((CAN_RBuf[0]=='T') && (CAN_RBuf[1]=='M'))
-            {
-                Eeprom_Write(2,1);
-                CANTID = 409;
-            }
-            else if((CAN_RBuf[0]=='T') && (CAN_RBuf[1]=='A'))
-            {
-                Eeprom_Write(2,2);
-                CANTID = 410;
-            }
-            else if((CAN_RBuf[0]=='C') && (CAN_RBuf[1]=='S'))
-            {
-                if(CAN_RBuf[2] == 1)
-                {
-                   Eeprom_Write(1,1);
-                }
-                else if(CAN_RBuf[2] == 2)
-                {
-                   Eeprom_Write(1,2);
-                }
-                else if(CAN_RBuf[2] == 3)
-                {
-                   Eeprom_Write(1,3);
-                }
-                else if(CAN_RBuf[2] == 4)
-                {
-                   Eeprom_Write(1,4);
-                }
-            }
-            else
-            {
-                Yellow_led = 0;
-            }
-
-        }
-    }
-    if(Uart1_Frame_Flag == 1)
-    {
-
-        Uart1_Data_Handler();
-        if(uart1_data_flag == 1)
-        {
-            Digital_Output_Handler();
-
-            uart1_data_flag = 0;
-        }
-        Uart1_Frame_Flag = 0;
-    }
-    if(Uart2_Frame_Flag == 1)
-    {
-        Uart2_Data_Handler();
-        if(uart2_data_flag == 1)
-        {
-          Uart1_Data_Send();
-          uart2_data_flag = 0;
-        }
-        if(nrf_data_flag == 1)
-        {
-            ECanWriteMessage(0,CANRID,8,0,CAN_TBuf);
-            for(channel=0;channel<38;channel++)
-            {
-                EUSART1_Write(Uart2_array[channel]);
-            }
-            EUSART1_String("\n");
-            if(serial_diagnost == 1)
-            {
-              EUSART1_String("{,LP,");
-              sprintf(temp_buf,"%d,%d,%d,%d,%d,%d,%d,%d,%d,}\n",(uint16_t)CANRID,CAN_TBuf[0],CAN_TBuf[1],CAN_TBuf[2],CAN_TBuf[3],CAN_TBuf[4],CAN_TBuf[5],CAN_TBuf[6],CAN_TBuf[7]);
-              EUSART1_String(temp_buf);
-            }
-            memset(CAN_TBuf,0x00,8*sizeof(uint8_t));
-            nrf_data_flag = 0;
-        }
-        Uart2_Frame_Flag = 0;
-    }
-
-    if(NRFP_flag == 1)
-    {
-        EUSART2_String("#SN");
-        EUSART2_Write((uint8_t)(N_Serial/10000)+0x30);
-        EUSART2_Write((uint8_t)((N_Serial%10000)/1000)+0x30);
-        EUSART2_Write((uint8_t)((N_Serial%1000)/100)+0x30);
-        EUSART2_Write((uint8_t)((N_Serial%100)/10)+0x30);
-        EUSART2_Write((uint8_t)(N_Serial%10)+0x30);
-        EUSART2_Write('\n');
-        NRFP_flag = 0;
-    }
-    else if(NRFC_flag == 1)
-    {
-        EUSART2_String("B4");
-        EUSART2_Write((uint8_t)(N_Serial/10000)+0x30);
-        EUSART2_Write((uint8_t)((N_Serial%10000)/1000)+0x30);
-        EUSART2_Write((uint8_t)((N_Serial%1000)/100)+0x30);
-        EUSART2_Write((uint8_t)((N_Serial%100)/10)+0x30);
-        EUSART2_Write((uint8_t)(N_Serial%10)+0x30);
-        EUSART2_Write('\n');
-        Delay_Ms(100);
-        __asm(" clrwdt");
-        EUSART2_String("B4");
-        EUSART2_Write((uint8_t)(N_Serial/10000)+0x30);
-        EUSART2_Write((uint8_t)((N_Serial%10000)/1000)+0x30);
-        EUSART2_Write((uint8_t)((N_Serial%1000)/100)+0x30);
-        EUSART2_Write((uint8_t)((N_Serial%100)/10)+0x30);
-        EUSART2_Write((uint8_t)(N_Serial%10)+0x30);
-        EUSART2_Write('\n');
-# 923 "DataProcess.c"
-        NRFC_flag = 0;
-    }
-}
-# 935 "DataProcess.c"
-void Uart1_Data_Send(void)
-{
-    char disp[25]={0};
-
-    sprintf(disp,"{,AD,%d,%d,%d,%d,%d,",ADC[0],ADC[1],ADC[2],ADC[3],ADC[4]);
-    EUSART1_String(disp);
-    sprintf(disp,"%d,%d,%d,%d,%d,",ADC[5],ADC[7],ADC[6],ADC[9],ADC[8]);
-    EUSART1_String(disp);
-    sprintf(disp,"%d,%d,%d,}\n",DADC[0],DADC[1],DADC[2]);
-    EUSART1_String(disp);
-
-}
-# 956 "DataProcess.c"
-void EUSART1_Receive_ISR(void)
-{
-    uint8_t RxdData=0;
-    RxdData = RCREG1;
-    if(uart1_index>24)
-    {
-        uart1_index = 0;
-    }
-    else if(RxdData != '\n' && uart1_index<25)
-    {
-        Uart1_array[uart1_index++] = RxdData;
-    }
-    else if(RxdData == '\n')
-    {
-        Uart1_array[uart1_index++] = RxdData;
-        Uart1_Frame_Flag = 1;
-        uart1_index = 0;
-    }
-}
-# 984 "DataProcess.c"
-void EUSART2_Receive_ISR(void)
-{
-    uint8_t RxdData = 0;
-    RxdData = RCREG2;
-    if(uart2_index>38)
-    {
-        uart2_index = 0;
-    }
-    else if(RxdData != '\n' && uart2_index<38)
-    {
-        Uart2_array[uart2_index++] = RxdData;
-    }
-    else if(RxdData == '\n')
-    {
-        Uart2_array[uart2_index++] = RxdData;
-        Uart2_Frame_Flag = 1;
-        uart2_index = 0;
-    }
-}
-# 1012 "DataProcess.c"
-void Digital_Output_Handler(void)
-{
-
-    Doutput.Output_1 = (uint8_t)((digital_output & 0x0001)>>0);
-    Doutput.Output_2 = (uint8_t)((digital_output & 0x0002)>>1);
-    Doutput.Output_3 = (uint8_t)((digital_output & 0x0004)>>2);
-    Doutput.Output_4 = (uint8_t)((digital_output & 0x0008)>>3);
-
-    Doutput.Output_5 = (uint8_t)((digital_output & 0x0010)>>4);
-    Doutput.Output_6 = (uint8_t)((digital_output & 0x0020)>>5);
-    Doutput.Output_7 = (uint8_t)((digital_output & 0x0040)>>6);
-    Doutput.Output_8 = (uint8_t)((digital_output & 0x0080)>>7);
-
-    Doutput.Output_9 = (uint8_t)((digital_output & 0x0100)>>8);
-    Doutput.Output_10 = (uint8_t)((digital_output & 0x0200)>>9);
-    Doutput.Output_11 = (uint8_t)((digital_output & 0x0400)>>10);
-    Doutput.Output_12 = (uint8_t)((digital_output & 0x0800)>>11);
-
-    Doutput.Output_13 = (uint8_t)((digital_output & 0x1000)>>12);
-    Doutput.Output_14 = (uint8_t)((digital_output & 0x2000)>>13);
-    Doutput.Output_15 = (uint8_t)((digital_output & 0x4000)>>14);
-    Doutput.Output_16 = (uint8_t)((digital_output & 0x8000)>>15);
-
-
-    switch(Doutput.Output_1)
-    {
-        case 1:
-            MC33996_Digitalwrite(1,1);
-            break;
-        case 0:
-            MC33996_Digitalwrite(1,0);
-            break;
-    }
-    switch(Doutput.Output_2)
-    {
-        case 1:
-            MC33996_Digitalwrite(2,1);
-            break;
-        case 0:
-            MC33996_Digitalwrite(2,0);
-            break;
-    }
-    switch(Doutput.Output_3)
-    {
-        case 1:
-            MC33996_Digitalwrite(3,1);
-            break;
-        case 0:
-            MC33996_Digitalwrite(3,0);
-            break;
-    }
-    switch(Doutput.Output_4)
-    {
-        case 1:
-            MC33996_Digitalwrite(4,1);
-            break;
-        case 0:
-            MC33996_Digitalwrite(4,0);
-            break;
-    }
-    switch(Doutput.Output_5)
-    {
-        case 1:
-            MC33996_Digitalwrite(5,1);
-            break;
-        case 0:
-            MC33996_Digitalwrite(5,0);
-            break;
-    }
-    switch(Doutput.Output_6)
-    {
-        case 1:
-            MC33996_Digitalwrite(6,1);
-            break;
-        case 0:
-            MC33996_Digitalwrite(6,0);
-            break;
-    }
-    switch(Doutput.Output_7)
-    {
-        case 1:
-            MC33996_Digitalwrite(7,1);
-            break;
-        case 0:
-            MC33996_Digitalwrite(7,0);
-            break;
-    }
-    switch(Doutput.Output_8)
-    {
-        case 1:
-            MC33996_Digitalwrite(8,1);
-            break;
-        case 0:
-            MC33996_Digitalwrite(8,0);
-            break;
-    }
-    switch(Doutput.Output_9)
-    {
-        case 1:
-            MC33996_Digitalwrite(9,1);
-            break;
-        case 0:
-            MC33996_Digitalwrite(9,0);
-            break;
-    }
-    switch(Doutput.Output_10)
-    {
-        case 1:
-            MC33996_Digitalwrite(10,1);
-            break;
-        case 0:
-            MC33996_Digitalwrite(10,0);
-            break;
-    }
-    switch(Doutput.Output_11)
-    {
-        case 1:
-            MC33996_Digitalwrite(11,1);
-            break;
-        case 0:
-            MC33996_Digitalwrite(11,0);
-            break;
-    }
-    switch(Doutput.Output_12)
-    {
-        case 1:
-            MC33996_Digitalwrite(12,1);
-            break;
-        case 0:
-            MC33996_Digitalwrite(12,0);
-            break;
-    }
-    switch(Doutput.Output_13)
-    {
-        case 1:
-            MC33996_Digitalwrite(13,1);
-            break;
-        case 0:
-            MC33996_Digitalwrite(13,0);
-            break;
-    }
-    switch(Doutput.Output_14)
-    {
-        case 1:
-            MC33996_Digitalwrite(14,1);
-            break;
-        case 0:
-            MC33996_Digitalwrite(14,0);
-            break;
-    }
-    switch(Doutput.Output_15)
-    {
-        case 1:
-            MC33996_Digitalwrite(15,1);
-            break;
-        case 0:
-            MC33996_Digitalwrite(15,0);
-            break;
-    }
-    switch(Doutput.Output_16)
-    {
-        case 1:
-            MC33996_Digitalwrite(16,1);
-            break;
-        case 0:
-            MC33996_Digitalwrite(16,0);
-            break;
-    }
-
+    return cs;
 }

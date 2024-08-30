@@ -14,7 +14,8 @@
 // TODO Insert appropriate #include <>
 #include "Timer0.h"
 #include "EUSART.h"
-#include "ECAN_Filter.h"
+#include "ecan.h"
+//#include "ECAN_Filter.h"
 #include "SPI.h"
 #include "InternalADC.h"
 #include "MC33972.h"
@@ -23,7 +24,7 @@
 #include "DataProcess.h"
 #include "Internal_EEPROM.h"
 //#include "MP3.h"
-
+#include "CRC.h"
 volatile uint16_t ms_count,can_count,Led_Count,blink_flag,Watchdog_count;
 extern volatile uint32_t can_timeout;
 bool Red_Led,serial_diagnost;

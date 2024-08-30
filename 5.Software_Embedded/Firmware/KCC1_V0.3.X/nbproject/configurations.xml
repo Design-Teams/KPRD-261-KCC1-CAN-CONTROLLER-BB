@@ -6,6 +6,7 @@
                    projectFiles="true">
       <itemPath>main.h</itemPath>
       <itemPath>DataProcess.h</itemPath>
+      <itemPath>CRC.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
@@ -16,6 +17,7 @@
                    projectFiles="true">
       <itemPath>newmain.c</itemPath>
       <itemPath>DataProcess.c</itemPath>
+      <itemPath>CRC.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
@@ -47,7 +49,7 @@
       <compileType>
         <linkerTool>
           <linkerLibItems>
-            <linkerLibFileItem>../../../../../Rahul/PIC18F/PIC18_Library_test/Firmware.X/dist/default/production/Firmware.X.a</linkerLibFileItem>
+            <linkerLibFileItem>../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Firmware_V0.1.X/dist/default/production/Firmware_V0.1.X.a</linkerLibFileItem>
           </linkerLibItems>
         </linkerTool>
         <archiverTool>
@@ -77,22 +79,22 @@
         <property key="default-bitfield-type" value="true"/>
         <property key="default-char-type" value="true"/>
         <property key="define-macros" value=""/>
-        <property key="disable-optimizations" value="true"/>
+        <property key="disable-optimizations" value="false"/>
         <property key="extra-include-directories"
-                  value="..\..\..\..\..\Rahul\PIC18F\PIC18_Library_test\Low_Level\Header;..\..\..\..\..\Rahul\PIC18F\PIC18_Library_test\Device_Level\Header"/>
+                  value="..\..\..\..\kprd-999-int-msdi-driver-board\5.Software-Embedded\Firmware\Rahul\PIC18_Library_V0.1\Device_Level\Header;..\..\..\..\kprd-999-int-msdi-driver-board\5.Software-Embedded\Firmware\Rahul\PIC18_Library_V0.1\Low_Level\Header"/>
         <property key="favor-optimization-for" value="-speed,+space"/>
         <property key="garbage-collect-data" value="true"/>
         <property key="garbage-collect-functions" value="true"/>
         <property key="identifier-length" value="255"/>
         <property key="local-generation" value="false"/>
-        <property key="operation-mode" value="free"/>
+        <property key="operation-mode" value="std"/>
         <property key="opt-xc8-compiler-strict_ansi" value="false"/>
         <property key="optimization-assembler" value="true"/>
         <property key="optimization-assembler-files" value="true"/>
         <property key="optimization-debug" value="false"/>
         <property key="optimization-invariant-enable" value="false"/>
         <property key="optimization-invariant-value" value="16"/>
-        <property key="optimization-level" value="-O0"/>
+        <property key="optimization-level" value="-O2"/>
         <property key="optimization-speed" value="false"/>
         <property key="optimization-stable-enable" value="false"/>
         <property key="preprocess-assembler" value="true"/>

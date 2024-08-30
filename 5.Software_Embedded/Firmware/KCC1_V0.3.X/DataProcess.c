@@ -65,7 +65,7 @@ void OSCILLATOR_Initialize(void)
 
 void System_Initialize(void)
 {
-    uint8_t read=0;
+    uint8_t eep_read1=0,eep_read2=0,eep_read3=0;
     char buf[20]={0};
     uint16_t CAN_Speed=0;
     TRISA = 0x00;
@@ -86,53 +86,100 @@ void System_Initialize(void)
      CLRWDT();
     OSCILLATOR_Initialize();            // Oscillator initialize
     TMR0_Initialize(1);                 // Timer0 initialize with 1 ms
-    EUSART1_Initialize(44236800,57600); // EUSART1 Initialize
-    EUSART2_Initialize(44236800,9600);  // EUSART2 Initialize
+    EUSART1_Initialize(48000000,57600); // EUSART1 Initialize
+    EUSART2_Initialize(48000000,9600);  // EUSART2 Initialize
     //Soft_Uart_Initialize();             // Soft Uart Initialize
     LATBbits.LATB2 = 1;
     CLRWDT();
     //Delay_Ms(200);
-    CLRWDT();
-    read = Eeprom_Read(5);  // Read eeprom
-    if(read != 'R')        // if valid data not found then set default parameter
+    
+    
+    //EEPROM memory mapping
+    // CANID store at eeprom 1,2,3 location
+    // CANSPEED store at eeprom 4,5,6 location
+    // Factory reset stored at eeprom 7,8,9 location
+    
+    eep_read1 = Eeprom_Read(7); eep_read2 = Eeprom_Read(8); eep_read3 = Eeprom_Read(9);
+    
+    //read = Eeprom_Read(5);  // Read eeprom
+   // if(read != 'R')        // if valid data not found then set default parameter
+    if(((eep_read1 != 'R')&&(eep_read2 != 'R'))||((eep_read2 != 'R')&&(eep_read3 != 'R'))||((eep_read1 != 'R')&&(eep_read3 != 'R')))
     {
-      CANTID = 409;
-      Eeprom_Write(2,1);
+      CAN_Txpara.CANID = 409;
+      Eeprom_Write(1,'1');Eeprom_Write(2,'1');Eeprom_Write(3,'1');
+      CLRWDT();
+      eep_read1 = Eeprom_Read(1); eep_read2 = Eeprom_Read(2); eep_read3 = Eeprom_Read(3);
+      if(((eep_read1 != '1')&&(eep_read2 != '1'))||((eep_read2 != '1')&&(eep_read3 != '1'))||((eep_read1 != '1')&&(eep_read3 != '1')))
+      {
+         Eeprom_Write(1,'1');Eeprom_Write(2,'1');Eeprom_Write(3,'1');
+         EUSART1_String("CANID stored at eeprom failed\r\n");
+      }
+      else
+      {
+          EUSART1_String("CANID stored at eeprom Success\r\n");
+      }
+          
       CAN_Speed = 250;
-      Eeprom_Write(1,3);
-      Eeprom_Write(5,'R');
+      Eeprom_Write(4,'3');Eeprom_Write(5,'3');Eeprom_Write(6,'3');
+      CLRWDT();
+      eep_read1 = Eeprom_Read(4); eep_read2 = Eeprom_Read(5); eep_read3 = Eeprom_Read(6);
+      if(((eep_read1 != '3')&&(eep_read2 != '3'))||((eep_read2 != '3')&&(eep_read3 != '3'))||((eep_read1 != '3')&&(eep_read3 != '3')))
+      {
+         Eeprom_Write(4,'3');Eeprom_Write(5,'3');Eeprom_Write(6,'3');
+         EUSART1_String("CANspeed stored at eeprom failed\r\n");
+      }
+      else
+      {
+          EUSART1_String("CANspeed stored at eeprom Success\r\n");
+      }
+      
+      //Eeprom_Write(1,3);
+      //Eeprom_Write(5,'R');
+      Eeprom_Write(7,'R');Eeprom_Write(8,'R');Eeprom_Write(9,'R');
+      CLRWDT();
+      eep_read1 = Eeprom_Read(7); eep_read2 = Eeprom_Read(8); eep_read3 = Eeprom_Read(9);
+      if(((eep_read1 != 'R')&&(eep_read2 != 'R'))||((eep_read2 != 'R')&&(eep_read3 != 'R'))||((eep_read1 != 'R')&&(eep_read3 != 'R')))
+      {
+         Eeprom_Write(7,'R');Eeprom_Write(8,'R');Eeprom_Write(9,'R');
+         EUSART1_String("Factory setting stored at eeprom failed\r\n");
+      }
+      else
+      {
+          EUSART1_String("Factory setting stored at eeprom Success\r\n");
+      }
     }
     else
     {
-       read = Eeprom_Read(1);     // Read CAN Speed setting
-       if(read == 1)
+       eep_read1 = Eeprom_Read(4); eep_read2 = Eeprom_Read(5);eep_read3 = Eeprom_Read(6);    // Read CAN Speed setting
+       if(((eep_read1 == '1')&&(eep_read2 == '1'))||((eep_read2 == '1')&&(eep_read3 == '1'))||((eep_read3 == '1')&&(eep_read1 == '1')))//if(read == 1)
        {
            CAN_Speed = 100;
        }
-       else if(read == 2)
+       else if(((eep_read1 == '2')&&(eep_read2 == '2'))||((eep_read2 == '2')&&(eep_read3 == '2'))||((eep_read3 == '2')&&(eep_read1 == '2')))//if(read == 2)
        {
            CAN_Speed = 125;
        }
-       else if(read == 3)
+       else if(((eep_read1 == '3')&&(eep_read2 == '3'))||((eep_read2 == '3')&&(eep_read3 == '3'))||((eep_read3 == '3')&&(eep_read1 == '3')))//if(read == 3)
        {
            CAN_Speed = 250;
        }
-       else if(read == 4)
+       else if(((eep_read1 == '4')&&(eep_read2 == '4'))||((eep_read2 == '4')&&(eep_read3 == '4'))||((eep_read3 == '4')&&(eep_read1 == '4')))//if(read == 4)
        {
            CAN_Speed = 500;
        }
-       read = Eeprom_Read(2);    // Read CAN ID MAIN/AUX
-       if(read == 1)
+       //read = Eeprom_Read(2);    // Read CAN ID MAIN/AUX
+       eep_read1 = Eeprom_Read(1); eep_read2 = Eeprom_Read(2);eep_read3 = Eeprom_Read(3);    // Read CAN Speed setting
+       if(((eep_read1 == '1')&&(eep_read2 == '1'))||((eep_read2 == '1')&&(eep_read3 == '1'))||((eep_read3 == '1')&&(eep_read1 == '1')))//if(read == 1)if(read == 1)
        {
-          CANTID = 409; 
+          CAN_Txpara.CANID = 409; 
        }
-       else if(read == 2)
+       else if(((eep_read1 == '2')&&(eep_read2 == '2'))||((eep_read2 == '2')&&(eep_read3 == '2'))||((eep_read3 == '2')&&(eep_read1 == '2')))//if(read == 2)else if(read == 2)
        {
-          CANTID = 410; 
+          CAN_Txpara.CANID = 410; 
        }
        
     }
-    if((CANTID == 409)&&(CAN_Speed == 250))
+    if((CAN_Txpara.CANID == 409)&&(CAN_Speed == 250))
     {
          EUSART1_String("Default Setting\r\n");
     }
@@ -141,7 +188,8 @@ void System_Initialize(void)
         EUSART1_String("User Setting\r\n"); 
     }
      CLRWDT(); 
-    Init_Ecan(CAN_Speed,true,(uint16_t)CANTID);
+    //Init_Ecan(CAN_Speed,true,(uint16_t)CAN_Txpara.CANID);
+    ECAN_Initialize(CAN_Speed,true,CAN_Txpara.CANID);
     INTCONbits.PEIE = 1;               // Peripheral Interrupt Enable
     INTCONbits.GIE  = 1;               // Global Interrupt Enable
     
@@ -190,7 +238,7 @@ void System_Initialize(void)
     LATBbits.LATB3   = 0;
 	TRISBbits.TRISB2 = 0; // CAN Tx
 	TRISBbits.TRISB3 = 1;
-    sprintf(buf,"KCC1_V0.2 CANID = %d,CANSpeed = %d\r\n",(uint16_t)CANTID,CAN_Speed);
+    sprintf(buf,"KCC1_V%0.2f CANID = %d,CANSpeed = %d\r\n",Firm_Ver,(uint16_t)CAN_Txpara.CANID,CAN_Speed);
     EUSART1_String(buf);
     
     
@@ -284,21 +332,21 @@ void Uart2_Data_Handler(void)
             token = strtok(NULL,",");
             sprintf(token_buf[k],"%s",token);
         }
-        memset(CAN_TBuf,0x00,8*sizeof(uint8_t));
-        CANRID = 0;
+        memset(CAN_Txpara.CAN_Buf,0x00,8*sizeof(uint8_t));
+        CAN_Rxpara.CANID = 0;
         N_Load = 0;
         N_ADC  = 0;
-        CANRID     = (uint16_t)(atol(token_buf[0]));//Hook Type Main/Aux
+        CAN_Rxpara.CANID     = (uint16_t)(atol(token_buf[0]));//Hook Type Main/Aux
         N_Load     = (uint16_t)(atol(token_buf[1]));//Calibrated Load
         N_ADC      = (uint16_t)(atol(token_buf[2]));//Load Adc Count
-        CAN_TBuf[4] = (uint8_t)(atol(token_buf[3]));//Load Status safe/approch/overload
-        CAN_TBuf[5] = (uint8_t)(((atol(token_buf[4]))& 0xFF00)>>8);//Battery adc count
-        CAN_TBuf[6] = (uint8_t)(((atol(token_buf[4]))& 0x00FF)>>0);
-        CAN_TBuf[7] = (uint8_t)(atol(token_buf[5]));//temperature
-        CAN_TBuf[0] = (uint8_t)((N_Load & 0xFF00)>>8);
-        CAN_TBuf[1] = (uint8_t)((N_Load & 0x00FF)>>0);
-        CAN_TBuf[2] = (uint8_t)((N_ADC & 0xFF00)>>8);
-        CAN_TBuf[3] = (uint8_t)((N_ADC & 0x00FF)>>0);
+        CAN_Txpara.CAN_Buf[4] = (uint8_t)(atol(token_buf[3]));//Load Status safe/approch/overload
+        CAN_Txpara.CAN_Buf[5] = (uint8_t)(((atol(token_buf[4]))& 0xFF00)>>8);//Battery adc count
+        CAN_Txpara.CAN_Buf[6] = (uint8_t)(((atol(token_buf[4]))& 0x00FF)>>0);
+        CAN_Txpara.CAN_Buf[7] = (uint8_t)(atol(token_buf[5]));//temperature
+        CAN_Txpara.CAN_Buf[0] = (uint8_t)((N_Load & 0xFF00)>>8);
+        CAN_Txpara.CAN_Buf[1] = (uint8_t)((N_Load & 0x00FF)>>0);
+        CAN_Txpara.CAN_Buf[2] = (uint8_t)((N_ADC & 0xFF00)>>8);
+        CAN_Txpara.CAN_Buf[3] = (uint8_t)((N_ADC & 0x00FF)>>0);
         
     }
 }
@@ -311,70 +359,141 @@ void Uart2_Data_Handler(void)
 ===========================================================================================================================*/
 void Can_Data_Send(void)
 {
+    static uint8_t can_frame_no = 0;
+    uint16_t crc=0;
     if(can_frame_no == 0)
     {
-        CAN_TBuf[0] = 0x01;
-        CAN_TBuf[1] = (uint8_t)((ADC[0]&0xFF00)>>8);
-        CAN_TBuf[2] = (uint8_t)((ADC[0]&0x00FF)>>0);
-        CAN_TBuf[3] = (uint8_t)((ADC[1]&0xFF00)>>8);
-        CAN_TBuf[4] = (uint8_t)((ADC[1]&0x00FF)>>0);
-        CAN_TBuf[5] = (uint8_t)((ADC[2]&0xFF00)>>8);
-        CAN_TBuf[6] = (uint8_t)((ADC[2]&0x00FF)>>0);
-        CAN_TBuf[7] = DADC[0];
-        ECanWriteMessage(0,CANTID,8,0,CAN_TBuf);
-        can_frame_no++;
+        ECAN_TxMSG.idType = dSTANDARD_CAN_MSG_ID_2_0B;
+        ECAN_TxMSG.dlc    = 8;
+        ECAN_TxMSG.id     = CAN_Txpara.CANID;//CAN_Txpara.CANID;
+        ECAN_TxMSG.data0  = 0x01;
+        ECAN_TxMSG.data1  = (uint8_t)((ADC[2]&0xFF00)>>8);
+        ECAN_TxMSG.data2  = (uint8_t)((ADC[2]&0x00FF)>>0);
+        ECAN_TxMSG.data3  = (uint8_t)((ADC[3]&0xFF00)>>8);
+        ECAN_TxMSG.data4  = (uint8_t)((ADC[3]&0x00FF)>>0);
+        ECAN_TxMSG.data5  = DADC[0];//(uint8_t)((ADC[2]&0xFF00)>>8);//119
+        crc = (uint16_t)(ECAN_TxMSG.data0+ECAN_TxMSG.data1+ECAN_TxMSG.data2+ECAN_TxMSG.data3+ECAN_TxMSG.data4+ECAN_TxMSG.data5);
+        crc = Check_Sum(crc);
+        ECAN_TxMSG.data6 = (uint8_t)((crc&0xFF00)>>8);
+        ECAN_TxMSG.data7 = (uint8_t)((crc&0x00FF)>>0);
+        //ECAN_TxMSG.data6  = (uint8_t)((ADC[2]&0xFF00)>>8);//(uint8_t)((ADC[2]&0x00FF)>>0);
+        //ECAN_TxMSG.data7  = (uint8_t)((ADC[2]&0x00FF)>>0);// DADC[0];
+        CAN_transmit(&ECAN_TxMSG);
+        //can_frame_no++;
+        can_frame_no = 0;
+//        CAN_Txpara.CAN_Buf[0] = 0x01;
+//        CAN_Txpara.CAN_Buf[1] = (uint8_t)((ADC[0]&0xFF00)>>8);
+//        CAN_Txpara.CAN_Buf[2] = (uint8_t)((ADC[0]&0x00FF)>>0);
+//        CAN_Txpara.CAN_Buf[3] = (uint8_t)((ADC[1]&0xFF00)>>8);
+//        CAN_Txpara.CAN_Buf[4] = (uint8_t)((ADC[1]&0x00FF)>>0);
+//        CAN_Txpara.CAN_Buf[5] = (uint8_t)((ADC[2]&0xFF00)>>8);
+//        CAN_Txpara.CAN_Buf[6] = (uint8_t)((ADC[2]&0x00FF)>>0);
+//        CAN_Txpara.CAN_Buf[7] = DADC[0];
+//        ECanWriteMessage(0,CAN_Txpara.CANID,8,0,CAN_Txpara.CAN_Buf);
+//        can_frame_no++;
     }
     else if(can_frame_no == 1)
     {
-        CAN_TBuf[0] = 0x02;
-        CAN_TBuf[1] = (uint8_t)((ADC[3]&0xFF00)>>8);
-        CAN_TBuf[2] = (uint8_t)((ADC[3]&0x00FF)>>0);
-        CAN_TBuf[3] = (uint8_t)((ADC[4]&0xFF00)>>8);
-        CAN_TBuf[4] = (uint8_t)((ADC[4]&0x00FF)>>0);
-        CAN_TBuf[5] = (uint8_t)((ADC[5]&0xFF00)>>8);
-        CAN_TBuf[6] = (uint8_t)((ADC[5]&0x00FF)>>0);
-        CAN_TBuf[7] = DADC[1];
-        ECanWriteMessage(0,CANTID,8,0,CAN_TBuf); 
+        ECAN_TxMSG.idType = dSTANDARD_CAN_MSG_ID_2_0B;
+        ECAN_TxMSG.dlc    = 8;
+        ECAN_TxMSG.id     = CAN_Txpara.CANID;//CAN_Txpara.CANID;
+        ECAN_TxMSG.data0  = 0x02;
+        ECAN_TxMSG.data1  = (uint8_t)((ADC[3]&0xFF00)>>8);
+        ECAN_TxMSG.data2  = (uint8_t)((ADC[3]&0x00FF)>>0);
+        ECAN_TxMSG.data3  = (uint8_t)((ADC[4]&0xFF00)>>8);
+        ECAN_TxMSG.data4  = (uint8_t)((ADC[4]&0x00FF)>>0);
+        ECAN_TxMSG.data5  = (uint8_t)((ADC[5]&0xFF00)>>8);
+        ECAN_TxMSG.data6  = (uint8_t)((ADC[5]&0x00FF)>>0);
+        ECAN_TxMSG.data7  =  DADC[1];
+        CAN_transmit(&ECAN_TxMSG);
         can_frame_no++;
+//        CAN_Txpara.CAN_Buf[0] = 0x02;
+//        CAN_Txpara.CAN_Buf[1] = (uint8_t)((ADC[3]&0xFF00)>>8);
+//        CAN_Txpara.CAN_Buf[2] = (uint8_t)((ADC[3]&0x00FF)>>0);
+//        CAN_Txpara.CAN_Buf[3] = (uint8_t)((ADC[4]&0xFF00)>>8);
+//        CAN_Txpara.CAN_Buf[4] = (uint8_t)((ADC[4]&0x00FF)>>0);
+//        CAN_Txpara.CAN_Buf[5] = (uint8_t)((ADC[5]&0xFF00)>>8);
+//        CAN_Txpara.CAN_Buf[6] = (uint8_t)((ADC[5]&0x00FF)>>0);
+//        CAN_Txpara.CAN_Buf[7] = DADC[1];
+//        ECanWriteMessage(0,CAN_Txpara.CANID,8,0,CAN_Txpara.CAN_Buf); 
+//        can_frame_no++;
     }
     else if(can_frame_no == 2)
     {
-        CAN_TBuf[0] = 0x03;
-        CAN_TBuf[1] = (uint8_t)((ADC[7]&0xFF00)>>8);
-        CAN_TBuf[2] = (uint8_t)((ADC[7]&0x00FF)>>0);
-        CAN_TBuf[3] = (uint8_t)((ADC[6]&0xFF00)>>8);
-        CAN_TBuf[4] = (uint8_t)((ADC[6]&0x00FF)>>0);
-        CAN_TBuf[5] = (uint8_t)((ADC[9]&0xFF00)>>8);
-        CAN_TBuf[6] = (uint8_t)((ADC[9]&0x00FF)>>0);
-        CAN_TBuf[7] = DADC[2];
-        ECanWriteMessage(0,CANTID,8,0,CAN_TBuf); 
+        ECAN_TxMSG.idType = dSTANDARD_CAN_MSG_ID_2_0B;
+        ECAN_TxMSG.dlc    = 8;
+        ECAN_TxMSG.id     = CAN_Txpara.CANID;//CAN_Txpara.CANID;
+        ECAN_TxMSG.data0  = 0x03;
+        ECAN_TxMSG.data1  = (uint8_t)((ADC[7]&0xFF00)>>8);
+        ECAN_TxMSG.data2  = (uint8_t)((ADC[7]&0x00FF)>>0);
+        ECAN_TxMSG.data3  = (uint8_t)((ADC[6]&0xFF00)>>8);
+        ECAN_TxMSG.data4  = (uint8_t)((ADC[6]&0x00FF)>>0);
+        ECAN_TxMSG.data5  = (uint8_t)((ADC[9]&0xFF00)>>8);
+        ECAN_TxMSG.data6  = (uint8_t)((ADC[9]&0x00FF)>>0);
+        ECAN_TxMSG.data7  =  DADC[2];
+        CAN_transmit(&ECAN_TxMSG);
         can_frame_no++;
+//        CAN_Txpara.CAN_Buf[0] = 0x03;
+//        CAN_Txpara.CAN_Buf[1] = (uint8_t)((ADC[7]&0xFF00)>>8);
+//        CAN_Txpara.CAN_Buf[2] = (uint8_t)((ADC[7]&0x00FF)>>0);
+//        CAN_Txpara.CAN_Buf[3] = (uint8_t)((ADC[6]&0xFF00)>>8);
+//        CAN_Txpara.CAN_Buf[4] = (uint8_t)((ADC[6]&0x00FF)>>0);
+//        CAN_Txpara.CAN_Buf[5] = (uint8_t)((ADC[9]&0xFF00)>>8);
+//        CAN_Txpara.CAN_Buf[6] = (uint8_t)((ADC[9]&0x00FF)>>0);
+//        CAN_Txpara.CAN_Buf[7] = DADC[2];
+//        ECanWriteMessage(0,CAN_Txpara.CANID,8,0,CAN_Txpara.CAN_Buf); 
+//        can_frame_no++;
     }
     else if(can_frame_no == 3)
     {
-        CAN_TBuf[0] = 0x04;
-        CAN_TBuf[1] = (uint8_t)((ADC[8]&0xFF00)>>8);
-        CAN_TBuf[2] = (uint8_t)((ADC[8]&0x00FF)>>0);
-        CAN_TBuf[3] = 0;
-        CAN_TBuf[4] = 0;
-        CAN_TBuf[5] = 0;
-        CAN_TBuf[6] = 0;
-        CAN_TBuf[7] = 0;
-        ECanWriteMessage(0,CANTID,8,0,CAN_TBuf); 
+        ECAN_TxMSG.idType = dSTANDARD_CAN_MSG_ID_2_0B;
+        ECAN_TxMSG.dlc    = 8;
+        ECAN_TxMSG.id     = CAN_Txpara.CANID;//CAN_Txpara.CANID;
+        ECAN_TxMSG.data0  = 0x04;
+        ECAN_TxMSG.data1  = (uint8_t)((ADC[8]&0xFF00)>>8);
+        ECAN_TxMSG.data2  = (uint8_t)((ADC[8]&0x00FF)>>0);
+        ECAN_TxMSG.data3  = 0;
+        ECAN_TxMSG.data4  = 0;
+        ECAN_TxMSG.data5  = 0;
+        ECAN_TxMSG.data6  = 0;
+        ECAN_TxMSG.data7  = 0;
+        CAN_transmit(&ECAN_TxMSG);
         can_frame_no = 0;
+//        CAN_Txpara.CAN_Buf[0] = 0x04;
+//        CAN_Txpara.CAN_Buf[1] = (uint8_t)((ADC[8]&0xFF00)>>8);
+//        CAN_Txpara.CAN_Buf[2] = (uint8_t)((ADC[8]&0x00FF)>>0);
+//        CAN_Txpara.CAN_Buf[3] = 0;
+//        CAN_Txpara.CAN_Buf[4] = 0;
+//        CAN_Txpara.CAN_Buf[5] = 0;
+//        CAN_Txpara.CAN_Buf[6] = 0;
+//        CAN_Txpara.CAN_Buf[7] = 0;
+//        ECanWriteMessage(0,CAN_Txpara.CANID,8,0,CAN_Txpara.CAN_Buf); 
+//        can_frame_no = 0;
     }
 }
 
 void CAN_Request_Send(void)
 {
-    memset(CAN_TBuf,0x00,8*sizeof(uint8_t));
-    CAN_TBuf[0] = 'S';
-    CAN_TBuf[1] = 'T';
-    CAN_TBuf[2] = 'A';
-    CAN_TBuf[3] = 'T';   
-    ECanWriteMessage(0,CANTID,8,0,CAN_TBuf);  // Put request on CAN bus
+    //memset(ECAN_TxMSG.,0x00,8*sizeof(uint8_t));
+    ECAN_TxMSG.idType = dSTANDARD_CAN_MSG_ID_2_0B;
+    ECAN_TxMSG.dlc    = 8;
+    ECAN_TxMSG.id     = CAN_Txpara.CANID;//CAN_Txpara.CANID;
+    ECAN_TxMSG.data0  = 'S';
+    ECAN_TxMSG.data1  = 'T';
+    ECAN_TxMSG.data2  = 'A';
+    ECAN_TxMSG.data3  = 'T';
+    ECAN_TxMSG.data4  = 0;
+    ECAN_TxMSG.data5  = 0;
+    ECAN_TxMSG.data6  = 0;
+    ECAN_TxMSG.data7  = 0;
+    CAN_transmit(&ECAN_TxMSG);
+//    CAN_Txpara.CAN_Buf[0] = 'S';
+//    CAN_Txpara.CAN_Buf[1] = 'T';
+//    CAN_Txpara.CAN_Buf[2] = 'A';
+//    CAN_Txpara.CAN_Buf[3] = 'T';   
+//    ECanWriteMessage(0,CAN_Txpara.CANID,8,0,CAN_Txpara.CAN_Buf);  // Put request on CAN bus
     Delay_Ms(100);
-    memset(CAN_TBuf,0x00,8*sizeof(uint8_t)); 
+//    memset(CAN_Txpara.CAN_Buf,0x00,8*sizeof(uint8_t)); 
     Yellow_led = false;
     can_timeout = 10000;
 }
@@ -390,9 +509,9 @@ void CAN_Request_Send(void)
 //{
 //    char disp[25]={0};
 //    
-//    sprintf(disp,"{,CD,%d,%d,%d,%d,%d",(uint16_t)CANRID,CAN_RBuf[0],CAN_RBuf[1],CAN_RBuf[2],CAN_RBuf[3]); 
+//    sprintf(disp,"{,CD,%d,%d,%d,%d,%d",(uint16_t)CAN_Rxpara.CANID,CAN_Rxpara.CAN_Buf[0],CAN_Rxpara.CAN_Buf[1],CAN_Rxpara.CAN_Buf[2],CAN_Rxpara.CAN_Buf[3]); 
 //    EUSART1_String(disp); 
-//    sprintf(disp,",%d,%d,%d,%d,}\n",CAN_RBuf[4],CAN_RBuf[5],CAN_RBuf[6],CAN_RBuf[7]); 
+//    sprintf(disp,",%d,%d,%d,%d,}\n",CAN_Rxpara.CAN_Buf[4],CAN_Rxpara.CAN_Buf[5],CAN_Rxpara.CAN_Buf[6],CAN_Rxpara.CAN_Buf[7]); 
 //    EUSART1_String(disp);
 //}
 /*=============================================================================
@@ -406,20 +525,21 @@ void CAN_Request_Send(void)
 void Data_Process(void)
 {
     uint8_t channel = 0;
+    uint8_t eep_read1=0,eep_read2=0,eep_read3=0;
     char temp_buf[20]={0};
     float F_temp=0.0;
     memset(temp_ADC,0x00,15*sizeof(uint16_t));           // Clear buffer
     memset(DADC,0x00,3*sizeof(uint16_t));
     MC33972_Read_ADC(Analog_Ch0);                   // Set MSDI analog channel
     Delay_Ms(1);
-    ADC[0] = Get_Adc_Data(3);                   // Read voltage
+    ADC[0] = Get_Adc_Data(3,250);                   // Read voltage
     ADC[0] = (uint16_t)((ADC[0]*0.00735)*10);
     Delay_Ms(1);
     for(channel=7;channel<22;channel++)            // Read Multiple Analog Channel
     {
         MC33972_Read_ADC(Analog_Ch0+channel);
         Delay_Ms(1);
-        temp_ADC[channel-7]=Get_Adc_Data(3);                // Store adc value to ADC buffer from 0 location
+        temp_ADC[channel-7]=Get_Adc_Data(3,100);                // Store adc value to ADC buffer from 0 location
     }
         
     F_temp = (float)(temp_ADC[5]/0.85); //12
@@ -784,64 +904,165 @@ void Data_Process(void)
     {
         CAN_Request_Send();
     }
-    CAN_RStatus = Read_ECan(0,&CANRID,8,0,CAN_RBuf);    // Read CAN Bus
-    if(CAN_RStatus)            // Check data on CAN is present
+    
+    if(Check_CAN_Interrupt()!=0)  // Check CAN interrupt arrived or not
     {
-        if(CANRID == CANTID)  // Check CAN ID
+        if(CAN_messagesInBuffer()!=0) // check CAN message buffer is not empty
         {
-            if((CAN_RBuf[0]=='O') && (CAN_RBuf[1]=='D')) // Check OD String
+            if(CAN_receive(&ECAN_RxMSG)!=0) // Read received data on CAN
+           {
+               CAN_Rxpara.CANID      = ECAN_RxMSG.id;
+               CAN_Rxpara.CAN_Buf[0] = ECAN_RxMSG.data0;
+               CAN_Rxpara.CAN_Buf[1] = ECAN_RxMSG.data1;
+               CAN_Rxpara.CAN_Buf[2] = ECAN_RxMSG.data2;
+               CAN_Rxpara.CAN_Buf[3] = ECAN_RxMSG.data3;
+               CAN_Rxpara.CAN_Buf[4] = ECAN_RxMSG.data4;
+               CAN_Rxpara.CAN_Buf[5] = ECAN_RxMSG.data5;
+               CAN_Rxpara.CAN_Buf[6] = ECAN_RxMSG.data6;
+               CAN_Rxpara.CAN_Buf[7] = ECAN_RxMSG.data7;
+               CAN_RStatus = 1;          // if new data is present then set can flag
+           }
+        }   
+    }
+    //CAN_RStatus = Read_ECan(0,&CAN_Rxpara.CANID,8,0,CAN_Rxpara.CAN_Buf);    // Read CAN Bus
+    if(CAN_RStatus == 1)            // Check data on CAN is present
+    {
+        if(CAN_Rxpara.CANID == CAN_Txpara.CANID)//CAN_Txpara.CANID)  // Check CAN ID
+        {
+            if((CAN_Rxpara.CAN_Buf[0]=='O') && (CAN_Rxpara.CAN_Buf[1]=='D')) // Check OD String
             {
-                digital_output = (uint16_t)((CAN_RBuf[2]<<8)|(CAN_RBuf[3]<<0));
+                digital_output = (uint16_t)((CAN_Rxpara.CAN_Buf[2]<<8)|(CAN_Rxpara.CAN_Buf[3]<<0));
                 Digital_Output_Handler();  // Take action as per output signal
             }
-            else if((CAN_RBuf[0]=='D') && (CAN_RBuf[1]=='M'))
+            else if((CAN_Rxpara.CAN_Buf[0]=='D') && (CAN_Rxpara.CAN_Buf[1]=='M'))
             {
                Red_Led = true; 
+               serial_diagnost = true;
             }
-            else if((CAN_RBuf[0]=='N') && (CAN_RBuf[1]=='M'))
+            else if((CAN_Rxpara.CAN_Buf[0]=='N') && (CAN_Rxpara.CAN_Buf[1]=='M'))
             {
                Red_Led = false; 
+               serial_diagnost = false;
             }
-            else if((CAN_RBuf[0]=='O') && (CAN_RBuf[1]=='K')) // Check Valid Response
+            else if((CAN_Rxpara.CAN_Buf[0]=='O') && (CAN_Rxpara.CAN_Buf[1]=='K')) // Check Valid Response
             {
                 Yellow_led = true;  
                 can_timeout = 60000;
             }
-            else if((CAN_RBuf[0]=='T') && (CAN_RBuf[1]=='M'))  // MAIN 
+            else if((CAN_Rxpara.CAN_Buf[0]=='T') && (CAN_Rxpara.CAN_Buf[1]=='M'))  // MAIN 
             {
-                Eeprom_Write(2,1);
-                CANTID = 409;
+               // Eeprom_Write(2,1);
+                Eeprom_Write(1,'1');Eeprom_Write(2,'1');Eeprom_Write(3,'1');
+                CLRWDT();
+                Delay_Ms(100);
+                eep_read1 = Eeprom_Read(1); eep_read2 = Eeprom_Read(2); eep_read3 = Eeprom_Read(3);
+                if(((eep_read1 != '1')&&(eep_read2 != '1'))||((eep_read2 != '1')&&(eep_read3 != '1'))||((eep_read1 != '1')&&(eep_read3 != '1')))
+                {
+                    Eeprom_Write(1,'1');Eeprom_Write(2,'1');Eeprom_Write(3,'1');
+                    EUSART1_String("CANID 409 stored at eeprom failed\r\n");
+                }
+                else
+                {
+                    EUSART1_String("CANID 409 stored at eeprom Success\r\n");
+                }
+                CAN_Txpara.CANID = 409;
             }
-            else if((CAN_RBuf[0]=='T') && (CAN_RBuf[1]=='A'))  // AUX
+            else if((CAN_Rxpara.CAN_Buf[0]=='T') && (CAN_Rxpara.CAN_Buf[1]=='A'))  // AUX
             {
-                Eeprom_Write(2,2);
-                CANTID = 410;
+                //Eeprom_Write(2,2);
+                Eeprom_Write(1,'2');Eeprom_Write(2,'2');Eeprom_Write(3,'2');
+                CLRWDT();
+                Delay_Ms(100);
+                eep_read1 = Eeprom_Read(1); eep_read2 = Eeprom_Read(2); eep_read3 = Eeprom_Read(3);
+                if(((eep_read1 != '2')&&(eep_read2 != '2'))||((eep_read2 != '2')&&(eep_read3 != '2'))||((eep_read1 != '2')&&(eep_read3 != '2')))
+                {
+                    Eeprom_Write(1,'2');Eeprom_Write(2,'2');Eeprom_Write(3,'2');
+                    EUSART1_String("CANID 410 stored at eeprom failed\r\n");
+                }
+                else
+                {
+                    EUSART1_String("CANID 410 stored at eeprom Success\r\n");
+                }
+                CAN_Txpara.CANID = 410;
             }
-            else if((CAN_RBuf[0]=='C') && (CAN_RBuf[1]=='S'))  // CAN Speed 
+            else if((CAN_Rxpara.CAN_Buf[0]=='C') && (CAN_Rxpara.CAN_Buf[1]=='S'))  // CAN Speed 
             {
-                if(CAN_RBuf[2] == 1)
+                if(CAN_Rxpara.CAN_Buf[2] == 1)
                 {
-                   Eeprom_Write(1,1); 
+                   //Eeprom_Write(1,1);
+                    Eeprom_Write(4,'1');Eeprom_Write(5,'1');Eeprom_Write(6,'1');
+                    CLRWDT();
+                    Delay_Ms(100);
+                    eep_read1 = Eeprom_Read(4); eep_read2 = Eeprom_Read(5); eep_read3 = Eeprom_Read(6);
+                    if(((eep_read1 != '1')&&(eep_read2 != '1'))||((eep_read2 != '1')&&(eep_read3 != '1'))||((eep_read1 != '1')&&(eep_read3 != '1')))
+                    {
+                        Eeprom_Write(4,'1');Eeprom_Write(5,'1');Eeprom_Write(6,'1');
+                        EUSART1_String("CANSpeed 100K stored at eeprom failed\r\n");
+                    }
+                    else
+                    {
+                        EUSART1_String("CANSpeed 100k stored at eeprom Success\r\n");
+                    }
                 }
-                else if(CAN_RBuf[2] == 2)
+                else if(CAN_Rxpara.CAN_Buf[2] == 2)
                 {
-                   Eeprom_Write(1,2); 
+                   //Eeprom_Write(1,2); 
+                    Eeprom_Write(4,'2');Eeprom_Write(5,'2');Eeprom_Write(6,'2');
+                    CLRWDT();
+                    Delay_Ms(100);
+                    eep_read1 = Eeprom_Read(4); eep_read2 = Eeprom_Read(5); eep_read3 = Eeprom_Read(6);
+                    if(((eep_read1 != '2')&&(eep_read2 != '2'))||((eep_read2 != '2')&&(eep_read3 != '2'))||((eep_read1 != '2')&&(eep_read3 != '2')))
+                    {
+                        Eeprom_Write(4,'2');Eeprom_Write(5,'2');Eeprom_Write(6,'2');
+                        EUSART1_String("CANSpeed 100K stored at eeprom failed\r\n");
+                    }
+                    else
+                    {
+                        EUSART1_String("CANSpeed 100k stored at eeprom Success\r\n");
+                    }
                 }
-                else if(CAN_RBuf[2] == 3)
+                else if(CAN_Rxpara.CAN_Buf[2] == 3)
                 {
-                   Eeprom_Write(1,3); 
+                   //Eeprom_Write(1,3); 
+                    Eeprom_Write(4,'3');Eeprom_Write(5,'3');Eeprom_Write(6,'3');
+                    CLRWDT();
+                    Delay_Ms(100);
+                    eep_read1 = Eeprom_Read(4); eep_read2 = Eeprom_Read(5); eep_read3 = Eeprom_Read(6);
+                    if(((eep_read1 != '3')&&(eep_read2 != '3'))||((eep_read2 != '3')&&(eep_read3 != '3'))||((eep_read1 != '3')&&(eep_read3 != '3')))
+                    {
+                        Eeprom_Write(4,'3');Eeprom_Write(5,'3');Eeprom_Write(6,'3');
+                        EUSART1_String("CANSpeed 100K stored at eeprom failed\r\n");
+                    }
+                    else
+                    {
+                        EUSART1_String("CANSpeed 100k stored at eeprom Success\r\n");
+                    }
                 }
-                else if(CAN_RBuf[2] == 4)
+                else if(CAN_Rxpara.CAN_Buf[2] == 4)
                 {
-                   Eeprom_Write(1,4); 
+                  // Eeprom_Write(1,4); 
+                    Eeprom_Write(4,'4');Eeprom_Write(5,'4');Eeprom_Write(6,'4');
+                    CLRWDT();
+                    Delay_Ms(100);
+                    eep_read1 = Eeprom_Read(4); eep_read2 = Eeprom_Read(5); eep_read3 = Eeprom_Read(6);
+                    if(((eep_read1 != '4')&&(eep_read2 != '4'))||((eep_read2 != '4')&&(eep_read3 != '4'))||((eep_read1 != '4')&&(eep_read3 != '4')))
+                    {
+                        Eeprom_Write(4,'4');Eeprom_Write(5,'4');Eeprom_Write(6,'4');
+                        EUSART1_String("CANSpeed 100K stored at eeprom failed\r\n");
+                    }
+                    else
+                    {
+                        EUSART1_String("CANSpeed 100k stored at eeprom Success\r\n");
+                    }
                 }
             }
             else
             {
                 Yellow_led = false;  
             }
-            
         }
+        CAN_RStatus = 0;
+        memset(CAN_Rxpara.CAN_Buf,0x00,8*sizeof(uint16_t)); 
     }
     if(Uart1_Frame_Flag == 1)
     {
@@ -860,24 +1081,36 @@ void Data_Process(void)
         Uart2_Data_Handler();           // Check UART received data
         if(uart2_data_flag == true)
         {
-          Uart1_Data_Send(); 
+          Uart1_Data_Send();            //uart2 received data send to uart1
           uart2_data_flag = false;
         }
         if(nrf_data_flag == 1)
         {
-            ECanWriteMessage(0,CANRID,8,0,CAN_TBuf);
-            for(channel=0;channel<38;channel++)
-            {
-                EUSART1_Write(Uart2_array[channel]);
-            }
-            EUSART1_String("\n");
+//            ECAN_TxMSG.idType = dSTANDARD_CAN_MSG_ID_2_0B;
+//            ECAN_TxMSG.dlc    = 8;
+//            ECAN_TxMSG.id     = CAN_Rxpara.CANID;
+//            ECAN_TxMSG.data0  = CAN_Txpara.CAN_Buf[0];
+//            ECAN_TxMSG.data1  = CAN_Txpara.CAN_Buf[1];
+//            ECAN_TxMSG.data2  = CAN_Txpara.CAN_Buf[2];
+//            ECAN_TxMSG.data3  = CAN_Txpara.CAN_Buf[3];
+//            ECAN_TxMSG.data4  = CAN_Txpara.CAN_Buf[4];
+//            ECAN_TxMSG.data5  = CAN_Txpara.CAN_Buf[5];
+//            ECAN_TxMSG.data6  = CAN_Txpara.CAN_Buf[6];
+//            ECAN_TxMSG.data7  = CAN_Txpara.CAN_Buf[7];
+//            CAN_transmit(&ECAN_TxMSG);
+            //ECanWriteMessage(0,CAN_Rxpara.CANID,8,0,CAN_Txpara.CAN_Buf);
+//            for(channel=0;channel<38;channel++)
+//            {
+//                EUSART1_Write(Uart2_array[channel]);
+//            }
+//            EUSART1_String("\n");
             if(serial_diagnost == true)
             {
               EUSART1_String("{,LP,");
-              sprintf(temp_buf,"%d,%d,%d,%d,%d,%d,%d,%d,%d,}\n",(uint16_t)CANRID,CAN_TBuf[0],CAN_TBuf[1],CAN_TBuf[2],CAN_TBuf[3],CAN_TBuf[4],CAN_TBuf[5],CAN_TBuf[6],CAN_TBuf[7]);  
+              sprintf(temp_buf,"%d,%d,%d,%d,%d,%d,%d,%d,%d,}\n",(uint16_t)CAN_Rxpara.CANID,CAN_Txpara.CAN_Buf[0],CAN_Txpara.CAN_Buf[1],CAN_Txpara.CAN_Buf[2],CAN_Txpara.CAN_Buf[3],CAN_Txpara.CAN_Buf[4],CAN_Txpara.CAN_Buf[5],CAN_Txpara.CAN_Buf[6],CAN_Txpara.CAN_Buf[7]);  
               EUSART1_String(temp_buf);
             }
-            memset(CAN_TBuf,0x00,8*sizeof(uint8_t));
+            memset(CAN_Txpara.CAN_Buf,0x00,8*sizeof(uint8_t));
             nrf_data_flag = false;
         }
         Uart2_Frame_Flag = 0;

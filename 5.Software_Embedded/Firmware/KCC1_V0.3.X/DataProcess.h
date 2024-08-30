@@ -16,6 +16,8 @@
 
 #define ADC_Offset_Count 5
 
+#define Firm_Ver 0.03  // version
+
 typedef struct
 {
     uint8_t Output_1:1;
@@ -36,16 +38,26 @@ typedef struct
     uint8_t Output_16:1;
 }OP_HANDLE;
 
+typedef struct
+{
+    uint8_t CAN_Buf[9];
+    uint32_t CANID;
+}CAN_data;
+
 OP_HANDLE Doutput;
+
+CAN_data CAN_Txpara,CAN_Rxpara;
+
+uCAN_MSG ECAN_TxMSG,ECAN_RxMSG;
 
 extern bool Red_Led,serial_diagnost;
 //bool diagnost_mode;
-uint8_t  CAN_TBuf[9],CAN_RBuf[9],DADC[3],can_frame_no;//,adc_overflow;
+uint8_t  DADC[3];//,adc_overflow; CAN_TBuf[9],CAN_RBuf[9],
 uint8_t  digital_status,uart1_data_flag,uart2_data_flag,can1_data_flag,nrf_data_flag,NRFP_flag,NRFC_flag;
 uint8_t  CAN_RStatus,ADC_PCnt[8],ADC_NCnt[8];//,N_Cap,N_Bat,N_MSB,N_LSB,
 uint16_t digital_output;
 uint16_t ADC[10],NID,N_Load,N_ADC,temp_ADC[15];//adc_result,
-uint32_t CANRID,N_Serial,CANTID;
+uint32_t N_Serial;//CANRID,CANTID;
 volatile uint8_t Uart1_Frame_Flag,Uart2_Frame_Flag,uart1_index,uart2_index;
 char Uart1_array[25],Uart2_array[40];
 volatile uint32_t can_timeout;
