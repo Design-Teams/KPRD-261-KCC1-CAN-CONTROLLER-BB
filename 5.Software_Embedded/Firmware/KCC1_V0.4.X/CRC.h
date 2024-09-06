@@ -8,8 +8,8 @@
 #ifndef CRC_H
 #define	CRC_H
 
-uint16_t Check_Sum(uint16_t CRC_data);
-
+uint16_t CRC16_calculate(uint16_t const Sum_data);
+uint32_t CRC32_calculate(uint32_t const Sum_data);
 #ifdef	__cplusplus
 extern "C" {
 #endif

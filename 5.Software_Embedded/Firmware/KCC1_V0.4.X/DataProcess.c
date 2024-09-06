@@ -332,21 +332,28 @@ void Uart2_Data_Handler(void)
             token = strtok(NULL,",");
             sprintf(token_buf[k],"%s",token);
         }
-        memset(CAN_Txpara.CAN_Buf,0x00,8*sizeof(uint8_t));
-        CAN_Rxpara.CANID = 0;
-        N_Load = 0;
-        N_ADC  = 0;
-        CAN_Rxpara.CANID     = (uint16_t)(atol(token_buf[0]));//Hook Type Main/Aux
-        N_Load     = (uint16_t)(atol(token_buf[1]));//Calibrated Load
-        N_ADC      = (uint16_t)(atol(token_buf[2]));//Load Adc Count
-        CAN_Txpara.CAN_Buf[4] = (uint8_t)(atol(token_buf[3]));//Load Status safe/approch/overload
-        CAN_Txpara.CAN_Buf[5] = (uint8_t)(((atol(token_buf[4]))& 0xFF00)>>8);//Battery adc count
-        CAN_Txpara.CAN_Buf[6] = (uint8_t)(((atol(token_buf[4]))& 0x00FF)>>0);
-        CAN_Txpara.CAN_Buf[7] = (uint8_t)(atol(token_buf[5]));//temperature
-        CAN_Txpara.CAN_Buf[0] = (uint8_t)((N_Load & 0xFF00)>>8);
-        CAN_Txpara.CAN_Buf[1] = (uint8_t)((N_Load & 0x00FF)>>0);
-        CAN_Txpara.CAN_Buf[2] = (uint8_t)((N_ADC & 0xFF00)>>8);
-        CAN_Txpara.CAN_Buf[3] = (uint8_t)((N_ADC & 0x00FF)>>0);
+       
+        NRF.ID         = (uint16_t)(atol(token_buf[0]));//Hook Type Main/Aux
+        NRF.Act_Load   = (uint16_t)(atol(token_buf[1]));//Calibrated Load
+        NRF.Load_Count = (uint16_t)(atol(token_buf[2]));//Load Adc Count
+        NRF.Bat_Vtg    = (uint16_t)(atol(token_buf[3]));//Battery Voltage
+        NRF.Status     = (uint8_t)(atol(token_buf[4]));//Status
+        
+//         memset(CAN_Txpara.CAN_Buf,0x00,8*sizeof(uint8_t));
+//        CAN_Rxpara.CANID = 0;
+//        N_Load = 0;
+//        N_ADC  = 0;
+//        CAN_Rxpara.CANID     = (uint16_t)(atol(token_buf[0]));//Hook Type Main/Aux
+//        N_Load     = (uint16_t)(atol(token_buf[1]));//Calibrated Load
+//        N_ADC      = (uint16_t)(atol(token_buf[2]));//Load Adc Count
+//        CAN_Txpara.CAN_Buf[4] = (uint8_t)(atol(token_buf[3]));//Load Status safe/approch/overload
+//        CAN_Txpara.CAN_Buf[5] = (uint8_t)(((atol(token_buf[4]))& 0xFF00)>>8);//Battery adc count
+//        CAN_Txpara.CAN_Buf[6] = (uint8_t)(((atol(token_buf[4]))& 0x00FF)>>0);
+//        CAN_Txpara.CAN_Buf[7] = (uint8_t)(atol(token_buf[5]));//temperature
+//        CAN_Txpara.CAN_Buf[0] = (uint8_t)((N_Load & 0xFF00)>>8);
+//        CAN_Txpara.CAN_Buf[1] = (uint8_t)((N_Load & 0x00FF)>>0);
+//        CAN_Txpara.CAN_Buf[2] = (uint8_t)((N_ADC & 0xFF00)>>8);
+//        CAN_Txpara.CAN_Buf[3] = (uint8_t)((N_ADC & 0x00FF)>>0);
         
     }
 }
@@ -372,25 +379,13 @@ void Can_Data_Send(void)
         ECAN_TxMSG.data3  = (uint8_t)((ADC[3]&0xFF00)>>8);
         ECAN_TxMSG.data4  = (uint8_t)((ADC[3]&0x00FF)>>0);
         ECAN_TxMSG.data5  = DADC[0];//(uint8_t)((ADC[2]&0xFF00)>>8);//119
-        crc = (uint16_t)(ECAN_TxMSG.data0+ECAN_TxMSG.data1+ECAN_TxMSG.data2+ECAN_TxMSG.data3+ECAN_TxMSG.data4+ECAN_TxMSG.data5);
-        crc = Check_Sum(crc);
+        crc = (uint16_t)ECAN_TxMSG.id;
+        crc += (uint16_t)(ECAN_TxMSG.data0+ECAN_TxMSG.data1+ECAN_TxMSG.data2+ECAN_TxMSG.data3+ECAN_TxMSG.data4+ECAN_TxMSG.data5);
+        crc = CRC16_calculate(crc);
         ECAN_TxMSG.data6 = (uint8_t)((crc&0xFF00)>>8);
         ECAN_TxMSG.data7 = (uint8_t)((crc&0x00FF)>>0);
-        //ECAN_TxMSG.data6  = (uint8_t)((ADC[2]&0xFF00)>>8);//(uint8_t)((ADC[2]&0x00FF)>>0);
-        //ECAN_TxMSG.data7  = (uint8_t)((ADC[2]&0x00FF)>>0);// DADC[0];
         CAN_transmit(&ECAN_TxMSG);
-        //can_frame_no++;
-        can_frame_no = 0;
-//        CAN_Txpara.CAN_Buf[0] = 0x01;
-//        CAN_Txpara.CAN_Buf[1] = (uint8_t)((ADC[0]&0xFF00)>>8);
-//        CAN_Txpara.CAN_Buf[2] = (uint8_t)((ADC[0]&0x00FF)>>0);
-//        CAN_Txpara.CAN_Buf[3] = (uint8_t)((ADC[1]&0xFF00)>>8);
-//        CAN_Txpara.CAN_Buf[4] = (uint8_t)((ADC[1]&0x00FF)>>0);
-//        CAN_Txpara.CAN_Buf[5] = (uint8_t)((ADC[2]&0xFF00)>>8);
-//        CAN_Txpara.CAN_Buf[6] = (uint8_t)((ADC[2]&0x00FF)>>0);
-//        CAN_Txpara.CAN_Buf[7] = DADC[0];
-//        ECanWriteMessage(0,CAN_Txpara.CANID,8,0,CAN_Txpara.CAN_Buf);
-//        can_frame_no++;
+        can_frame_no++;
     }
     else if(can_frame_no == 1)
     {
@@ -398,25 +393,20 @@ void Can_Data_Send(void)
         ECAN_TxMSG.dlc    = 8;
         ECAN_TxMSG.id     = CAN_Txpara.CANID;//CAN_Txpara.CANID;
         ECAN_TxMSG.data0  = 0x02;
-        ECAN_TxMSG.data1  = (uint8_t)((ADC[3]&0xFF00)>>8);
-        ECAN_TxMSG.data2  = (uint8_t)((ADC[3]&0x00FF)>>0);
-        ECAN_TxMSG.data3  = (uint8_t)((ADC[4]&0xFF00)>>8);
-        ECAN_TxMSG.data4  = (uint8_t)((ADC[4]&0x00FF)>>0);
-        ECAN_TxMSG.data5  = (uint8_t)((ADC[5]&0xFF00)>>8);
-        ECAN_TxMSG.data6  = (uint8_t)((ADC[5]&0x00FF)>>0);
-        ECAN_TxMSG.data7  =  DADC[1];
+        ECAN_TxMSG.data1  = (uint8_t)((ADC[4]&0xFF00)>>8);
+        ECAN_TxMSG.data2  = (uint8_t)((ADC[4]&0x00FF)>>0);
+        ECAN_TxMSG.data3  = (uint8_t)((ADC[5]&0xFF00)>>8);
+        ECAN_TxMSG.data4  = (uint8_t)((ADC[5]&0x00FF)>>0);
+        ECAN_TxMSG.data5  = DADC[1];//(uint8_t)((ADC[5]&0xFF00)>>8);
+                
+        crc = (uint16_t)ECAN_TxMSG.id;
+        crc += (uint16_t)(ECAN_TxMSG.data0+ECAN_TxMSG.data1+ECAN_TxMSG.data2+ECAN_TxMSG.data3+ECAN_TxMSG.data4+ECAN_TxMSG.data5);
+        crc = CRC16_calculate(crc);
+        ECAN_TxMSG.data6 = (uint8_t)((crc&0xFF00)>>8);
+        ECAN_TxMSG.data7 = (uint8_t)((crc&0x00FF)>>0);
+        
         CAN_transmit(&ECAN_TxMSG);
         can_frame_no++;
-//        CAN_Txpara.CAN_Buf[0] = 0x02;
-//        CAN_Txpara.CAN_Buf[1] = (uint8_t)((ADC[3]&0xFF00)>>8);
-//        CAN_Txpara.CAN_Buf[2] = (uint8_t)((ADC[3]&0x00FF)>>0);
-//        CAN_Txpara.CAN_Buf[3] = (uint8_t)((ADC[4]&0xFF00)>>8);
-//        CAN_Txpara.CAN_Buf[4] = (uint8_t)((ADC[4]&0x00FF)>>0);
-//        CAN_Txpara.CAN_Buf[5] = (uint8_t)((ADC[5]&0xFF00)>>8);
-//        CAN_Txpara.CAN_Buf[6] = (uint8_t)((ADC[5]&0x00FF)>>0);
-//        CAN_Txpara.CAN_Buf[7] = DADC[1];
-//        ECanWriteMessage(0,CAN_Txpara.CANID,8,0,CAN_Txpara.CAN_Buf); 
-//        can_frame_no++;
     }
     else if(can_frame_no == 2)
     {
@@ -424,25 +414,20 @@ void Can_Data_Send(void)
         ECAN_TxMSG.dlc    = 8;
         ECAN_TxMSG.id     = CAN_Txpara.CANID;//CAN_Txpara.CANID;
         ECAN_TxMSG.data0  = 0x03;
-        ECAN_TxMSG.data1  = (uint8_t)((ADC[7]&0xFF00)>>8);
-        ECAN_TxMSG.data2  = (uint8_t)((ADC[7]&0x00FF)>>0);
-        ECAN_TxMSG.data3  = (uint8_t)((ADC[6]&0xFF00)>>8);
-        ECAN_TxMSG.data4  = (uint8_t)((ADC[6]&0x00FF)>>0);
-        ECAN_TxMSG.data5  = (uint8_t)((ADC[9]&0xFF00)>>8);
-        ECAN_TxMSG.data6  = (uint8_t)((ADC[9]&0x00FF)>>0);
-        ECAN_TxMSG.data7  =  DADC[2];
+        ECAN_TxMSG.data1  = (uint8_t)((ADC[6]&0xFF00)>>8);
+        ECAN_TxMSG.data2  = (uint8_t)((ADC[6]&0x00FF)>>0);
+        ECAN_TxMSG.data3  = (uint8_t)((ADC[7]&0xFF00)>>8);
+        ECAN_TxMSG.data4  = (uint8_t)((ADC[7]&0x00FF)>>0);
+        ECAN_TxMSG.data5  =  DADC[2];
+                
+        crc = (uint16_t)ECAN_TxMSG.id;
+        crc += (uint16_t)(ECAN_TxMSG.data0+ECAN_TxMSG.data1+ECAN_TxMSG.data2+ECAN_TxMSG.data3+ECAN_TxMSG.data4+ECAN_TxMSG.data5);
+        crc = CRC16_calculate(crc);
+        ECAN_TxMSG.data6 = (uint8_t)((crc&0xFF00)>>8);
+        ECAN_TxMSG.data7 = (uint8_t)((crc&0x00FF)>>0);
+        
         CAN_transmit(&ECAN_TxMSG);
         can_frame_no++;
-//        CAN_Txpara.CAN_Buf[0] = 0x03;
-//        CAN_Txpara.CAN_Buf[1] = (uint8_t)((ADC[7]&0xFF00)>>8);
-//        CAN_Txpara.CAN_Buf[2] = (uint8_t)((ADC[7]&0x00FF)>>0);
-//        CAN_Txpara.CAN_Buf[3] = (uint8_t)((ADC[6]&0xFF00)>>8);
-//        CAN_Txpara.CAN_Buf[4] = (uint8_t)((ADC[6]&0x00FF)>>0);
-//        CAN_Txpara.CAN_Buf[5] = (uint8_t)((ADC[9]&0xFF00)>>8);
-//        CAN_Txpara.CAN_Buf[6] = (uint8_t)((ADC[9]&0x00FF)>>0);
-//        CAN_Txpara.CAN_Buf[7] = DADC[2];
-//        ECanWriteMessage(0,CAN_Txpara.CANID,8,0,CAN_Txpara.CAN_Buf); 
-//        can_frame_no++;
     }
     else if(can_frame_no == 3)
     {
@@ -452,28 +437,91 @@ void Can_Data_Send(void)
         ECAN_TxMSG.data0  = 0x04;
         ECAN_TxMSG.data1  = (uint8_t)((ADC[8]&0xFF00)>>8);
         ECAN_TxMSG.data2  = (uint8_t)((ADC[8]&0x00FF)>>0);
-        ECAN_TxMSG.data3  = 0;
+        ECAN_TxMSG.data3  = (uint8_t)((ADC[9]&0xFF00)>>8);
+        ECAN_TxMSG.data4  = (uint8_t)((ADC[9]&0x00FF)>>0);
+        ECAN_TxMSG.data5  = 0;                
+        
+        crc = (uint16_t)ECAN_TxMSG.id;
+        crc += (uint16_t)(ECAN_TxMSG.data0+ECAN_TxMSG.data1+ECAN_TxMSG.data2+ECAN_TxMSG.data3+ECAN_TxMSG.data4);
+        crc = CRC16_calculate(crc);
+        
+        ECAN_TxMSG.data6 = (uint8_t)((crc&0xFF00)>>8);
+        ECAN_TxMSG.data7 = (uint8_t)((crc&0x00FF)>>0);
+        
+        CAN_transmit(&ECAN_TxMSG);
+        can_frame_no++;
+    }
+    else if(can_frame_no == 4)
+    {
+        ECAN_TxMSG.idType = dSTANDARD_CAN_MSG_ID_2_0B;
+        ECAN_TxMSG.dlc    = 8;
+        ECAN_TxMSG.id     = CAN_Rxpara.CANID;
+        ECAN_TxMSG.data0  = 0x05;
+        ECAN_TxMSG.data1  = CAN_Txpara.CAN_Buf[0];
+        ECAN_TxMSG.data2  = CAN_Txpara.CAN_Buf[1];
+        ECAN_TxMSG.data3  = CAN_Txpara.CAN_Buf[2];
+        ECAN_TxMSG.data4  = CAN_Txpara.CAN_Buf[3];
+        ECAN_TxMSG.data5  = CAN_Txpara.CAN_Buf[4];                
+        
+        crc = (uint16_t)ECAN_TxMSG.id;
+        crc += (uint16_t)(ECAN_TxMSG.data0+ECAN_TxMSG.data1+ECAN_TxMSG.data2+ECAN_TxMSG.data3+ECAN_TxMSG.data4+ECAN_TxMSG.data5);
+        crc = CRC16_calculate(crc);
+        
+        ECAN_TxMSG.data6 = (uint8_t)((crc&0xFF00)>>8);
+        ECAN_TxMSG.data7 = (uint8_t)((crc&0x00FF)>>0);
+        
+        CAN_transmit(&ECAN_TxMSG);
+        can_frame_no++;
+    }
+    else if(can_frame_no == 5)      // NRF Data Start
+    {
+        ECAN_TxMSG.idType = dSTANDARD_CAN_MSG_ID_2_0B;
+        ECAN_TxMSG.dlc    = 8;
+        ECAN_TxMSG.id     = (uint32_t)NRF.ID;
+        ECAN_TxMSG.data0  = 0x06;
+        ECAN_TxMSG.data1  = (uint8_t)((NRF.Act_Load & 0xFF00)>>8);
+        ECAN_TxMSG.data2  = (uint8_t)((NRF.Act_Load & 0x00FF)>>0);
+        ECAN_TxMSG.data3  = (uint8_t)((NRF.Load_Count & 0xFF00)>>8);
+        ECAN_TxMSG.data4  = (uint8_t)((NRF.Load_Count & 0x00FF)>>0);
+        ECAN_TxMSG.data5  = 0;                
+        
+        crc = (uint16_t)ECAN_TxMSG.id;
+        crc += (uint16_t)(ECAN_TxMSG.data0+ECAN_TxMSG.data1+ECAN_TxMSG.data2+ECAN_TxMSG.data3+ECAN_TxMSG.data4);
+        crc = CRC16_calculate(crc);
+        
+        ECAN_TxMSG.data6 = (uint8_t)((crc&0xFF00)>>8);
+        ECAN_TxMSG.data7 = (uint8_t)((crc&0x00FF)>>0);
+        
+        CAN_transmit(&ECAN_TxMSG);
+        can_frame_no++;
+    }
+    else if(can_frame_no == 6)      // NRF Data Start
+    {
+        ECAN_TxMSG.idType = dSTANDARD_CAN_MSG_ID_2_0B;
+        ECAN_TxMSG.dlc    = 8;
+        ECAN_TxMSG.id     = (uint32_t)NRF.ID;
+        ECAN_TxMSG.data0  = 0x07;
+        ECAN_TxMSG.data1  = (uint8_t)((NRF.Bat_Vtg & 0xFF00)>>8);
+        ECAN_TxMSG.data2  = (uint8_t)((NRF.Bat_Vtg & 0x00FF)>>0);
+        ECAN_TxMSG.data3  = NRF.Status;
         ECAN_TxMSG.data4  = 0;
-        ECAN_TxMSG.data5  = 0;
-        ECAN_TxMSG.data6  = 0;
-        ECAN_TxMSG.data7  = 0;
+        ECAN_TxMSG.data5  = 0;                
+        
+        crc = (uint16_t)ECAN_TxMSG.id;
+        crc += (uint16_t)(ECAN_TxMSG.data0+ECAN_TxMSG.data1+ECAN_TxMSG.data2+ECAN_TxMSG.data3);
+        crc = CRC16_calculate(crc);
+        
+        ECAN_TxMSG.data6 = (uint8_t)((crc&0xFF00)>>8);
+        ECAN_TxMSG.data7 = (uint8_t)((crc&0x00FF)>>0);
+        
         CAN_transmit(&ECAN_TxMSG);
         can_frame_no = 0;
-//        CAN_Txpara.CAN_Buf[0] = 0x04;
-//        CAN_Txpara.CAN_Buf[1] = (uint8_t)((ADC[8]&0xFF00)>>8);
-//        CAN_Txpara.CAN_Buf[2] = (uint8_t)((ADC[8]&0x00FF)>>0);
-//        CAN_Txpara.CAN_Buf[3] = 0;
-//        CAN_Txpara.CAN_Buf[4] = 0;
-//        CAN_Txpara.CAN_Buf[5] = 0;
-//        CAN_Txpara.CAN_Buf[6] = 0;
-//        CAN_Txpara.CAN_Buf[7] = 0;
-//        ECanWriteMessage(0,CAN_Txpara.CANID,8,0,CAN_Txpara.CAN_Buf); 
-//        can_frame_no = 0;
     }
 }
 
 void CAN_Request_Send(void)
 {
+    uint16_t crc = 0;
     //memset(ECAN_TxMSG.,0x00,8*sizeof(uint8_t));
     ECAN_TxMSG.idType = dSTANDARD_CAN_MSG_ID_2_0B;
     ECAN_TxMSG.dlc    = 8;
@@ -486,6 +534,13 @@ void CAN_Request_Send(void)
     ECAN_TxMSG.data5  = 0;
     ECAN_TxMSG.data6  = 0;
     ECAN_TxMSG.data7  = 0;
+    
+    crc = (uint16_t)ECAN_TxMSG.id;
+    crc += (uint16_t)(ECAN_TxMSG.data0+ECAN_TxMSG.data1+ECAN_TxMSG.data2+ECAN_TxMSG.data3);
+    crc = CRC16_calculate(crc);
+    ECAN_TxMSG.data6 = (uint8_t)((crc&0xFF00)>>8);
+    ECAN_TxMSG.data7 = (uint8_t)((crc&0x00FF)>>0);   
+    
     CAN_transmit(&ECAN_TxMSG);
 //    CAN_Txpara.CAN_Buf[0] = 'S';
 //    CAN_Txpara.CAN_Buf[1] = 'T';

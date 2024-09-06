@@ -20594,11 +20594,19 @@ typedef struct
     uint32_t CANID;
 }CAN_data;
 
+typedef struct
+{
+    uint8_t Status;
+    uint16_t ID;
+    uint16_t Act_Load;
+    uint16_t Load_Count;
+    uint16_t Bat_Vtg;
+}NRF_Para;
+
 OP_HANDLE Doutput;
-
 CAN_data CAN_Txpara,CAN_Rxpara;
-
 uCAN_MSG ECAN_TxMSG,ECAN_RxMSG;
+NRF_Para NRF;
 
 extern _Bool Red_Led,serial_diagnost;
 
@@ -20642,7 +20650,8 @@ void Eeprom_Read_Array(uint16_t Addr,uint8_t *Data, uint8_t length);
 
 # 1 "./CRC.h" 1
 # 11 "./CRC.h"
-uint16_t Check_Sum(uint16_t CRC_data);
+uint16_t CRC16_calculate(uint16_t const Sum_data);
+uint32_t CRC32_calculate(uint32_t const Sum_data);
 # 27 "./main.h" 2
 
 volatile uint16_t ms_count,can_count,Led_Count,blink_flag,Watchdog_count;

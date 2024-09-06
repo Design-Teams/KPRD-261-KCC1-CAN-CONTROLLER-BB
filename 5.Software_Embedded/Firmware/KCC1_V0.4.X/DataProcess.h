@@ -16,7 +16,7 @@
 
 #define ADC_Offset_Count 5
 
-#define Firm_Ver 0.03  // version
+#define Firm_Ver 0.04  // version
 
 typedef struct
 {
@@ -44,11 +44,19 @@ typedef struct
     uint32_t CANID;
 }CAN_data;
 
+typedef struct
+{
+    uint8_t Status;
+    uint16_t ID;
+    uint16_t Act_Load;
+    uint16_t Load_Count;
+    uint16_t Bat_Vtg;
+}NRF_Para;
+
 OP_HANDLE Doutput;
-
 CAN_data CAN_Txpara,CAN_Rxpara;
-
 uCAN_MSG ECAN_TxMSG,ECAN_RxMSG;
+NRF_Para NRF;
 
 extern bool Red_Led,serial_diagnost;
 //bool diagnost_mode;
