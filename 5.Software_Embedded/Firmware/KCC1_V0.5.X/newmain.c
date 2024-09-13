@@ -144,17 +144,23 @@ void main(void)
     Led_Count = 500;
     can_timeout = 10000;
     Watchdog_count = 800;
+    serial_diagnost = true;
     while(1)
     {
         Data_Process();
         if(can_count == 0)
         {
-            if(serial_diagnost == true)
-            {
-                Uart1_Data_Send();
-            }
+//            if(serial_diagnost == true)
+//            {
+//                Uart1_Data_Send();
+//            }
             Can_Data_Send();
             can_count = 500;
+        }
+        if(Uart2_Frame_Flag == 1)
+        {
+            Uart2_Data_Handler();
+            Uart2_Frame_Flag = 0;
         }
         if(Watchdog_count == 0)
         {

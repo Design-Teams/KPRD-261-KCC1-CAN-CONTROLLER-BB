@@ -16,11 +16,11 @@ uint16_t CRC16_calculate(uint16_t const Sum_data)
     return CRC16;
 }
 
-uint32_t CRC32_calculate(uint32_t const Sum_data)
-{
-    uint32_t CRC32=0;
-    
-    CRC32 = ((4294967295-Sum_data)+ 1);
-    
-    return CRC32;
-}
+//uint32_t CRC32_calculate(uint32_t const Sum_data)
+//{
+//    uint32_t CRC32=0;
+//    
+//    CRC32 = ((4294967295-Sum_data)+ 1);
+//    
+//    return CRC32;
+//}

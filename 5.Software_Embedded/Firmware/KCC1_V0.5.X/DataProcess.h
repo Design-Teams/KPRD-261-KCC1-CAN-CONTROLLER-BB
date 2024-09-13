@@ -16,7 +16,7 @@
 
 #define ADC_Offset_Count 5
 
-#define Firm_Ver 0.04  // version
+#define Firm_Ver 0.05  // version
 
 typedef struct
 {
@@ -56,12 +56,13 @@ typedef struct
 OP_HANDLE Doutput;
 CAN_data CAN_Txpara,CAN_Rxpara;
 uCAN_MSG ECAN_TxMSG,ECAN_RxMSG;
-NRF_Para NRF;
+NRF_Para NRF[2];
 
 extern bool Red_Led,serial_diagnost;
 //bool diagnost_mode;
 uint8_t  DADC[3];//,adc_overflow; CAN_TBuf[9],CAN_RBuf[9],
-uint8_t  digital_status,uart1_data_flag,uart2_data_flag,can1_data_flag,nrf_data_flag,NRFP_flag,NRFC_flag;
+uint8_t uart2_data_flag;
+uint8_t  digital_status,uart1_data_flag,can1_data_flag,nrf_data_flag,NRFP_flag,NRFC_flag;
 uint8_t  CAN_RStatus,ADC_PCnt[8],ADC_NCnt[8];//,N_Cap,N_Bat,N_MSB,N_LSB,
 uint16_t digital_output;
 uint16_t ADC[10],NID,N_Load,N_ADC,temp_ADC[15];//adc_result,

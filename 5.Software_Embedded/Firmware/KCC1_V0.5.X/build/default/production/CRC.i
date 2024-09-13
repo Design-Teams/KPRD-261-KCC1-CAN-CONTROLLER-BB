@@ -20544,12 +20544,13 @@ typedef struct
 OP_HANDLE Doutput;
 CAN_data CAN_Txpara,CAN_Rxpara;
 uCAN_MSG ECAN_TxMSG,ECAN_RxMSG;
-NRF_Para NRF;
+NRF_Para NRF[2];
 
 extern _Bool Red_Led,serial_diagnost;
 
 uint8_t DADC[3];
-uint8_t digital_status,uart1_data_flag,uart2_data_flag,can1_data_flag,nrf_data_flag,NRFP_flag,NRFC_flag;
+uint8_t uart2_data_flag;
+uint8_t digital_status,uart1_data_flag,can1_data_flag,nrf_data_flag,NRFP_flag,NRFC_flag;
 uint8_t CAN_RStatus,ADC_PCnt[8],ADC_NCnt[8];
 uint16_t digital_output;
 uint16_t ADC[10],NID,N_Load,N_ADC,temp_ADC[15];
@@ -20589,8 +20590,27 @@ void Eeprom_Read_Array(uint16_t Addr,uint8_t *Data, uint8_t length);
 # 1 "./CRC.h" 1
 # 11 "./CRC.h"
 uint16_t CRC16_calculate(uint16_t const Sum_data);
-uint32_t CRC32_calculate(uint32_t const Sum_data);
 # 27 "./main.h" 2
+
+# 1 "./Moving_Filter.h" 1
+# 23 "./Moving_Filter.h"
+typedef struct
+{
+ uint8_t buffer_index;
+    uint8_t ADC_PCnt;
+    uint8_t ADC_NCnt;
+ uint16_t adc_buffer[10];
+    uint16_t prev_adc_sum;
+ uint32_t adc_sum;
+
+}Filter;
+
+Filter moving_flt[8];
+
+void ADC_Filter_Init(uint8_t Channel_no);
+uint16_t ADC_Filter(uint16_t new_value,uint8_t Channel_no);
+uint16_t ADC_Threshold_Check(uint16_t new_value,uint8_t Channel_no);
+# 28 "./main.h" 2
 
 volatile uint16_t ms_count,can_count,Led_Count,blink_flag,Watchdog_count;
 extern volatile uint32_t can_timeout;
@@ -20606,13 +20626,4 @@ uint16_t CRC16_calculate(uint16_t const Sum_data)
     CRC16 = ((0xffff-Sum_data)+ 1);
 
     return CRC16;
-}
-
-uint32_t CRC32_calculate(uint32_t const Sum_data)
-{
-    uint32_t CRC32=0;
-
-    CRC32 = ((4294967295-Sum_data)+ 1);
-
-    return CRC32;
 }

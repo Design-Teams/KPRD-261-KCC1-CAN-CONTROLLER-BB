@@ -89,6 +89,7 @@ void System_Initialize(void)
     EUSART1_Initialize(48000000,57600); // EUSART1 Initialize
     EUSART2_Initialize(48000000,9600);  // EUSART2 Initialize
     //Soft_Uart_Initialize();             // Soft Uart Initialize
+    Soft_Uart_Tx(0);
     LATBbits.LATB2 = 1;
     CLRWDT();
     //Delay_Ms(200);
@@ -200,14 +201,17 @@ void System_Initialize(void)
     TRISAbits.TRISA3 = 1;
     TMR0_StartTimer();                 // Start Timer0
     MC_RST = 1;
-    CLRWDT();
-    Delay_Ms(500);
-    CLRWDT();
-    Delay_Ms(500);
-    CLRWDT();
-    Delay_Ms(500);
-    CLRWDT();
-    Delay_Ms(500);
+    for(eep_read1=0;eep_read1<4;eep_read1++)
+    {
+        CLRWDT();
+        Delay_Ms(500);
+    }
+//        CLRWDT();
+//    Delay_Ms(500);
+//    CLRWDT();
+//    Delay_Ms(500);
+//    CLRWDT();
+//    Delay_Ms(500);
    
     if(MC33996_SPI_Check() == 1)        // MC33996 output ic SPI integrity check 
     {
@@ -221,10 +225,15 @@ void System_Initialize(void)
     {
         EUSART1_String("SPI Check error\r\n"); 
         LATAbits.LATA2 = 1; // R LED Pin
-        Delay_Ms(500);
-        CLRWDT();
-        Delay_Ms(500);
-        CLRWDT();
+        for(eep_read1=0;eep_read1<2;eep_read1++)
+        {
+            CLRWDT();
+            Delay_Ms(500);
+        }
+//        Delay_Ms(500);
+//        CLRWDT();
+//        Delay_Ms(500);
+//        CLRWDT();
         LATAbits.LATA2 = 1; // R LED Pin
     }
     
@@ -238,10 +247,17 @@ void System_Initialize(void)
     LATBbits.LATB3   = 0;
 	TRISBbits.TRISB2 = 0; // CAN Tx
 	TRISBbits.TRISB3 = 1;
-    sprintf(buf,"KCC1_V%0.2f CANID = %d,CANSpeed = %d\r\n",Firm_Ver,(uint16_t)CAN_Txpara.CANID,CAN_Speed);
+    sprintf(buf,"KCC1_V%0.2f",Firm_Ver);
+    EUSART1_String(buf);
+    sprintf(buf," CANID=%d",(uint16_t)CAN_Txpara.CANID);
+    EUSART1_String(buf);
+    sprintf(buf," CANSpeed=%d\r\n",CAN_Speed);
     EUSART1_String(buf);
     
-    
+    for(eep_read1=0;eep_read1<8;eep_read1++)
+    {
+        ADC_Filter_Init(eep_read1);
+    }
     LATAbits.LATA1 = 1; // LED Pin
     Delay_Ms(300);
     CLRWDT();
@@ -251,6 +267,7 @@ void System_Initialize(void)
     Delay_Ms(300);
     LATAbits.LATA2 = 0;
     CAN_Request_Send();
+    EUSART1_String("Program Starts...\r\n");
     CLRWDT();
 }
 /*=============================================================================
@@ -319,43 +336,52 @@ void Uart1_Data_Handler(void)
 
 void Uart2_Data_Handler(void)
 {
-    char* token,token_buf[6][10],lbuf[5];
-    uint8_t k;
-    
+    char* token,token_buf[6][10];//lbuf[5]={0};
+    uint8_t k=0;
+    uint16_t temp=0;
+   // PIE3bits.RC2IE = 0;
     if(memcmp(((char*)Uart2_array+1),",LP,",4) == 0)          //Output data {,OD,digital_output,mp3_stat,track_num,}
     {
         nrf_data_flag = true;
         token = strtok((char*)Uart2_array, ",");
         token = strtok(NULL,",");
-        for(k=0; k<6; k++)
+        for(k=0; k<5; k++)
         {
             token = strtok(NULL,",");
             sprintf(token_buf[k],"%s",token);
         }
-       
-        NRF.ID         = (uint16_t)(atol(token_buf[0]));//Hook Type Main/Aux
-        NRF.Act_Load   = (uint16_t)(atol(token_buf[1]));//Calibrated Load
-        NRF.Load_Count = (uint16_t)(atol(token_buf[2]));//Load Adc Count
-        NRF.Bat_Vtg    = (uint16_t)(atol(token_buf[3]));//Battery Voltage
-        NRF.Status     = (uint8_t)(atol(token_buf[4]));//Status
-        
-//         memset(CAN_Txpara.CAN_Buf,0x00,8*sizeof(uint8_t));
-//        CAN_Rxpara.CANID = 0;
-//        N_Load = 0;
-//        N_ADC  = 0;
-//        CAN_Rxpara.CANID     = (uint16_t)(atol(token_buf[0]));//Hook Type Main/Aux
-//        N_Load     = (uint16_t)(atol(token_buf[1]));//Calibrated Load
-//        N_ADC      = (uint16_t)(atol(token_buf[2]));//Load Adc Count
-//        CAN_Txpara.CAN_Buf[4] = (uint8_t)(atol(token_buf[3]));//Load Status safe/approch/overload
-//        CAN_Txpara.CAN_Buf[5] = (uint8_t)(((atol(token_buf[4]))& 0xFF00)>>8);//Battery adc count
-//        CAN_Txpara.CAN_Buf[6] = (uint8_t)(((atol(token_buf[4]))& 0x00FF)>>0);
-//        CAN_Txpara.CAN_Buf[7] = (uint8_t)(atol(token_buf[5]));//temperature
-//        CAN_Txpara.CAN_Buf[0] = (uint8_t)((N_Load & 0xFF00)>>8);
-//        CAN_Txpara.CAN_Buf[1] = (uint8_t)((N_Load & 0x00FF)>>0);
-//        CAN_Txpara.CAN_Buf[2] = (uint8_t)((N_ADC & 0xFF00)>>8);
-//        CAN_Txpara.CAN_Buf[3] = (uint8_t)((N_ADC & 0x00FF)>>0);
-        
+        temp = (uint16_t)(atol(token_buf[0]));//Hook Type Main/Aux
+        if(temp == 201)
+        {
+            NRF[0].ID         = 0;
+            NRF[0].Act_Load   = 0;
+            NRF[0].Load_Count = 0;
+            NRF[0].Bat_Vtg    = 0;
+            NRF[0].Status     = 0;
+            
+            NRF[0].ID         = (uint16_t)(atol(token_buf[0]));//Hook Type Main/Aux
+            NRF[0].Act_Load   = (uint16_t)(atol(token_buf[1]));//Calibrated Load
+            NRF[0].Load_Count = (uint16_t)(atol(token_buf[2]));//Load Adc Count
+            NRF[0].Bat_Vtg    = (uint16_t)(atol(token_buf[3]));//Battery Voltage
+            NRF[0].Status     = (uint8_t)(atol(token_buf[4]));//Status
+        }
+        else
+        {
+            NRF[1].ID         = 0;
+            NRF[1].Act_Load   = 0;
+            NRF[1].Load_Count = 0;
+            NRF[1].Bat_Vtg    = 0;
+            NRF[1].Status     = 0;
+            
+            NRF[1].ID         = (uint16_t)(atol(token_buf[0]));//Hook Type Main/Aux
+            NRF[1].Act_Load   = (uint16_t)(atol(token_buf[1]));//Calibrated Load
+            NRF[1].Load_Count = (uint16_t)(atol(token_buf[2]));//Load Adc Count
+            NRF[1].Bat_Vtg    = (uint16_t)(atol(token_buf[3]));//Battery Voltage
+            NRF[1].Status     = (uint8_t)(atol(token_buf[4]));//Status
+        }
     }
+    //PIE3bits.RC2IE = 1;
+    Uart2_Frame_Flag = 0;
 }
 /*=============================================================================
  * Function     : Can_Data_Send.
@@ -368,155 +394,146 @@ void Can_Data_Send(void)
 {
     static uint8_t can_frame_no = 0;
     uint16_t crc=0;
-    if(can_frame_no == 0)
+     ECAN_TxMSG.idType = dSTANDARD_CAN_MSG_ID_2_0B;
+     ECAN_TxMSG.dlc    = 8;
+     ECAN_TxMSG.id     = CAN_Txpara.CANID;//CAN_Txpara.CANID;
+     ECAN_TxMSG.data0  = 0;
+     ECAN_TxMSG.data1  = 0;
+     ECAN_TxMSG.data2  = 0;
+     ECAN_TxMSG.data3  = 0;
+     ECAN_TxMSG.data4  = 0;
+     ECAN_TxMSG.data5  = 0;
+     ECAN_TxMSG.data6  = 0;
+     ECAN_TxMSG.data7  = 0;
+//    if(can_frame_no == 0)
+//    {
+    switch(can_frame_no)
     {
-        ECAN_TxMSG.idType = dSTANDARD_CAN_MSG_ID_2_0B;
-        ECAN_TxMSG.dlc    = 8;
-        ECAN_TxMSG.id     = CAN_Txpara.CANID;//CAN_Txpara.CANID;
-        ECAN_TxMSG.data0  = 0x01;
-        ECAN_TxMSG.data1  = (uint8_t)((ADC[2]&0xFF00)>>8);
-        ECAN_TxMSG.data2  = (uint8_t)((ADC[2]&0x00FF)>>0);
-        ECAN_TxMSG.data3  = (uint8_t)((ADC[3]&0xFF00)>>8);
-        ECAN_TxMSG.data4  = (uint8_t)((ADC[3]&0x00FF)>>0);
-        ECAN_TxMSG.data5  = DADC[0];//(uint8_t)((ADC[2]&0xFF00)>>8);//119
-        crc = (uint16_t)ECAN_TxMSG.id;
-        crc += (uint16_t)(ECAN_TxMSG.data0+ECAN_TxMSG.data1+ECAN_TxMSG.data2+ECAN_TxMSG.data3+ECAN_TxMSG.data4+ECAN_TxMSG.data5);
-        crc = CRC16_calculate(crc);
-        ECAN_TxMSG.data6 = (uint8_t)((crc&0xFF00)>>8);
-        ECAN_TxMSG.data7 = (uint8_t)((crc&0x00FF)>>0);
-        CAN_transmit(&ECAN_TxMSG);
-        can_frame_no++;
+        case 0:
+            ECAN_TxMSG.data0  = 0x01;
+            ECAN_TxMSG.data1  = (uint8_t)((ADC[2]&0xFF00)>>8);
+            ECAN_TxMSG.data2  = (uint8_t)((ADC[2]&0x00FF)>>0);
+            ECAN_TxMSG.data3  = (uint8_t)((ADC[3]&0xFF00)>>8);
+            ECAN_TxMSG.data4  = (uint8_t)((ADC[3]&0x00FF)>>0);
+            ECAN_TxMSG.data5  = DADC[0];//(uint8_t)((ADC[2]&0xFF00)>>8);//119
+        
+            can_frame_no++;
+            break;
+    
+//    else if(can_frame_no == 1)
+//    {
+        case 1:
+            ECAN_TxMSG.data0  = 0x02;
+            ECAN_TxMSG.data1  = (uint8_t)((ADC[4]&0xFF00)>>8);
+            ECAN_TxMSG.data2  = (uint8_t)((ADC[4]&0x00FF)>>0);
+            ECAN_TxMSG.data3  = (uint8_t)((ADC[5]&0xFF00)>>8);
+            ECAN_TxMSG.data4  = (uint8_t)((ADC[5]&0x00FF)>>0);
+            ECAN_TxMSG.data5  = DADC[1];//(uint8_t)((ADC[5]&0xFF00)>>8);
+            can_frame_no++;
+            break;
+    
+//    else if(can_frame_no == 2)
+//    {
+        case 2:
+            ECAN_TxMSG.data0  = 0x03;
+            ECAN_TxMSG.data1  = (uint8_t)((ADC[6]&0xFF00)>>8);
+            ECAN_TxMSG.data2  = (uint8_t)((ADC[6]&0x00FF)>>0);
+            ECAN_TxMSG.data3  = (uint8_t)((ADC[7]&0xFF00)>>8);
+            ECAN_TxMSG.data4  = (uint8_t)((ADC[7]&0x00FF)>>0);
+            ECAN_TxMSG.data5  =  DADC[2];
+            can_frame_no++;
+            break;
+    //}
+//    else if(can_frame_no == 3)
+//    {
+        case 3:
+            ECAN_TxMSG.data0  = 0x04;
+            ECAN_TxMSG.data1  = (uint8_t)((ADC[8]&0xFF00)>>8);
+            ECAN_TxMSG.data2  = (uint8_t)((ADC[8]&0x00FF)>>0);
+            ECAN_TxMSG.data3  = (uint8_t)((ADC[9]&0xFF00)>>8);
+            ECAN_TxMSG.data4  = (uint8_t)((ADC[9]&0x00FF)>>0);
+            ECAN_TxMSG.data5  = 0;                
+            can_frame_no++;
+            break;
+//    }
+//    else if(can_frame_no == 4)      // NRF Data Start
+//    {
+        case 4:
+            ECAN_TxMSG.data0  = 0x05;
+            ECAN_TxMSG.data1  = (uint8_t) NRF[0].ID;
+            ECAN_TxMSG.data2  = (uint8_t)((NRF[0].Act_Load & 0xFF00)>>8);
+            ECAN_TxMSG.data3  = (uint8_t)((NRF[0].Act_Load & 0x00FF)>>0);
+            ECAN_TxMSG.data4  = (uint8_t)((NRF[0].Load_Count & 0xFF00)>>8);
+            ECAN_TxMSG.data5  = (uint8_t)((NRF[0].Load_Count & 0x00FF)>>0);
+            NRF[0].ID = 0;
+            NRF[0].Act_Load   = 0;
+            NRF[0].Load_Count = 0;
+           // nrf_frame++;
+            can_frame_no++;
+            break;
+//    }
+//    else if(can_frame_no == 5)      // NRF Data Start
+//    {
+        case 5:
+            ECAN_TxMSG.data0  = 0x06;
+            ECAN_TxMSG.data1  = (uint8_t)((NRF[0].Bat_Vtg & 0xFF00)>>8);
+            ECAN_TxMSG.data2  = (uint8_t)((NRF[0].Bat_Vtg & 0x00FF)>>0);
+            ECAN_TxMSG.data3  = NRF[0].Status;
+            ECAN_TxMSG.data4  = 0;
+            ECAN_TxMSG.data5  = 0;
+            NRF[0].Bat_Vtg = 0;
+            NRF[0].Status  = 0;
+            can_frame_no++;
+            break;
+//    }
+//    else if(can_frame_no == 6)
+//    {
+        case 6:
+            ECAN_TxMSG.data0  = 0x07;  
+            ECAN_TxMSG.data1  = (uint8_t)NRF[1].ID;
+            ECAN_TxMSG.data2  = (uint8_t)((NRF[1].Act_Load & 0xFF00)>>8);
+            ECAN_TxMSG.data3  = (uint8_t)((NRF[1].Act_Load & 0x00FF)>>0);
+            ECAN_TxMSG.data4  = (uint8_t)((NRF[1].Load_Count & 0xFF00)>>8);
+            ECAN_TxMSG.data5  = (uint8_t)((NRF[1].Load_Count & 0x00FF)>>0);
+            NRF[1].ID = 0;
+            NRF[1].Act_Load   = 0;
+            NRF[1].Load_Count = 0;
+            can_frame_no++;
+            break;
+//    }
+//     else if(can_frame_no == 7)      // NRF Data Start
+//    {
+        case 7:
+            ECAN_TxMSG.data0  = 0x08;
+            ECAN_TxMSG.data1  = (uint8_t)((NRF[1].Bat_Vtg & 0xFF00)>>8);
+            ECAN_TxMSG.data2  = (uint8_t)((NRF[1].Bat_Vtg & 0x00FF)>>0);
+            ECAN_TxMSG.data3  = NRF[1].Status;
+            ECAN_TxMSG.data4  = 0;
+            ECAN_TxMSG.data5  = 0;
+            NRF[1].Bat_Vtg = 0;
+            NRF[1].Status  = 0;
+            can_frame_no++;
+            break;
+//    }
+//    else if(can_frame_no == 8)
+//    {
+        case 8:
+            ECAN_TxMSG.data0  = 0x09;
+            ECAN_TxMSG.data1  = (uint8_t)((ADC[0]&0xFF00)>>8);
+            ECAN_TxMSG.data2  = (uint8_t)((ADC[0]&0x00FF)>>0);
+            ECAN_TxMSG.data3  = (uint8_t)((ADC[1]&0xFF00)>>8);
+            ECAN_TxMSG.data4  = (uint8_t)((ADC[1]&0x00FF)>>0);
+            ECAN_TxMSG.data5  = 0;                     
+            can_frame_no=0;
+            break;
     }
-    else if(can_frame_no == 1)
-    {
-        ECAN_TxMSG.idType = dSTANDARD_CAN_MSG_ID_2_0B;
-        ECAN_TxMSG.dlc    = 8;
-        ECAN_TxMSG.id     = CAN_Txpara.CANID;//CAN_Txpara.CANID;
-        ECAN_TxMSG.data0  = 0x02;
-        ECAN_TxMSG.data1  = (uint8_t)((ADC[4]&0xFF00)>>8);
-        ECAN_TxMSG.data2  = (uint8_t)((ADC[4]&0x00FF)>>0);
-        ECAN_TxMSG.data3  = (uint8_t)((ADC[5]&0xFF00)>>8);
-        ECAN_TxMSG.data4  = (uint8_t)((ADC[5]&0x00FF)>>0);
-        ECAN_TxMSG.data5  = DADC[1];//(uint8_t)((ADC[5]&0xFF00)>>8);
-                
-        crc = (uint16_t)ECAN_TxMSG.id;
-        crc += (uint16_t)(ECAN_TxMSG.data0+ECAN_TxMSG.data1+ECAN_TxMSG.data2+ECAN_TxMSG.data3+ECAN_TxMSG.data4+ECAN_TxMSG.data5);
-        crc = CRC16_calculate(crc);
-        ECAN_TxMSG.data6 = (uint8_t)((crc&0xFF00)>>8);
-        ECAN_TxMSG.data7 = (uint8_t)((crc&0x00FF)>>0);
-        
-        CAN_transmit(&ECAN_TxMSG);
-        can_frame_no++;
-    }
-    else if(can_frame_no == 2)
-    {
-        ECAN_TxMSG.idType = dSTANDARD_CAN_MSG_ID_2_0B;
-        ECAN_TxMSG.dlc    = 8;
-        ECAN_TxMSG.id     = CAN_Txpara.CANID;//CAN_Txpara.CANID;
-        ECAN_TxMSG.data0  = 0x03;
-        ECAN_TxMSG.data1  = (uint8_t)((ADC[6]&0xFF00)>>8);
-        ECAN_TxMSG.data2  = (uint8_t)((ADC[6]&0x00FF)>>0);
-        ECAN_TxMSG.data3  = (uint8_t)((ADC[7]&0xFF00)>>8);
-        ECAN_TxMSG.data4  = (uint8_t)((ADC[7]&0x00FF)>>0);
-        ECAN_TxMSG.data5  =  DADC[2];
-                
-        crc = (uint16_t)ECAN_TxMSG.id;
-        crc += (uint16_t)(ECAN_TxMSG.data0+ECAN_TxMSG.data1+ECAN_TxMSG.data2+ECAN_TxMSG.data3+ECAN_TxMSG.data4+ECAN_TxMSG.data5);
-        crc = CRC16_calculate(crc);
-        ECAN_TxMSG.data6 = (uint8_t)((crc&0xFF00)>>8);
-        ECAN_TxMSG.data7 = (uint8_t)((crc&0x00FF)>>0);
-        
-        CAN_transmit(&ECAN_TxMSG);
-        can_frame_no++;
-    }
-    else if(can_frame_no == 3)
-    {
-        ECAN_TxMSG.idType = dSTANDARD_CAN_MSG_ID_2_0B;
-        ECAN_TxMSG.dlc    = 8;
-        ECAN_TxMSG.id     = CAN_Txpara.CANID;//CAN_Txpara.CANID;
-        ECAN_TxMSG.data0  = 0x04;
-        ECAN_TxMSG.data1  = (uint8_t)((ADC[8]&0xFF00)>>8);
-        ECAN_TxMSG.data2  = (uint8_t)((ADC[8]&0x00FF)>>0);
-        ECAN_TxMSG.data3  = (uint8_t)((ADC[9]&0xFF00)>>8);
-        ECAN_TxMSG.data4  = (uint8_t)((ADC[9]&0x00FF)>>0);
-        ECAN_TxMSG.data5  = 0;                
-        
-        crc = (uint16_t)ECAN_TxMSG.id;
-        crc += (uint16_t)(ECAN_TxMSG.data0+ECAN_TxMSG.data1+ECAN_TxMSG.data2+ECAN_TxMSG.data3+ECAN_TxMSG.data4);
-        crc = CRC16_calculate(crc);
-        
-        ECAN_TxMSG.data6 = (uint8_t)((crc&0xFF00)>>8);
-        ECAN_TxMSG.data7 = (uint8_t)((crc&0x00FF)>>0);
-        
-        CAN_transmit(&ECAN_TxMSG);
-        can_frame_no++;
-    }
-    else if(can_frame_no == 4)
-    {
-        ECAN_TxMSG.idType = dSTANDARD_CAN_MSG_ID_2_0B;
-        ECAN_TxMSG.dlc    = 8;
-        ECAN_TxMSG.id     = CAN_Rxpara.CANID;
-        ECAN_TxMSG.data0  = 0x05;
-        ECAN_TxMSG.data1  = CAN_Txpara.CAN_Buf[0];
-        ECAN_TxMSG.data2  = CAN_Txpara.CAN_Buf[1];
-        ECAN_TxMSG.data3  = CAN_Txpara.CAN_Buf[2];
-        ECAN_TxMSG.data4  = CAN_Txpara.CAN_Buf[3];
-        ECAN_TxMSG.data5  = CAN_Txpara.CAN_Buf[4];                
-        
-        crc = (uint16_t)ECAN_TxMSG.id;
-        crc += (uint16_t)(ECAN_TxMSG.data0+ECAN_TxMSG.data1+ECAN_TxMSG.data2+ECAN_TxMSG.data3+ECAN_TxMSG.data4+ECAN_TxMSG.data5);
-        crc = CRC16_calculate(crc);
-        
-        ECAN_TxMSG.data6 = (uint8_t)((crc&0xFF00)>>8);
-        ECAN_TxMSG.data7 = (uint8_t)((crc&0x00FF)>>0);
-        
-        CAN_transmit(&ECAN_TxMSG);
-        can_frame_no++;
-    }
-    else if(can_frame_no == 5)      // NRF Data Start
-    {
-        ECAN_TxMSG.idType = dSTANDARD_CAN_MSG_ID_2_0B;
-        ECAN_TxMSG.dlc    = 8;
-        ECAN_TxMSG.id     = (uint32_t)NRF.ID;
-        ECAN_TxMSG.data0  = 0x06;
-        ECAN_TxMSG.data1  = (uint8_t)((NRF.Act_Load & 0xFF00)>>8);
-        ECAN_TxMSG.data2  = (uint8_t)((NRF.Act_Load & 0x00FF)>>0);
-        ECAN_TxMSG.data3  = (uint8_t)((NRF.Load_Count & 0xFF00)>>8);
-        ECAN_TxMSG.data4  = (uint8_t)((NRF.Load_Count & 0x00FF)>>0);
-        ECAN_TxMSG.data5  = 0;                
-        
-        crc = (uint16_t)ECAN_TxMSG.id;
-        crc += (uint16_t)(ECAN_TxMSG.data0+ECAN_TxMSG.data1+ECAN_TxMSG.data2+ECAN_TxMSG.data3+ECAN_TxMSG.data4);
-        crc = CRC16_calculate(crc);
-        
-        ECAN_TxMSG.data6 = (uint8_t)((crc&0xFF00)>>8);
-        ECAN_TxMSG.data7 = (uint8_t)((crc&0x00FF)>>0);
-        
-        CAN_transmit(&ECAN_TxMSG);
-        can_frame_no++;
-    }
-    else if(can_frame_no == 6)      // NRF Data Start
-    {
-        ECAN_TxMSG.idType = dSTANDARD_CAN_MSG_ID_2_0B;
-        ECAN_TxMSG.dlc    = 8;
-        ECAN_TxMSG.id     = (uint32_t)NRF.ID;
-        ECAN_TxMSG.data0  = 0x07;
-        ECAN_TxMSG.data1  = (uint8_t)((NRF.Bat_Vtg & 0xFF00)>>8);
-        ECAN_TxMSG.data2  = (uint8_t)((NRF.Bat_Vtg & 0x00FF)>>0);
-        ECAN_TxMSG.data3  = NRF.Status;
-        ECAN_TxMSG.data4  = 0;
-        ECAN_TxMSG.data5  = 0;                
-        
-        crc = (uint16_t)ECAN_TxMSG.id;
-        crc += (uint16_t)(ECAN_TxMSG.data0+ECAN_TxMSG.data1+ECAN_TxMSG.data2+ECAN_TxMSG.data3);
-        crc = CRC16_calculate(crc);
-        
-        ECAN_TxMSG.data6 = (uint8_t)((crc&0xFF00)>>8);
-        ECAN_TxMSG.data7 = (uint8_t)((crc&0x00FF)>>0);
-        
-        CAN_transmit(&ECAN_TxMSG);
-        can_frame_no = 0;
-    }
+     
+    crc = (uint16_t)ECAN_TxMSG.id;
+    crc += (uint16_t)(ECAN_TxMSG.data0+ECAN_TxMSG.data1+ECAN_TxMSG.data2+ECAN_TxMSG.data3+ECAN_TxMSG.data4+ECAN_TxMSG.data5);
+    crc = CRC16_calculate(crc);
+    ECAN_TxMSG.data6 = (uint8_t)((crc&0xFF00)>>8);
+    ECAN_TxMSG.data7 = (uint8_t)((crc&0x00FF)>>0);
+    CAN_transmit(&ECAN_TxMSG);
 }
 
 void CAN_Request_Send(void)
@@ -581,6 +598,7 @@ void Data_Process(void)
 {
     uint8_t channel = 0;
     uint8_t eep_read1=0,eep_read2=0,eep_read3=0;
+    static uint8_t frame = 0;
     char temp_buf[20]={0};
     float F_temp=0.0;
     memset(temp_ADC,0x00,15*sizeof(uint16_t));           // Clear buffer
@@ -601,6 +619,22 @@ void Data_Process(void)
     F_temp/=10;
     ADC[1] = (uint16_t)F_temp; //12
    
+    for(channel=0;channel<5;channel++)
+    {
+        temp_ADC[channel] = ADC_Threshold_Check(temp_ADC[channel],channel);
+    }
+    for(channel=7;channel<10;channel++)
+    {
+        temp_ADC[channel] = ADC_Threshold_Check(temp_ADC[channel],channel);
+    }
+    ADC[2] = temp_ADC[4];
+    ADC[3] = temp_ADC[3];
+    ADC[4] = temp_ADC[2];
+    ADC[5] = temp_ADC[1];
+    ADC[6] = temp_ADC[0];
+    ADC[7] = temp_ADC[7];
+    ADC[8] = temp_ADC[8];
+    ADC[9] = temp_ADC[9];
     //ADC[0] for voltage
     //ADC[1] for temperature
     //ADC[2] for P1
@@ -613,252 +647,252 @@ void Data_Process(void)
     //ADC[9] for Length2
     /////////////////////////////////////////////
     //Pressure 1
-    if(temp_ADC[4]>(ADC[2]+ADC_Offset))
-    {
-        ADC_PCnt[0]+=1;
-        if(ADC_PCnt[0]>ADC_Offset_Count)
-        {// after ADC_Offset_Count also value is increased then only update value
-            ADC[2] = temp_ADC[4];
-            ADC_PCnt[0] = 0;
-        }
-    }
-    else if(ADC[2]>ADC_Offset)  // for less value first make sure that ADC value is greater than offset
-    {
-        if(temp_ADC[4]<(ADC[2]-ADC_Offset)) //if adc value sudden decrease then wait & check upto ADC_Offset_Count time
-        {
-            ADC_NCnt[0]+=1;
-            if(ADC_NCnt[0]>ADC_Offset_Count)
-            {// after ADC_Offset_Count also value is decrease then only update value
-               ADC[2] = temp_ADC[4];
-               ADC_NCnt[0] = 0; 
-            }
-        }
-        else
-        {
-           ADC[2] = temp_ADC[4];   // update value
-        }
-    }
-    else
-    {
-        ADC[2] = temp_ADC[4]; // update value
-    }
+//    if(temp_ADC[4]>(ADC[2]+ADC_Offset))
+//    {
+//        ADC_PCnt[0]+=1;
+//        if(ADC_PCnt[0]>ADC_Offset_Count)
+//        {// after ADC_Offset_Count also value is increased then only update value
+//            ADC[2] = temp_ADC[4];
+//            ADC_PCnt[0] = 0;
+//        }
+//    }
+//    else if(ADC[2]>ADC_Offset)  // for less value first make sure that ADC value is greater than offset
+//    {
+//        if(temp_ADC[4]<(ADC[2]-ADC_Offset)) //if adc value sudden decrease then wait & check upto ADC_Offset_Count time
+//        {
+//            ADC_NCnt[0]+=1;
+//            if(ADC_NCnt[0]>ADC_Offset_Count)
+//            {// after ADC_Offset_Count also value is decrease then only update value
+//               ADC[2] = temp_ADC[4];
+//               ADC_NCnt[0] = 0; 
+//            }
+//        }
+//        else
+//        {
+//           ADC[2] = temp_ADC[4];   // update value
+//        }
+//    }
+//    else
+//    {
+//        ADC[2] = temp_ADC[4]; // update value
+//    }
     /////////////////////////////////////////////
     //Pressure 2
-    if(temp_ADC[3]>(ADC[3]+ADC_Offset))
-    {
-        ADC_PCnt[1]+=1;
-        if(ADC_PCnt[1]>ADC_Offset_Count)
-        {// after ADC_Offset_Count also value is increased then only update value
-            ADC[3] = temp_ADC[3];
-            ADC_PCnt[1] = 0;
-        }
-    }
-    else if(ADC[3]>ADC_Offset)  // for less value first make sure that ADC value is greater than offset
-    {
-        if(temp_ADC[3]<(ADC[3]-ADC_Offset)) //if adc value sudden decrease then wait & check upto ADC_Offset_Count time
-        {
-            ADC_NCnt[1]+=1;
-            if(ADC_NCnt[1]>ADC_Offset_Count)
-            {// after ADC_Offset_Count also value is decrease then only update value
-               ADC[3] = temp_ADC[3];
-               ADC_NCnt[1] = 0; 
-            }
-        }
-        else
-        {
-           ADC[3] = temp_ADC[3];   // update value
-        }
-    }
-    else
-    {
-        ADC[3] = temp_ADC[3]; // update value
-    }
+//    if(temp_ADC[3]>(ADC[3]+ADC_Offset))
+//    {
+//        ADC_PCnt[1]+=1;
+//        if(ADC_PCnt[1]>ADC_Offset_Count)
+//        {// after ADC_Offset_Count also value is increased then only update value
+//            ADC[3] = temp_ADC[3];
+//            ADC_PCnt[1] = 0;
+//        }
+//    }
+//    else if(ADC[3]>ADC_Offset)  // for less value first make sure that ADC value is greater than offset
+//    {
+//        if(temp_ADC[3]<(ADC[3]-ADC_Offset)) //if adc value sudden decrease then wait & check upto ADC_Offset_Count time
+//        {
+//            ADC_NCnt[1]+=1;
+//            if(ADC_NCnt[1]>ADC_Offset_Count)
+//            {// after ADC_Offset_Count also value is decrease then only update value
+//               ADC[3] = temp_ADC[3];
+//               ADC_NCnt[1] = 0; 
+//            }
+//        }
+//        else
+//        {
+//           ADC[3] = temp_ADC[3];   // update value
+//        }
+//    }
+//    else
+//    {
+//        ADC[3] = temp_ADC[3]; // update value
+//    }
     ///////////////////////////////////////////////////////
     //Pressure 3
-    if(temp_ADC[2]>(ADC[4]+ADC_Offset))
-    {
-        ADC_PCnt[2]+=1;
-        if(ADC_PCnt[2]>ADC_Offset_Count)
-        {// after ADC_Offset_Count also value is increased then only update value
-            ADC[4] = temp_ADC[2];
-            ADC_PCnt[2] = 0;
-        }
-    }
-    else if(ADC[4]>ADC_Offset)  // for less value first make sure that ADC value is greater than offset
-    {
-        if(temp_ADC[2]<(ADC[4]-ADC_Offset)) //if adc value sudden decrease then wait & check upto ADC_Offset_Count time
-        {
-            ADC_NCnt[2]+=1;
-            if(ADC_NCnt[2]>ADC_Offset_Count)
-            {// after ADC_Offset_Count also value is decrease then only update value
-               ADC[4] = temp_ADC[2];
-               ADC_NCnt[2] = 0; 
-            }
-        }
-        else
-        {
-           ADC[4] = temp_ADC[2];   // update value
-        }
-    }
-    else
-    {
-        ADC[4] = temp_ADC[2]; // update value
-    }
+//    if(temp_ADC[2]>(ADC[4]+ADC_Offset))
+//    {
+//        ADC_PCnt[2]+=1;
+//        if(ADC_PCnt[2]>ADC_Offset_Count)
+//        {// after ADC_Offset_Count also value is increased then only update value
+//            ADC[4] = temp_ADC[2];
+//            ADC_PCnt[2] = 0;
+//        }
+//    }
+//    else if(ADC[4]>ADC_Offset)  // for less value first make sure that ADC value is greater than offset
+//    {
+//        if(temp_ADC[2]<(ADC[4]-ADC_Offset)) //if adc value sudden decrease then wait & check upto ADC_Offset_Count time
+//        {
+//            ADC_NCnt[2]+=1;
+//            if(ADC_NCnt[2]>ADC_Offset_Count)
+//            {// after ADC_Offset_Count also value is decrease then only update value
+//               ADC[4] = temp_ADC[2];
+//               ADC_NCnt[2] = 0; 
+//            }
+//        }
+//        else
+//        {
+//           ADC[4] = temp_ADC[2];   // update value
+//        }
+//    }
+//    else
+//    {
+//        ADC[4] = temp_ADC[2]; // update value
+//    }
     ///////////////////////////////////////////////////////
     //Pressure 4
-    if(temp_ADC[1]>(ADC[5]+ADC_Offset))
-    {
-        ADC_PCnt[3]+=1;
-        if(ADC_PCnt[3]>ADC_Offset_Count)
-        {// after ADC_Offset_Count also value is increased then only update value
-            ADC[5] = temp_ADC[1];
-            ADC_PCnt[3] = 0;
-        }
-    }
-    else if(ADC[5]>ADC_Offset)  // for less value first make sure that ADC value is greater than offset
-    {
-        if(temp_ADC[1]<(ADC[5]-ADC_Offset)) //if adc value sudden decrease then wait & check upto ADC_Offset_Count time
-        {
-            ADC_NCnt[3]+=1;
-            if(ADC_NCnt[3]>ADC_Offset_Count)
-            {// after ADC_Offset_Count also value is decrease then only update value
-               ADC[5] = temp_ADC[1];
-               ADC_NCnt[3] = 0; 
-            }
-        }
-        else
-        {
-           ADC[5] = temp_ADC[1];   // update value
-        }
-    }
-    else
-    {
-        ADC[5] = temp_ADC[1]; // update value
-    }
+//    if(temp_ADC[1]>(ADC[5]+ADC_Offset))
+//    {
+//        ADC_PCnt[3]+=1;
+//        if(ADC_PCnt[3]>ADC_Offset_Count)
+//        {// after ADC_Offset_Count also value is increased then only update value
+//            ADC[5] = temp_ADC[1];
+//            ADC_PCnt[3] = 0;
+//        }
+//    }
+//    else if(ADC[5]>ADC_Offset)  // for less value first make sure that ADC value is greater than offset
+//    {
+//        if(temp_ADC[1]<(ADC[5]-ADC_Offset)) //if adc value sudden decrease then wait & check upto ADC_Offset_Count time
+//        {
+//            ADC_NCnt[3]+=1;
+//            if(ADC_NCnt[3]>ADC_Offset_Count)
+//            {// after ADC_Offset_Count also value is decrease then only update value
+//               ADC[5] = temp_ADC[1];
+//               ADC_NCnt[3] = 0; 
+//            }
+//        }
+//        else
+//        {
+//           ADC[5] = temp_ADC[1];   // update value
+//        }
+//    }
+//    else
+//    {
+//        ADC[5] = temp_ADC[1]; // update value
+//    }
     //////////////////////////////////////////////////////
     // Angle 1
-    if(temp_ADC[0]>(ADC[6]+ADC_Offset))
-    {
-        ADC_PCnt[4]+=1;
-        if(ADC_PCnt[4]>ADC_Offset_Count)
-        {// after ADC_Offset_Count also value is increased then only update value
-            ADC[6] = temp_ADC[0];
-            ADC_PCnt[4] = 0;
-        }
-    }
-    else if(ADC[6]>ADC_Offset)  // for less value first make sure that ADC value is greater than offset
-    {
-        if(temp_ADC[0]<(ADC[6]-ADC_Offset)) //if adc value sudden decrease then wait & check upto ADC_Offset_Count time
-        {
-            ADC_NCnt[4]+=1;
-            if(ADC_NCnt[4]>ADC_Offset_Count)
-            {// after ADC_Offset_Count also value is decrease then only update value
-               ADC[6] = temp_ADC[0];
-               ADC_NCnt[4] = 0; 
-            }
-        }
-        else
-        {
-           ADC[6] = temp_ADC[0];   // update value
-        }
-    }
-    else
-    {
-        ADC[6] = temp_ADC[0]; // update value
-    }
+//    if(temp_ADC[0]>(ADC[6]+ADC_Offset))
+//    {
+//        ADC_PCnt[4]+=1;
+//        if(ADC_PCnt[4]>ADC_Offset_Count)
+//        {// after ADC_Offset_Count also value is increased then only update value
+//            ADC[6] = temp_ADC[0];
+//            ADC_PCnt[4] = 0;
+//        }
+//    }
+//    else if(ADC[6]>ADC_Offset)  // for less value first make sure that ADC value is greater than offset
+//    {
+//        if(temp_ADC[0]<(ADC[6]-ADC_Offset)) //if adc value sudden decrease then wait & check upto ADC_Offset_Count time
+//        {
+//            ADC_NCnt[4]+=1;
+//            if(ADC_NCnt[4]>ADC_Offset_Count)
+//            {// after ADC_Offset_Count also value is decrease then only update value
+//               ADC[6] = temp_ADC[0];
+//               ADC_NCnt[4] = 0; 
+//            }
+//        }
+//        else
+//        {
+//           ADC[6] = temp_ADC[0];   // update value
+//        }
+//    }
+//    else
+//    {
+//        ADC[6] = temp_ADC[0]; // update value
+//    }
     //////////////////////////////////////////////////
     // Length 1
-    if(temp_ADC[7]>(ADC[7]+ADC_Offset))
-    {
-        ADC_PCnt[5]+=1;
-        if(ADC_PCnt[5]>ADC_Offset_Count)
-        {// after ADC_Offset_Count also value is increased then only update value
-            ADC[7] = temp_ADC[7];
-            ADC_PCnt[5] = 0;
-        }
-    }
-    else if(ADC[7]>ADC_Offset)  // for less value first make sure that ADC value is greater than offset
-    {
-        if(temp_ADC[7]<(ADC[7]-ADC_Offset)) //if adc value sudden decrease then wait & check upto ADC_Offset_Count time
-        {
-            ADC_NCnt[5]+=1;
-            if(ADC_NCnt[5]>ADC_Offset_Count)
-            {// after ADC_Offset_Count also value is decrease then only update value
-               ADC[7] = temp_ADC[7];
-               ADC_NCnt[5] = 0; 
-            }
-        }
-        else
-        {
-           ADC[7] = temp_ADC[7];   // update value
-        }
-    }
-    else
-    {
-        ADC[7] = temp_ADC[7]; // update value
-    }
+//    if(temp_ADC[7]>(ADC[7]+ADC_Offset))
+//    {
+//        ADC_PCnt[5]+=1;
+//        if(ADC_PCnt[5]>ADC_Offset_Count)
+//        {// after ADC_Offset_Count also value is increased then only update value
+//            ADC[7] = temp_ADC[7];
+//            ADC_PCnt[5] = 0;
+//        }
+//    }
+//    else if(ADC[7]>ADC_Offset)  // for less value first make sure that ADC value is greater than offset
+//    {
+//        if(temp_ADC[7]<(ADC[7]-ADC_Offset)) //if adc value sudden decrease then wait & check upto ADC_Offset_Count time
+//        {
+//            ADC_NCnt[5]+=1;
+//            if(ADC_NCnt[5]>ADC_Offset_Count)
+//            {// after ADC_Offset_Count also value is decrease then only update value
+//               ADC[7] = temp_ADC[7];
+//               ADC_NCnt[5] = 0; 
+//            }
+//        }
+//        else
+//        {
+//           ADC[7] = temp_ADC[7];   // update value
+//        }
+//    }
+//    else
+//    {
+//        ADC[7] = temp_ADC[7]; // update value
+//    }
     //////////////////////////////////////////////////
     //Angle 2
-    if(temp_ADC[8]>(ADC[8]+ADC_Offset))
-    {
-        ADC_PCnt[6]+=1;
-        if(ADC_PCnt[6]>ADC_Offset_Count)
-        {// after ADC_Offset_Count also value is increased then only update value
-            ADC[8] = temp_ADC[8];
-            ADC_PCnt[6] = 0;
-        }
-    }
-    else if(ADC[8]>ADC_Offset)  // for less value first make sure that ADC value is greater than offset
-    {
-        if(temp_ADC[8]<(ADC[8]-ADC_Offset)) //if adc value sudden decrease then wait & check upto ADC_Offset_Count time
-        {
-            ADC_NCnt[6]+=1;
-            if(ADC_NCnt[6]>ADC_Offset_Count)
-            {// after ADC_Offset_Count also value is decrease then only update value
-               ADC[8] = temp_ADC[8];
-               ADC_NCnt[6] = 0; 
-            }
-        }
-        else
-        {
-           ADC[8] = temp_ADC[8];   // update value
-        }
-    }
-    else
-    {
-        ADC[8] = temp_ADC[8]; // update value
-    }
+//    if(temp_ADC[8]>(ADC[8]+ADC_Offset))
+//    {
+//        ADC_PCnt[6]+=1;
+//        if(ADC_PCnt[6]>ADC_Offset_Count)
+//        {// after ADC_Offset_Count also value is increased then only update value
+//            ADC[8] = temp_ADC[8];
+//            ADC_PCnt[6] = 0;
+//        }
+//    }
+//    else if(ADC[8]>ADC_Offset)  // for less value first make sure that ADC value is greater than offset
+//    {
+//        if(temp_ADC[8]<(ADC[8]-ADC_Offset)) //if adc value sudden decrease then wait & check upto ADC_Offset_Count time
+//        {
+//            ADC_NCnt[6]+=1;
+//            if(ADC_NCnt[6]>ADC_Offset_Count)
+//            {// after ADC_Offset_Count also value is decrease then only update value
+//               ADC[8] = temp_ADC[8];
+//               ADC_NCnt[6] = 0; 
+//            }
+//        }
+//        else
+//        {
+//           ADC[8] = temp_ADC[8];   // update value
+//        }
+//    }
+//    else
+//    {
+//        ADC[8] = temp_ADC[8]; // update value
+//    }
     //////////////////////////////////////////////////
     // Length 2
-    if(temp_ADC[9]>(ADC[9]+ADC_Offset))
-    {
-        ADC_PCnt[7]+=1;
-        if(ADC_PCnt[7]>ADC_Offset_Count)
-        {// after ADC_Offset_Count also value is increased then only update value
-            ADC[9] = temp_ADC[9];
-            ADC_PCnt[7] = 0;
-        }
-    }
-    else if(ADC[9]>ADC_Offset)  // for less value first make sure that ADC value is greater than offset
-    {
-        if(temp_ADC[9]<(ADC[9]-ADC_Offset)) //if adc value sudden decrease then wait & check upto ADC_Offset_Count time
-        {
-            ADC_NCnt[7]+=1;
-            if(ADC_NCnt[7]>ADC_Offset_Count)
-            {// after ADC_Offset_Count also value is decrease then only update value
-               ADC[9] = temp_ADC[9];
-               ADC_NCnt[7] = 0; 
-            }
-        }
-        else
-        {
-           ADC[9] = temp_ADC[9];   // update value
-        }
-    }
-    else
-    {
-        ADC[9] = temp_ADC[9]; // update value
-    }
+//    if(temp_ADC[9]>(ADC[9]+ADC_Offset))
+//    {
+//        ADC_PCnt[7]+=1;
+//        if(ADC_PCnt[7]>ADC_Offset_Count)
+//        {// after ADC_Offset_Count also value is increased then only update value
+//            ADC[9] = temp_ADC[9];
+//            ADC_PCnt[7] = 0;
+//        }
+//    }
+//    else if(ADC[9]>ADC_Offset)  // for less value first make sure that ADC value is greater than offset
+//    {
+//        if(temp_ADC[9]<(ADC[9]-ADC_Offset)) //if adc value sudden decrease then wait & check upto ADC_Offset_Count time
+//        {
+//            ADC_NCnt[7]+=1;
+//            if(ADC_NCnt[7]>ADC_Offset_Count)
+//            {// after ADC_Offset_Count also value is decrease then only update value
+//               ADC[9] = temp_ADC[9];
+//               ADC_NCnt[7] = 0; 
+//            }
+//        }
+//        else
+//        {
+//           ADC[9] = temp_ADC[9];   // update value
+//        }
+//    }
+//    else
+//    {
+//        ADC[9] = temp_ADC[9]; // update value
+//    }
     //////////////////////////////////////////////////
     if((temp_ADC[10]>Wire_Break_min) && (temp_ADC[10]<Wire_Break_max))  //ADC[4]           
     {
@@ -1134,38 +1168,29 @@ void Data_Process(void)
     if(Uart2_Frame_Flag == 1)
     {
         Uart2_Data_Handler();           // Check UART received data
-        if(uart2_data_flag == true)
-        {
-          Uart1_Data_Send();            //uart2 received data send to uart1
-          uart2_data_flag = false;
-        }
+//        if(uart2_data_flag == true)
+//        {
+//          Uart1_Data_Send();            //uart2 received data send to uart1
+//          uart2_data_flag = false;
+//        }
         if(nrf_data_flag == 1)
         {
-//            ECAN_TxMSG.idType = dSTANDARD_CAN_MSG_ID_2_0B;
-//            ECAN_TxMSG.dlc    = 8;
-//            ECAN_TxMSG.id     = CAN_Rxpara.CANID;
-//            ECAN_TxMSG.data0  = CAN_Txpara.CAN_Buf[0];
-//            ECAN_TxMSG.data1  = CAN_Txpara.CAN_Buf[1];
-//            ECAN_TxMSG.data2  = CAN_Txpara.CAN_Buf[2];
-//            ECAN_TxMSG.data3  = CAN_Txpara.CAN_Buf[3];
-//            ECAN_TxMSG.data4  = CAN_Txpara.CAN_Buf[4];
-//            ECAN_TxMSG.data5  = CAN_Txpara.CAN_Buf[5];
-//            ECAN_TxMSG.data6  = CAN_Txpara.CAN_Buf[6];
-//            ECAN_TxMSG.data7  = CAN_Txpara.CAN_Buf[7];
-//            CAN_transmit(&ECAN_TxMSG);
-            //ECanWriteMessage(0,CAN_Rxpara.CANID,8,0,CAN_Txpara.CAN_Buf);
-//            for(channel=0;channel<38;channel++)
-//            {
-//                EUSART1_Write(Uart2_array[channel]);
-//            }
-//            EUSART1_String("\n");
             if(serial_diagnost == true)
             {
               EUSART1_String("{,LP,");
-              sprintf(temp_buf,"%d,%d,%d,%d,%d,%d,%d,%d,%d,}\n",(uint16_t)CAN_Rxpara.CANID,CAN_Txpara.CAN_Buf[0],CAN_Txpara.CAN_Buf[1],CAN_Txpara.CAN_Buf[2],CAN_Txpara.CAN_Buf[3],CAN_Txpara.CAN_Buf[4],CAN_Txpara.CAN_Buf[5],CAN_Txpara.CAN_Buf[6],CAN_Txpara.CAN_Buf[7]);  
+              if(frame==0)
+              {
+                sprintf(temp_buf,"%d,%d,%d,%d,%d,}\n",(uint16_t)NRF[0].ID,NRF[0].Act_Load,NRF[0].Load_Count,NRF[0].Bat_Vtg,NRF[0].Status);  
+                frame++;
+              }  
+              else
+              {
+                sprintf(temp_buf,"%d,%d,%d,%d,%d,}\n",(uint16_t)NRF[1].ID,NRF[1].Act_Load,NRF[1].Load_Count,NRF[1].Bat_Vtg,NRF[1].Status);  
+                  frame = 0;
+              }
               EUSART1_String(temp_buf);
             }
-            memset(CAN_Txpara.CAN_Buf,0x00,8*sizeof(uint8_t));
+           // memset(CAN_Txpara.CAN_Buf,0x00,8*sizeof(uint8_t));
             nrf_data_flag = false;
         }
         Uart2_Frame_Flag = 0;
@@ -1277,7 +1302,7 @@ void EUSART2_Receive_ISR(void)
     {
         uart2_index = 0;
     }
-    else if(RxdData != '\n' && uart2_index<38)
+    else if((RxdData != '\n') && (Uart2_Frame_Flag == 0))
     {
         Uart2_array[uart2_index++] = RxdData;
     }

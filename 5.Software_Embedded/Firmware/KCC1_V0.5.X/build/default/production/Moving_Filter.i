@@ -1,4 +1,4 @@
-# 1 "newmain.c"
+# 1 "Moving_Filter.c"
 # 1 "<built-in>" 1
 # 1 "<built-in>" 3
 # 288 "<built-in>" 3
@@ -6,69 +6,7 @@
 # 1 "<built-in>" 2
 # 1 "C:/Program Files/Microchip/MPLABX/v5.50/packs/Microchip/PIC18F-K_DFP/1.4.87/xc8\\pic\\include\\language_support.h" 1 3
 # 2 "<built-in>" 2
-# 1 "newmain.c" 2
-# 51 "newmain.c"
-#pragma config RETEN = OFF
-#pragma config INTOSCSEL = HIGH
-#pragma config SOSCSEL = DIG
-#pragma config XINST = OFF
-
-
-#pragma config FOSC = HS1
-#pragma config PLLCFG = ON
-#pragma config FCMEN = OFF
-#pragma config IESO = OFF
-
-
-#pragma config PWRTEN = OFF
-#pragma config BOREN = SBORDIS
-#pragma config BORV = 2
-#pragma config BORPWR = ZPBORMV
-
-
-#pragma config WDTEN = OFF
-#pragma config WDTPS = 512
-
-
-#pragma config CANMX = PORTB
-#pragma config MSSPMSK = MSK7
-#pragma config MCLRE = ON
-
-
-#pragma config STVREN = ON
-#pragma config BBSIZ = BB2K
-
-
-#pragma config CP0 = OFF
-#pragma config CP1 = OFF
-#pragma config CP2 = OFF
-#pragma config CP3 = OFF
-
-
-#pragma config CPB = OFF
-#pragma config CPD = OFF
-
-
-#pragma config WRT0 = OFF
-#pragma config WRT1 = OFF
-#pragma config WRT2 = OFF
-#pragma config WRT3 = OFF
-
-
-#pragma config WRTC = OFF
-#pragma config WRTB = OFF
-#pragma config WRTD = OFF
-
-
-#pragma config EBTR0 = OFF
-#pragma config EBTR1 = OFF
-#pragma config EBTR2 = OFF
-#pragma config EBTR3 = OFF
-
-
-#pragma config EBTRB = OFF
-
-
+# 1 "Moving_Filter.c" 2
 # 1 "./main.h" 1
 # 12 "./main.h"
 # 1 "C:/Program Files/Microchip/MPLABX/v5.50/packs/Microchip/PIC18F-K_DFP/1.4.87/xc8\\pic\\include\\xc.h" 1 3
@@ -20606,12 +20544,13 @@ typedef struct
 OP_HANDLE Doutput;
 CAN_data CAN_Txpara,CAN_Rxpara;
 uCAN_MSG ECAN_TxMSG,ECAN_RxMSG;
-NRF_Para NRF;
+NRF_Para NRF[2];
 
 extern _Bool Red_Led,serial_diagnost;
 
 uint8_t DADC[3];
-uint8_t digital_status,uart1_data_flag,uart2_data_flag,can1_data_flag,nrf_data_flag,NRFP_flag,NRFC_flag;
+uint8_t uart2_data_flag;
+uint8_t digital_status,uart1_data_flag,can1_data_flag,nrf_data_flag,NRFP_flag,NRFC_flag;
 uint8_t CAN_RStatus,ADC_PCnt[8],ADC_NCnt[8];
 uint16_t digital_output;
 uint16_t ADC[10],NID,N_Load,N_ADC,temp_ADC[15];
@@ -20651,122 +20590,97 @@ void Eeprom_Read_Array(uint16_t Addr,uint8_t *Data, uint8_t length);
 # 1 "./CRC.h" 1
 # 11 "./CRC.h"
 uint16_t CRC16_calculate(uint16_t const Sum_data);
-uint32_t CRC32_calculate(uint32_t const Sum_data);
 # 27 "./main.h" 2
+
+# 1 "./Moving_Filter.h" 1
+# 23 "./Moving_Filter.h"
+typedef struct
+{
+ uint8_t buffer_index;
+    uint8_t ADC_PCnt;
+    uint8_t ADC_NCnt;
+ uint16_t adc_buffer[10];
+    uint16_t prev_adc_sum;
+ uint32_t adc_sum;
+
+}Filter;
+
+Filter moving_flt[8];
+
+void ADC_Filter_Init(uint8_t Channel_no);
+uint16_t ADC_Filter(uint16_t new_value,uint8_t Channel_no);
+uint16_t ADC_Threshold_Check(uint16_t new_value,uint8_t Channel_no);
+# 28 "./main.h" 2
 
 volatile uint16_t ms_count,can_count,Led_Count,blink_flag,Watchdog_count;
 extern volatile uint32_t can_timeout;
 _Bool Red_Led,serial_diagnost;
 extern _Bool Yellow_led;
 void Delay_Ms(uint16_t delay);
-# 111 "newmain.c" 2
-# 130 "newmain.c"
-void Delay_Ms(uint16_t delay)
-{
-    ms_count = delay;
-    while(ms_count>0);
+# 1 "Moving_Filter.c" 2
+
+
+void ADC_Filter_Init(uint8_t Channel_no)
+ {
+
+    for (uint8_t i = 0; i < 10; i++)
+ {
+        moving_flt[Channel_no].adc_buffer[i] = 0;
+    }
+
+    moving_flt[Channel_no].buffer_index = 0;
+
+    moving_flt[Channel_no].adc_sum = 0;
 }
 
 
-void main(void)
-{
-    uint16_t adc_count = 0;
-    __asm(" clrwdt");
-    System_Initialize();
-    __asm(" clrwdt");
-    blink_flag = 1;
-    Led_Count = 500;
-    can_timeout = 10000;
-    Watchdog_count = 800;
-    while(1)
-    {
-        Data_Process();
-        if(can_count == 0)
-        {
-            if(serial_diagnost == 1)
-            {
-                Uart1_Data_Send();
-            }
-            Can_Data_Send();
-            can_count = 500;
-        }
-        if(Watchdog_count == 0)
-        {
-            Watchdog_count = 800;
-            __asm(" clrwdt");
-        }
-    }
-     return;
-}
-# 175 "newmain.c"
-void __attribute__((picinterrupt(("")))) INTERRUPT_InterruptManager (void)
+uint16_t ADC_Filter(uint16_t new_value,uint8_t Channel_no)
 {
 
-    if(INTCONbits.TMR0IE == 1 && INTCONbits.TMR0IF == 1)
+    moving_flt[Channel_no].adc_sum -= moving_flt[Channel_no].adc_buffer[moving_flt[Channel_no].buffer_index];
+
+    moving_flt[Channel_no].adc_buffer[moving_flt[Channel_no].buffer_index] = new_value;
+    moving_flt[Channel_no].adc_sum += new_value;
+
+    moving_flt[Channel_no].buffer_index = ((moving_flt[Channel_no].buffer_index + 1) % 10);
+
+
+    return (uint16_t)(moving_flt[Channel_no].adc_sum / 10);
+}
+
+uint16_t ADC_Threshold_Check(uint16_t new_value,uint8_t Channel_no)
+{
+    if(new_value>(moving_flt[Channel_no].prev_adc_sum+80))
     {
-        TMR0_ISR();
-        if(Watchdog_count>0)
+       moving_flt[Channel_no].ADC_PCnt++;
+       if(moving_flt[Channel_no].ADC_PCnt>5)
+       {
+          moving_flt[Channel_no].prev_adc_sum = ADC_Filter(new_value,Channel_no);
+          moving_flt[Channel_no].ADC_PCnt = 0;
+       }
+    }
+    else if(new_value>80)
+    {
+        if(new_value<(moving_flt[Channel_no].prev_adc_sum-80))
         {
-            Watchdog_count--;
+          moving_flt[Channel_no].ADC_NCnt++;
+          if(moving_flt[Channel_no].ADC_NCnt>5)
+          {
+            moving_flt[Channel_no].prev_adc_sum = ADC_Filter(new_value,Channel_no);
+            moving_flt[Channel_no].ADC_NCnt = 0;
+          }
         }
-        if(ms_count>0)
+        else
         {
-            ms_count--;
-        }
-        if(can_count>0)
-        {
-            can_count--;
-        }
-        if(Led_Count>0)
-        {
-            Led_Count--;
-        }
-        if(can_timeout>0)
-        {
-            can_timeout--;
-        }
-        if((blink_flag == 1) &&(Led_Count == 0))
-        {
-            if(Red_Led == 1)
-            {
-                LATCbits.LATC0 = 0;
-                LATAbits.LATA2 =~LATAbits.LATA2;
-            }
-            else
-            {
-                LATAbits.LATA2 = 0;
-                LATCbits.LATC0 =~ LATCbits.LATC0;
-            }
-            if(Yellow_led == 1)
-            {
-               LATAbits.LATA1 =~ LATAbits.LATA1;
-            }
-            else
-            {
-                LATAbits.LATA1 = 0;
-            }
-            Led_Count = 500;
+          moving_flt[Channel_no].prev_adc_sum = ADC_Filter(new_value,Channel_no);
+          moving_flt[Channel_no].ADC_NCnt = 0;
         }
     }
-    else if(INTCONbits.PEIE == 1)
+    else
     {
-        if(PIE1bits.RC1IE == 1 && PIR1bits.RC1IF == 1)
-        {
-          EUSART1_Receive_ISR();
-          PIR1bits.RC1IF = 0;
-        }
-        if(PIE3bits.RC2IE == 1 && PIR3bits.RC2IF == 1)
-        {
-           EUSART2_Receive_ISR();
-           PIR3bits.RC2IF = 0;
-        }
-        if(PIE5bits.RXB1IE == 1 && PIR5bits.RXB1IF == 1)
-        {
-            ECAN_RXB1I_ISR();
-        }
-        if(PIE5bits.RXB0IE == 1 && PIR5bits.RXB0IF == 1)
-        {
-            ECAN_RXB0I_ISR();
-        }
+        moving_flt[Channel_no].prev_adc_sum = ADC_Filter(new_value,Channel_no);
+        moving_flt[Channel_no].ADC_PCnt = 0;
+        moving_flt[Channel_no].ADC_NCnt = 0;
     }
+    return(moving_flt[Channel_no].prev_adc_sum);
 }
