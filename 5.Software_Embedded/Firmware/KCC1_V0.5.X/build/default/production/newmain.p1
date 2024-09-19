@@ -14,26 +14,32 @@ Version 4.0 HI-TECH Software Intermediate Code
 "48 ./DataProcess.h
 [; ;./DataProcess.h: 48: {
 [s S1532 `uc 1 `us 1 `us 1 `us 1 `us 1 ]
-[n S1532 . Status ID Act_Load Load_Count Bat_Vtg ]
+[n S1532 . Status ID Cal_Load Load_Count Batt_Vtg ]
 "24 ./Moving_Filter.h
 [; ;./Moving_Filter.h: 24: {
 [s S1533 `uc 1 `uc 1 `uc 1 `us -> 10 `i `us 1 `ul 1 ]
 [n S1533 . buffer_index ADC_PCnt ADC_NCnt adc_buffer prev_adc_sum adc_sum ]
 [p mainexit ]
-"84 ./DataProcess.h
-[; ;./DataProcess.h: 84: void System_Initialize(void);
+"85 ./DataProcess.h
+[; ;./DataProcess.h: 85: void System_Initialize(void);
 [v _System_Initialize `(v ~T0 @X0 0 ef ]
 "30 ./main.h
 [; ;./main.h: 30: extern volatile uint32_t can_timeout;
 [v _can_timeout `Vul ~T0 @X0 0 e ]
-"75 ./DataProcess.h
-[; ;./DataProcess.h: 75: void Data_Process(void);
+"76 ./DataProcess.h
+[; ;./DataProcess.h: 76: void Data_Process(void);
 [v _Data_Process `(v ~T0 @X0 0 ef ]
-"85
-[; ;./DataProcess.h: 85: void Can_Data_Send(void);
-[v _Can_Data_Send `(v ~T0 @X0 0 ef ]
-"77
-[; ;./DataProcess.h: 77: void Uart2_Data_Handler(void);
+"79
+[; ;./DataProcess.h: 79: void Uart1_Data_Send(void);
+[v _Uart1_Data_Send `(v ~T0 @X0 0 ef ]
+"87
+[; ;./DataProcess.h: 87: void Can_Digital_Data_Send(void);
+[v _Can_Digital_Data_Send `(v ~T0 @X0 0 ef ]
+"86
+[; ;./DataProcess.h: 86: void Can_Analog_Data_Send(void);
+[v _Can_Analog_Data_Send `(v ~T0 @X0 0 ef ]
+"78
+[; ;./DataProcess.h: 78: void Uart2_Data_Handler(void);
 [v _Uart2_Data_Handler `(v ~T0 @X0 0 ef ]
 [t ~ __interrupt . k ]
 [t T5 __interrupt ]
@@ -122,8 +128,8 @@ Version 4.0 HI-TECH Software Intermediate Code
 "31163
 [; ;C:/Program Files/Microchip/MPLABX/v5.50/packs/Microchip/PIC18F-K_DFP/1.4.87/xc8\pic\include\proc\pic18f25k80.h: 31163: extern volatile PIR1bits_t PIR1bits __attribute__((address(0xF9E)));
 [v _PIR1bits `VS1187 ~T0 @X0 0 e@3998 ]
-"79 ./DataProcess.h
-[; ;./DataProcess.h: 79: void EUSART1_Receive_ISR(void);
+"80 ./DataProcess.h
+[; ;./DataProcess.h: 80: void EUSART1_Receive_ISR(void);
 [v _EUSART1_Receive_ISR `(v ~T0 @X0 0 ef ]
 "31452 C:/Program Files/Microchip/MPLABX/v5.50/packs/Microchip/PIC18F-K_DFP/1.4.87/xc8\pic\include\proc\pic18f25k80.h
 [; ;C:/Program Files/Microchip/MPLABX/v5.50/packs/Microchip/PIC18F-K_DFP/1.4.87/xc8\pic\include\proc\pic18f25k80.h: 31452:     struct {
@@ -159,8 +165,8 @@ Version 4.0 HI-TECH Software Intermediate Code
 "31555
 [; ;C:/Program Files/Microchip/MPLABX/v5.50/packs/Microchip/PIC18F-K_DFP/1.4.87/xc8\pic\include\proc\pic18f25k80.h: 31555: extern volatile PIR3bits_t PIR3bits __attribute__((address(0xFA4)));
 [v _PIR3bits `VS1206 ~T0 @X0 0 e@4004 ]
-"80 ./DataProcess.h
-[; ;./DataProcess.h: 80: void EUSART2_Receive_ISR(void);
+"81 ./DataProcess.h
+[; ;./DataProcess.h: 81: void EUSART2_Receive_ISR(void);
 [v _EUSART2_Receive_ISR `(v ~T0 @X0 0 ef ]
 "29403 C:/Program Files/Microchip/MPLABX/v5.50/packs/Microchip/PIC18F-K_DFP/1.4.87/xc8\pic\include\proc\pic18f25k80.h
 [; ;C:/Program Files/Microchip/MPLABX/v5.50/packs/Microchip/PIC18F-K_DFP/1.4.87/xc8\pic\include\proc\pic18f25k80.h: 29403:     struct {
@@ -1715,7 +1721,17 @@ Version 4.0 HI-TECH Software Intermediate Code
 [; ;./DataProcess.h: 72: volatile uint32_t can_timeout;
 [v _can_timeout `Vul ~T0 @X0 1 e ]
 "73
-[; ;./DataProcess.h: 73: _Bool Yellow_led;
+[; ;./DataProcess.h: 73: static uint8_t Lp1_present=0,Lp2_present=0;
+[v _Lp1_present `uc ~T0 @X0 1 s ]
+[i _Lp1_present
+-> -> 0 `i `uc
+]
+[v _Lp2_present `uc ~T0 @X0 1 s ]
+[i _Lp2_present
+-> -> 0 `i `uc
+]
+"74
+[; ;./DataProcess.h: 74: _Bool Yellow_led;
 [v _Yellow_led `a ~T0 @X0 1 e ]
 "34 ./Moving_Filter.h
 [; ;./Moving_Filter.h: 34: Filter moving_flt[8];
@@ -1768,9 +1784,9 @@ Version 4.0 HI-TECH Software Intermediate Code
 [e :U _main ]
 [f ]
 "139
-[; ;newmain.c: 139:     uint16_t adc_count = 0;
-[v _adc_count `us ~T0 @X0 1 a ]
-[e = _adc_count -> -> 0 `i `us ]
+[; ;newmain.c: 139:     uint8_t can_frame = 0;
+[v _can_frame `uc ~T0 @X0 1 a ]
+[e = _can_frame -> -> 0 `i `uc ]
 "140
 [; ;newmain.c: 140:     __asm(" clrwdt");
 [; <"  clrwdt ;# ">
@@ -1792,9 +1808,6 @@ Version 4.0 HI-TECH Software Intermediate Code
 "146
 [; ;newmain.c: 146:     Watchdog_count = 800;
 [e = _Watchdog_count -> -> 800 `i `us ]
-"147
-[; ;newmain.c: 147:     serial_diagnost = 1;
-[e = _serial_diagnost -> -> 1 `i `a ]
 "148
 [; ;newmain.c: 148:     while(1)
 [e :U 1540 ]
@@ -1810,290 +1823,335 @@ Version 4.0 HI-TECH Software Intermediate Code
 "152
 [; ;newmain.c: 152:         {
 {
-"157
-[; ;newmain.c: 157:             Can_Data_Send();
-[e ( _Can_Data_Send ..  ]
-"158
-[; ;newmain.c: 158:             can_count = 500;
-[e = _can_count -> -> 500 `i `us ]
-"159
-[; ;newmain.c: 159:         }
-}
-[e :U 1542 ]
-"160
-[; ;newmain.c: 160:         if(Uart2_Frame_Flag == 1)
-[e $ ! == -> _Uart2_Frame_Flag `i -> 1 `i 1543  ]
-"161
-[; ;newmain.c: 161:         {
+"153
+[; ;newmain.c: 153:             if(serial_diagnost == 1)
+[e $ ! == -> _serial_diagnost `i -> 1 `i 1543  ]
+"154
+[; ;newmain.c: 154:             {
 {
-"162
-[; ;newmain.c: 162:             Uart2_Data_Handler();
-[e ( _Uart2_Data_Handler ..  ]
-"163
-[; ;newmain.c: 163:             Uart2_Frame_Flag = 0;
-[e = _Uart2_Frame_Flag -> -> 0 `i `uc ]
-"164
-[; ;newmain.c: 164:         }
+"155
+[; ;newmain.c: 155:                 Uart1_Data_Send();
+[e ( _Uart1_Data_Send ..  ]
+"156
+[; ;newmain.c: 156:             }
 }
 [e :U 1543 ]
-"165
-[; ;newmain.c: 165:         if(Watchdog_count == 0)
-[e $ ! == -> _Watchdog_count `ui -> -> 0 `i `ui 1544  ]
-"166
-[; ;newmain.c: 166:         {
+"158
+[; ;newmain.c: 158:             if(can_frame == 0)
+[e $ ! == -> _can_frame `i -> 0 `i 1544  ]
+"159
+[; ;newmain.c: 159:             {
 {
-"167
-[; ;newmain.c: 167:             Watchdog_count = 800;
-[e = _Watchdog_count -> -> 800 `i `us ]
-"168
-[; ;newmain.c: 168:             __asm(" clrwdt");
-[; <"  clrwdt ;# ">
-"169
-[; ;newmain.c: 169:         }
+"160
+[; ;newmain.c: 160:                 Can_Digital_Data_Send();
+[e ( _Can_Digital_Data_Send ..  ]
+"161
+[; ;newmain.c: 161:                 can_frame++;
+[e ++ _can_frame -> -> 1 `i `uc ]
+"162
+[; ;newmain.c: 162:                 can_count = 200;
+[e = _can_count -> -> 200 `i `us ]
+"163
+[; ;newmain.c: 163:             }
 }
+[e $U 1545  ]
+"164
+[; ;newmain.c: 164:             else
 [e :U 1544 ]
-"170
-[; ;newmain.c: 170:     }
+"165
+[; ;newmain.c: 165:             {
+{
+"166
+[; ;newmain.c: 166:                 Can_Analog_Data_Send();
+[e ( _Can_Analog_Data_Send ..  ]
+"167
+[; ;newmain.c: 167:                 can_frame = 0;
+[e = _can_frame -> -> 0 `i `uc ]
+"168
+[; ;newmain.c: 168:                 can_count = 400;
+[e = _can_count -> -> 400 `i `us ]
+"169
+[; ;newmain.c: 169:             }
+}
+[e :U 1545 ]
+"171
+[; ;newmain.c: 171:         }
+}
+[e :U 1542 ]
+"172
+[; ;newmain.c: 172:         if(Uart2_Frame_Flag == 1)
+[e $ ! == -> _Uart2_Frame_Flag `i -> 1 `i 1546  ]
+"173
+[; ;newmain.c: 173:         {
+{
+"174
+[; ;newmain.c: 174:             Uart2_Data_Handler();
+[e ( _Uart2_Data_Handler ..  ]
+"175
+[; ;newmain.c: 175:             Uart2_Frame_Flag = 0;
+[e = _Uart2_Frame_Flag -> -> 0 `i `uc ]
+"176
+[; ;newmain.c: 176:         }
+}
+[e :U 1546 ]
+"177
+[; ;newmain.c: 177:         if(Watchdog_count == 0)
+[e $ ! == -> _Watchdog_count `ui -> -> 0 `i `ui 1547  ]
+"178
+[; ;newmain.c: 178:         {
+{
+"179
+[; ;newmain.c: 179:             Watchdog_count = 800;
+[e = _Watchdog_count -> -> 800 `i `us ]
+"180
+[; ;newmain.c: 180:             __asm(" clrwdt");
+[; <"  clrwdt ;# ">
+"181
+[; ;newmain.c: 181:         }
+}
+[e :U 1547 ]
+"182
+[; ;newmain.c: 182:     }
 }
 [e :U 1539 ]
 [e $U 1540  ]
 [e :U 1541 ]
-"171
-[; ;newmain.c: 171:      return;
+"183
+[; ;newmain.c: 183:      return;
 [e $UE 1538  ]
-"172
-[; ;newmain.c: 172: }
+"184
+[; ;newmain.c: 184: }
 [e :UE 1538 ]
 }
 [v $root$_INTERRUPT_InterruptManager `(v ~T0 @X0 0 e ]
-"181
-[; ;newmain.c: 181: void __attribute__((picinterrupt(("")))) INTERRUPT_InterruptManager (void)
+"193
+[; ;newmain.c: 193: void __attribute__((picinterrupt(("")))) INTERRUPT_InterruptManager (void)
 [v _INTERRUPT_InterruptManager `(v ~T5 @X0 1 ef ]
-"182
-[; ;newmain.c: 182: {
+"194
+[; ;newmain.c: 194: {
 {
 [e :U _INTERRUPT_InterruptManager ]
 [f ]
-"184
-[; ;newmain.c: 184:     if(INTCONbits.TMR0IE == 1 && INTCONbits.TMR0IF == 1)
-[e $ ! && == -> . . _INTCONbits 0 5 `i -> 1 `i == -> . . _INTCONbits 0 2 `i -> 1 `i 1546  ]
-"185
-[; ;newmain.c: 185:     {
-{
-"186
-[; ;newmain.c: 186:         TMR0_ISR();
-[e ( _TMR0_ISR ..  ]
-"187
-[; ;newmain.c: 187:         if(Watchdog_count>0)
-[e $ ! > -> _Watchdog_count `ui -> -> 0 `i `ui 1547  ]
-"188
-[; ;newmain.c: 188:         {
-{
-"189
-[; ;newmain.c: 189:             Watchdog_count--;
-[e -- _Watchdog_count -> -> 1 `i `Vus ]
-"190
-[; ;newmain.c: 190:         }
-}
-[e :U 1547 ]
-"191
-[; ;newmain.c: 191:         if(ms_count>0)
-[e $ ! > -> _ms_count `ui -> -> 0 `i `ui 1548  ]
-"192
-[; ;newmain.c: 192:         {
-{
-"193
-[; ;newmain.c: 193:             ms_count--;
-[e -- _ms_count -> -> 1 `i `Vus ]
-"194
-[; ;newmain.c: 194:         }
-}
-[e :U 1548 ]
-"195
-[; ;newmain.c: 195:         if(can_count>0)
-[e $ ! > -> _can_count `ui -> -> 0 `i `ui 1549  ]
 "196
-[; ;newmain.c: 196:         {
-{
+[; ;newmain.c: 196:     if(INTCONbits.TMR0IE == 1 && INTCONbits.TMR0IF == 1)
+[e $ ! && == -> . . _INTCONbits 0 5 `i -> 1 `i == -> . . _INTCONbits 0 2 `i -> 1 `i 1549  ]
 "197
-[; ;newmain.c: 197:             can_count--;
-[e -- _can_count -> -> 1 `i `Vus ]
+[; ;newmain.c: 197:     {
+{
 "198
-[; ;newmain.c: 198:         }
-}
-[e :U 1549 ]
+[; ;newmain.c: 198:         TMR0_ISR();
+[e ( _TMR0_ISR ..  ]
 "199
-[; ;newmain.c: 199:         if(Led_Count>0)
-[e $ ! > -> _Led_Count `ui -> -> 0 `i `ui 1550  ]
+[; ;newmain.c: 199:         if(Watchdog_count>0)
+[e $ ! > -> _Watchdog_count `ui -> -> 0 `i `ui 1550  ]
 "200
 [; ;newmain.c: 200:         {
 {
 "201
-[; ;newmain.c: 201:             Led_Count--;
-[e -- _Led_Count -> -> 1 `i `Vus ]
+[; ;newmain.c: 201:             Watchdog_count--;
+[e -- _Watchdog_count -> -> 1 `i `Vus ]
 "202
 [; ;newmain.c: 202:         }
 }
 [e :U 1550 ]
 "203
-[; ;newmain.c: 203:         if(can_timeout>0)
-[e $ ! > _can_timeout -> -> -> 0 `i `l `ul 1551  ]
+[; ;newmain.c: 203:         if(ms_count>0)
+[e $ ! > -> _ms_count `ui -> -> 0 `i `ui 1551  ]
 "204
 [; ;newmain.c: 204:         {
 {
 "205
-[; ;newmain.c: 205:             can_timeout--;
-[e -- _can_timeout -> -> 1 `i `Vul ]
+[; ;newmain.c: 205:             ms_count--;
+[e -- _ms_count -> -> 1 `i `Vus ]
 "206
 [; ;newmain.c: 206:         }
 }
 [e :U 1551 ]
 "207
-[; ;newmain.c: 207:         if((blink_flag == 1) &&(Led_Count == 0))
-[e $ ! && == -> _blink_flag `ui -> -> 1 `i `ui == -> _Led_Count `ui -> -> 0 `i `ui 1552  ]
+[; ;newmain.c: 207:         if(can_count>0)
+[e $ ! > -> _can_count `ui -> -> 0 `i `ui 1552  ]
 "208
 [; ;newmain.c: 208:         {
 {
 "209
-[; ;newmain.c: 209:             if(Red_Led == 1)
-[e $ ! == -> _Red_Led `i -> 1 `i 1553  ]
+[; ;newmain.c: 209:             can_count--;
+[e -- _can_count -> -> 1 `i `Vus ]
 "210
-[; ;newmain.c: 210:             {
-{
-"211
-[; ;newmain.c: 211:                 LATCbits.LATC0 = 0;
-[e = . . _LATCbits 0 0 -> -> 0 `i `uc ]
-"212
-[; ;newmain.c: 212:                 LATAbits.LATA2 =~LATAbits.LATA2;
-[e = . . _LATAbits 0 2 -> ~ -> . . _LATAbits 0 2 `i `uc ]
-"213
-[; ;newmain.c: 213:             }
+[; ;newmain.c: 210:         }
 }
-[e $U 1554  ]
+[e :U 1552 ]
+"211
+[; ;newmain.c: 211:         if(Led_Count>0)
+[e $ ! > -> _Led_Count `ui -> -> 0 `i `ui 1553  ]
+"212
+[; ;newmain.c: 212:         {
+{
+"213
+[; ;newmain.c: 213:             Led_Count--;
+[e -- _Led_Count -> -> 1 `i `Vus ]
 "214
-[; ;newmain.c: 214:             else
+[; ;newmain.c: 214:         }
+}
 [e :U 1553 ]
 "215
-[; ;newmain.c: 215:             {
-{
+[; ;newmain.c: 215:         if(can_timeout>0)
+[e $ ! > _can_timeout -> -> -> 0 `i `l `ul 1554  ]
 "216
-[; ;newmain.c: 216:                 LATAbits.LATA2 = 0;
-[e = . . _LATAbits 0 2 -> -> 0 `i `uc ]
+[; ;newmain.c: 216:         {
+{
 "217
-[; ;newmain.c: 217:                 LATCbits.LATC0 =~ LATCbits.LATC0;
-[e = . . _LATCbits 0 0 -> ~ -> . . _LATCbits 0 0 `i `uc ]
+[; ;newmain.c: 217:             can_timeout--;
+[e -- _can_timeout -> -> 1 `i `Vul ]
 "218
-[; ;newmain.c: 218:             }
+[; ;newmain.c: 218:         }
 }
 [e :U 1554 ]
 "219
-[; ;newmain.c: 219:             if(Yellow_led == 1)
-[e $ ! == -> _Yellow_led `i -> 1 `i 1555  ]
+[; ;newmain.c: 219:         if((blink_flag == 1) &&(Led_Count == 0))
+[e $ ! && == -> _blink_flag `ui -> -> 1 `i `ui == -> _Led_Count `ui -> -> 0 `i `ui 1555  ]
 "220
-[; ;newmain.c: 220:             {
+[; ;newmain.c: 220:         {
 {
 "221
-[; ;newmain.c: 221:                LATAbits.LATA1 =~ LATAbits.LATA1;
-[e = . . _LATAbits 0 1 -> ~ -> . . _LATAbits 0 1 `i `uc ]
+[; ;newmain.c: 221:             if(Red_Led == 1)
+[e $ ! == -> _Red_Led `i -> 1 `i 1556  ]
 "222
-[; ;newmain.c: 222:             }
-}
-[e $U 1556  ]
-"223
-[; ;newmain.c: 223:             else
-[e :U 1555 ]
-"224
-[; ;newmain.c: 224:             {
+[; ;newmain.c: 222:             {
 {
+"223
+[; ;newmain.c: 223:                 LATCbits.LATC0 = 0;
+[e = . . _LATCbits 0 0 -> -> 0 `i `uc ]
+"224
+[; ;newmain.c: 224:                 LATAbits.LATA2 =~LATAbits.LATA2;
+[e = . . _LATAbits 0 2 -> ~ -> . . _LATAbits 0 2 `i `uc ]
 "225
-[; ;newmain.c: 225:                 LATAbits.LATA1 = 0;
-[e = . . _LATAbits 0 1 -> -> 0 `i `uc ]
-"226
-[; ;newmain.c: 226:             }
-}
-[e :U 1556 ]
-"227
-[; ;newmain.c: 227:             Led_Count = 500;
-[e = _Led_Count -> -> 500 `i `us ]
-"228
-[; ;newmain.c: 228:         }
-}
-[e :U 1552 ]
-"229
-[; ;newmain.c: 229:     }
+[; ;newmain.c: 225:             }
 }
 [e $U 1557  ]
+"226
+[; ;newmain.c: 226:             else
+[e :U 1556 ]
+"227
+[; ;newmain.c: 227:             {
+{
+"228
+[; ;newmain.c: 228:                 LATAbits.LATA2 = 0;
+[e = . . _LATAbits 0 2 -> -> 0 `i `uc ]
+"229
+[; ;newmain.c: 229:                 LATCbits.LATC0 =~ LATCbits.LATC0;
+[e = . . _LATCbits 0 0 -> ~ -> . . _LATCbits 0 0 `i `uc ]
 "230
-[; ;newmain.c: 230:     else if(INTCONbits.PEIE == 1)
-[e :U 1546 ]
-[e $ ! == -> . . _INTCONbits 1 6 `i -> 1 `i 1558  ]
+[; ;newmain.c: 230:             }
+}
+[e :U 1557 ]
 "231
-[; ;newmain.c: 231:     {
-{
+[; ;newmain.c: 231:             if(Yellow_led == 1)
+[e $ ! == -> _Yellow_led `i -> 1 `i 1558  ]
 "232
-[; ;newmain.c: 232:         if(PIE1bits.RC1IE == 1 && PIR1bits.RC1IF == 1)
-[e $ ! && == -> . . _PIE1bits 0 5 `i -> 1 `i == -> . . _PIR1bits 0 5 `i -> 1 `i 1559  ]
-"233
-[; ;newmain.c: 233:         {
+[; ;newmain.c: 232:             {
 {
+"233
+[; ;newmain.c: 233:                LATAbits.LATA1 =~ LATAbits.LATA1;
+[e = . . _LATAbits 0 1 -> ~ -> . . _LATAbits 0 1 `i `uc ]
 "234
-[; ;newmain.c: 234:           EUSART1_Receive_ISR();
-[e ( _EUSART1_Receive_ISR ..  ]
+[; ;newmain.c: 234:             }
+}
+[e $U 1559  ]
 "235
-[; ;newmain.c: 235:           PIR1bits.RC1IF = 0;
-[e = . . _PIR1bits 0 5 -> -> 0 `i `uc ]
+[; ;newmain.c: 235:             else
+[e :U 1558 ]
 "236
-[; ;newmain.c: 236:         }
+[; ;newmain.c: 236:             {
+{
+"237
+[; ;newmain.c: 237:                 LATAbits.LATA1 = 0;
+[e = . . _LATAbits 0 1 -> -> 0 `i `uc ]
+"238
+[; ;newmain.c: 238:             }
 }
 [e :U 1559 ]
-"237
-[; ;newmain.c: 237:         if(PIE3bits.RC2IE == 1 && PIR3bits.RC2IF == 1)
-[e $ ! && == -> . . _PIE3bits 0 5 `i -> 1 `i == -> . . _PIR3bits 0 5 `i -> 1 `i 1560  ]
-"238
-[; ;newmain.c: 238:         {
-{
 "239
-[; ;newmain.c: 239:            EUSART2_Receive_ISR();
-[e ( _EUSART2_Receive_ISR ..  ]
+[; ;newmain.c: 239:             Led_Count = 500;
+[e = _Led_Count -> -> 500 `i `us ]
 "240
-[; ;newmain.c: 240:            PIR3bits.RC2IF = 0;
-[e = . . _PIR3bits 0 5 -> -> 0 `i `uc ]
-"241
-[; ;newmain.c: 241:         }
+[; ;newmain.c: 240:         }
 }
-[e :U 1560 ]
+[e :U 1555 ]
+"241
+[; ;newmain.c: 241:     }
+}
+[e $U 1560  ]
 "242
-[; ;newmain.c: 242:         if(PIE5bits.RXB1IE == 1 && PIR5bits.RXB1IF == 1)
-[e $ ! && == -> . . _PIE5bits 0 1 `i -> 1 `i == -> . . _PIR5bits 0 1 `i -> 1 `i 1561  ]
+[; ;newmain.c: 242:     else if(INTCONbits.PEIE == 1)
+[e :U 1549 ]
+[e $ ! == -> . . _INTCONbits 1 6 `i -> 1 `i 1561  ]
 "243
-[; ;newmain.c: 243:         {
+[; ;newmain.c: 243:     {
 {
 "244
-[; ;newmain.c: 244:             ECAN_RXB1I_ISR();
-[e ( _ECAN_RXB1I_ISR ..  ]
+[; ;newmain.c: 244:         if(PIE1bits.RC1IE == 1 && PIR1bits.RC1IF == 1)
+[e $ ! && == -> . . _PIE1bits 0 5 `i -> 1 `i == -> . . _PIR1bits 0 5 `i -> 1 `i 1562  ]
 "245
-[; ;newmain.c: 245:         }
-}
-[e :U 1561 ]
-"246
-[; ;newmain.c: 246:         if(PIE5bits.RXB0IE == 1 && PIR5bits.RXB0IF == 1)
-[e $ ! && == -> . . _PIE5bits 0 0 `i -> 1 `i == -> . . _PIR5bits 0 0 `i -> 1 `i 1562  ]
-"247
-[; ;newmain.c: 247:         {
+[; ;newmain.c: 245:         {
 {
+"246
+[; ;newmain.c: 246:           EUSART1_Receive_ISR();
+[e ( _EUSART1_Receive_ISR ..  ]
+"247
+[; ;newmain.c: 247:           PIR1bits.RC1IF = 0;
+[e = . . _PIR1bits 0 5 -> -> 0 `i `uc ]
 "248
-[; ;newmain.c: 248:             ECAN_RXB0I_ISR();
-[e ( _ECAN_RXB0I_ISR ..  ]
-"249
-[; ;newmain.c: 249:         }
+[; ;newmain.c: 248:         }
 }
 [e :U 1562 ]
+"249
+[; ;newmain.c: 249:         if(PIE3bits.RC2IE == 1 && PIR3bits.RC2IF == 1)
+[e $ ! && == -> . . _PIE3bits 0 5 `i -> 1 `i == -> . . _PIR3bits 0 5 `i -> 1 `i 1563  ]
 "250
-[; ;newmain.c: 250:     }
-}
-[e :U 1558 ]
-[e :U 1557 ]
+[; ;newmain.c: 250:         {
+{
 "251
-[; ;newmain.c: 251: }
-[e :UE 1545 ]
+[; ;newmain.c: 251:            EUSART2_Receive_ISR();
+[e ( _EUSART2_Receive_ISR ..  ]
+"252
+[; ;newmain.c: 252:            PIR3bits.RC2IF = 0;
+[e = . . _PIR3bits 0 5 -> -> 0 `i `uc ]
+"253
+[; ;newmain.c: 253:         }
+}
+[e :U 1563 ]
+"254
+[; ;newmain.c: 254:         if(PIE5bits.RXB1IE == 1 && PIR5bits.RXB1IF == 1)
+[e $ ! && == -> . . _PIE5bits 0 1 `i -> 1 `i == -> . . _PIR5bits 0 1 `i -> 1 `i 1564  ]
+"255
+[; ;newmain.c: 255:         {
+{
+"256
+[; ;newmain.c: 256:             ECAN_RXB1I_ISR();
+[e ( _ECAN_RXB1I_ISR ..  ]
+"257
+[; ;newmain.c: 257:         }
+}
+[e :U 1564 ]
+"258
+[; ;newmain.c: 258:         if(PIE5bits.RXB0IE == 1 && PIR5bits.RXB0IF == 1)
+[e $ ! && == -> . . _PIE5bits 0 0 `i -> 1 `i == -> . . _PIR5bits 0 0 `i -> 1 `i 1565  ]
+"259
+[; ;newmain.c: 259:         {
+{
+"260
+[; ;newmain.c: 260:             ECAN_RXB0I_ISR();
+[e ( _ECAN_RXB0I_ISR ..  ]
+"261
+[; ;newmain.c: 261:         }
+}
+[e :U 1565 ]
+"262
+[; ;newmain.c: 262:     }
+}
+[e :U 1561 ]
+[e :U 1560 ]
+"263
+[; ;newmain.c: 263: }
+[e :UE 1548 ]
 }

@@ -136,7 +136,7 @@ void Delay_Ms(uint16_t delay)
 
 void main(void) 
 {
-    uint16_t adc_count = 0;
+    uint8_t can_frame = 0;
     CLRWDT();
     System_Initialize();
     CLRWDT();
@@ -144,18 +144,30 @@ void main(void)
     Led_Count = 500;
     can_timeout = 10000;
     Watchdog_count = 800;
-    serial_diagnost = true;
+    //serial_diagnost = true;
     while(1)
     {
         Data_Process();
         if(can_count == 0)
         {
-//            if(serial_diagnost == true)
-//            {
-//                Uart1_Data_Send();
-//            }
-            Can_Data_Send();
-            can_count = 500;
+            if(serial_diagnost == true)
+            {
+                Uart1_Data_Send();
+            }
+            //Uart1_Data_Send();
+            if(can_frame == 0)
+            {
+                Can_Digital_Data_Send();
+                can_frame++;
+                can_count = 200;
+            }
+            else
+            {
+                Can_Analog_Data_Send();
+                can_frame = 0;
+                can_count = 400;
+            }
+            
         }
         if(Uart2_Frame_Flag == 1)
         {

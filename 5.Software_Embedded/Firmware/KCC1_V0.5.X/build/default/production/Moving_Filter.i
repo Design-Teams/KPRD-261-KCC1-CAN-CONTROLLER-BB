@@ -20536,9 +20536,9 @@ typedef struct
 {
     uint8_t Status;
     uint16_t ID;
-    uint16_t Act_Load;
+    uint16_t Cal_Load;
     uint16_t Load_Count;
-    uint16_t Bat_Vtg;
+    uint16_t Batt_Vtg;
 }NRF_Para;
 
 OP_HANDLE Doutput;
@@ -20558,6 +20558,7 @@ uint32_t N_Serial;
 volatile uint8_t Uart1_Frame_Flag,Uart2_Frame_Flag,uart1_index,uart2_index;
 char Uart1_array[25],Uart2_array[40];
 volatile uint32_t can_timeout;
+static uint8_t Lp1_present=0,Lp2_present=0;
 _Bool Yellow_led;
 
 void Data_Process(void);
@@ -20570,7 +20571,8 @@ void Digital_Output_Handler(void);
 
 void OSCILLATOR_Initialize(void);
 void System_Initialize(void);
-void Can_Data_Send(void);
+void Can_Analog_Data_Send(void);
+void Can_Digital_Data_Send(void);
 void CAN_Request_Send(void);
 # 24 "./main.h" 2
 
@@ -20587,8 +20589,8 @@ void Eeprom_Read_Array(uint16_t Addr,uint8_t *Data, uint8_t length);
 # 25 "./main.h" 2
 
 
-# 1 "./CRC.h" 1
-# 11 "./CRC.h"
+# 1 "./CRC16.h" 1
+# 11 "./CRC16.h"
 uint16_t CRC16_calculate(uint16_t const Sum_data);
 # 27 "./main.h" 2
 

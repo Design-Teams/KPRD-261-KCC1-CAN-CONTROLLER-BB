@@ -6,8 +6,8 @@
                    projectFiles="true">
       <itemPath>main.h</itemPath>
       <itemPath>DataProcess.h</itemPath>
-      <itemPath>CRC.h</itemPath>
       <itemPath>Moving_Filter.h</itemPath>
+      <itemPath>CRC16.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
@@ -18,8 +18,8 @@
                    projectFiles="true">
       <itemPath>newmain.c</itemPath>
       <itemPath>DataProcess.c</itemPath>
-      <itemPath>CRC.c</itemPath>
       <itemPath>Moving_Filter.c</itemPath>
+      <itemPath>CRC16.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"

@@ -48,9 +48,9 @@ typedef struct
 {
     uint8_t Status;
     uint16_t ID;
-    uint16_t Act_Load;
+    uint16_t Cal_Load;
     uint16_t Load_Count;
-    uint16_t Bat_Vtg;
+    uint16_t Batt_Vtg;
 }NRF_Para;
 
 OP_HANDLE Doutput;
@@ -70,6 +70,7 @@ uint32_t N_Serial;//CANRID,CANTID;
 volatile uint8_t Uart1_Frame_Flag,Uart2_Frame_Flag,uart1_index,uart2_index;
 char Uart1_array[25],Uart2_array[40];
 volatile uint32_t can_timeout;
+static uint8_t Lp1_present=0,Lp2_present=0;
 bool Yellow_led;
 
 void Data_Process(void);
@@ -82,7 +83,8 @@ void Digital_Output_Handler(void);
 //void Can_to_Uart_Data(void);
 void OSCILLATOR_Initialize(void);
 void System_Initialize(void);
-void Can_Data_Send(void);
+void Can_Analog_Data_Send(void);
+void Can_Digital_Data_Send(void);
 void CAN_Request_Send(void);
 #ifdef	__cplusplus
 extern "C" {

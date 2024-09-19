@@ -7,10 +7,10 @@
 //#define SUart_Tx  LATBbits.LATB5
 #define RS485_Ctrl  LATBbits.LATB5
 
-#define Wire_Break_min 1790
-#define Wire_Break_max 1995
+#define Wire_Break_min 1600//1790
+#define Wire_Break_max 2000//1995
 #define Switch_Open_Min 1000
-#define Switch_Open_Max 1700
+#define Switch_Open_Max 1500//1700
 #define Switch_Close_Ground 100
 #define Switch_Close_Battery 3000
 
@@ -120,13 +120,13 @@ void System_Initialize(void)
           EUSART1_String("CANID stored at eeprom Success\r\n");
       }
           
-      CAN_Speed = 250;
-      Eeprom_Write(4,'3');Eeprom_Write(5,'3');Eeprom_Write(6,'3');
+      CAN_Speed = 125;
+      Eeprom_Write(4,'2');Eeprom_Write(5,'2');Eeprom_Write(6,'2');
       CLRWDT();
       eep_read1 = Eeprom_Read(4); eep_read2 = Eeprom_Read(5); eep_read3 = Eeprom_Read(6);
-      if(((eep_read1 != '3')&&(eep_read2 != '3'))||((eep_read2 != '3')&&(eep_read3 != '3'))||((eep_read1 != '3')&&(eep_read3 != '3')))
+      if(((eep_read1 != '2')&&(eep_read2 != '2'))||((eep_read2 != '2')&&(eep_read3 != '2'))||((eep_read1 != '2')&&(eep_read3 != '2')))
       {
-         Eeprom_Write(4,'3');Eeprom_Write(5,'3');Eeprom_Write(6,'3');
+         Eeprom_Write(4,'2');Eeprom_Write(5,'2');Eeprom_Write(6,'2');
          EUSART1_String("CANspeed stored at eeprom failed\r\n");
       }
       else
@@ -180,7 +180,7 @@ void System_Initialize(void)
        }
        
     }
-    if((CAN_Txpara.CANID == 409)&&(CAN_Speed == 250))
+    if((CAN_Txpara.CANID == 409)&&(CAN_Speed == 125))
     {
          EUSART1_String("Default Setting\r\n");
     }
@@ -251,7 +251,7 @@ void System_Initialize(void)
     EUSART1_String(buf);
     sprintf(buf," CANID=%d",(uint16_t)CAN_Txpara.CANID);
     EUSART1_String(buf);
-    sprintf(buf," CANSpeed=%d\r\n",CAN_Speed);
+    sprintf(buf," CANSpeed=%d\n",CAN_Speed);
     EUSART1_String(buf);
     
     for(eep_read1=0;eep_read1<8;eep_read1++)
@@ -269,6 +269,8 @@ void System_Initialize(void)
     CAN_Request_Send();
     EUSART1_String("Program Starts...\r\n");
     CLRWDT();
+    Lp1_present = 11;
+    Lp2_present = 11;
 }
 /*=============================================================================
  * Function     : Uart1_Data_Handler.
@@ -299,6 +301,10 @@ void Uart1_Data_Handler(void)
     else if(memcmp(((char*)Uart1_array+1),",SD,",4) == 0)          //Serial Diagnost
     {
         serial_diagnost = true;
+    }
+    else if(memcmp(((char*)Uart1_array+1),",NM,",4) == 0)          //Serial Diagnost
+    {
+        serial_diagnost = false;
     }
     else if(memcmp(((char*)Uart1_array+1),",SP,",4) == 0)          //Input data {,SP,11111,}
     {
@@ -339,6 +345,7 @@ void Uart2_Data_Handler(void)
     char* token,token_buf[6][10];//lbuf[5]={0};
     uint8_t k=0;
     uint16_t temp=0;
+    
    // PIE3bits.RC2IE = 0;
     if(memcmp(((char*)Uart2_array+1),",LP,",4) == 0)          //Output data {,OD,digital_output,mp3_stat,track_num,}
     {
@@ -354,34 +361,70 @@ void Uart2_Data_Handler(void)
         if(temp == 201)
         {
             NRF[0].ID         = 0;
-            NRF[0].Act_Load   = 0;
+            NRF[0].Cal_Load   = 0;
             NRF[0].Load_Count = 0;
-            NRF[0].Bat_Vtg    = 0;
+            NRF[0].Batt_Vtg   = 0;
             NRF[0].Status     = 0;
             
             NRF[0].ID         = (uint16_t)(atol(token_buf[0]));//Hook Type Main/Aux
-            NRF[0].Act_Load   = (uint16_t)(atol(token_buf[1]));//Calibrated Load
+            NRF[0].Cal_Load   = (uint16_t)(atol(token_buf[1]));//Calibrated Load
             NRF[0].Load_Count = (uint16_t)(atol(token_buf[2]));//Load Adc Count
-            NRF[0].Bat_Vtg    = (uint16_t)(atol(token_buf[3]));//Battery Voltage
+            NRF[0].Batt_Vtg   = (uint16_t)(atol(token_buf[3]));//Battery Voltage
             NRF[0].Status     = (uint8_t)(atol(token_buf[4]));//Status
+            Lp1_present = 0;
+            Lp2_present++;
         }
-        else
+        else if(temp == 202)
         {
             NRF[1].ID         = 0;
-            NRF[1].Act_Load   = 0;
+            NRF[1].Cal_Load   = 0;
             NRF[1].Load_Count = 0;
-            NRF[1].Bat_Vtg    = 0;
+            NRF[1].Batt_Vtg   = 0;
             NRF[1].Status     = 0;
             
             NRF[1].ID         = (uint16_t)(atol(token_buf[0]));//Hook Type Main/Aux
-            NRF[1].Act_Load   = (uint16_t)(atol(token_buf[1]));//Calibrated Load
+            NRF[1].Cal_Load   = (uint16_t)(atol(token_buf[1]));//Calibrated Load
             NRF[1].Load_Count = (uint16_t)(atol(token_buf[2]));//Load Adc Count
-            NRF[1].Bat_Vtg    = (uint16_t)(atol(token_buf[3]));//Battery Voltage
+            NRF[1].Batt_Vtg   = (uint16_t)(atol(token_buf[3]));//Battery Voltage
             NRF[1].Status     = (uint8_t)(atol(token_buf[4]));//Status
+            Lp1_present++;
+            Lp2_present = 0;
+        }
+        
+        if(Lp1_present>10)
+        {
+            Lp1_present = 11;
+        }
+        if(Lp2_present>10)
+        {
+            Lp2_present = 11;
         }
     }
     //PIE3bits.RC2IE = 1;
     Uart2_Frame_Flag = 0;
+}
+
+
+void Can_Digital_Data_Send(void)
+{
+    uint16_t crc = 0;
+    ECAN_TxMSG.idType = dSTANDARD_CAN_MSG_ID_2_0B;
+    ECAN_TxMSG.dlc    = 8;
+    ECAN_TxMSG.id     = CAN_Txpara.CANID;
+    
+    ECAN_TxMSG.data0  = 0x01;
+    ECAN_TxMSG.data1  = DADC[0];
+    ECAN_TxMSG.data2  = DADC[1];
+    ECAN_TxMSG.data3  = DADC[2];
+    ECAN_TxMSG.data4  = 0;
+    ECAN_TxMSG.data5  = 0;
+    
+    crc = (uint16_t)ECAN_TxMSG.id;
+    crc += (uint16_t)(ECAN_TxMSG.data0+ECAN_TxMSG.data1+ECAN_TxMSG.data2+ECAN_TxMSG.data3);
+    crc = CRC16_calculate(crc);
+    ECAN_TxMSG.data6 = (uint8_t)((crc&0xFF00)>>8);
+    ECAN_TxMSG.data7 = (uint8_t)((crc&0x00FF)>>0);
+    CAN_transmit(&ECAN_TxMSG);
 }
 /*=============================================================================
  * Function     : Can_Data_Send.
@@ -390,7 +433,7 @@ void Uart2_Data_Handler(void)
  * Return       : Void.
  * Example      : Can_Data_Send();
 ===========================================================================================================================*/
-void Can_Data_Send(void)
+void Can_Analog_Data_Send(void)
 {
     static uint8_t can_frame_no = 0;
     uint16_t crc=0;
@@ -405,137 +448,150 @@ void Can_Data_Send(void)
      ECAN_TxMSG.data5  = 0;
      ECAN_TxMSG.data6  = 0;
      ECAN_TxMSG.data7  = 0;
-//    if(can_frame_no == 0)
-//    {
+    
+     if((ADC[2]<80)&&(ADC[3]<80)&&(can_frame_no == 0))       // if adc count is less then we conclude that sensor disconnect
+     {
+        can_frame_no = 1;            // Skip this can frame
+     }
+     if((ADC[4]<80)&&(ADC[5]<80)&&(can_frame_no == 1))
+     {
+        can_frame_no = 2;
+     }
+     if((ADC[6]<80)&&(ADC[7]<80)&&(can_frame_no == 2))
+     {
+            can_frame_no = 3;
+     }
+     if((ADC[8]<80)&&(ADC[9]<80)&&(can_frame_no == 3))
+     {
+            can_frame_no = 4;
+     }
+     if((Lp1_present>9)&&(can_frame_no == 4))                // if load plate is not detected then skip can frame
+     {
+            can_frame_no = 6;
+     }
+     if((Lp2_present>9)&&(can_frame_no == 6))
+     {
+            can_frame_no = 8;
+     }
     switch(can_frame_no)
     {
         case 0:
-            ECAN_TxMSG.data0  = 0x01;
+            ECAN_TxMSG.data0  = 0x02;
             ECAN_TxMSG.data1  = (uint8_t)((ADC[2]&0xFF00)>>8);
             ECAN_TxMSG.data2  = (uint8_t)((ADC[2]&0x00FF)>>0);
             ECAN_TxMSG.data3  = (uint8_t)((ADC[3]&0xFF00)>>8);
             ECAN_TxMSG.data4  = (uint8_t)((ADC[3]&0x00FF)>>0);
-            ECAN_TxMSG.data5  = DADC[0];//(uint8_t)((ADC[2]&0xFF00)>>8);//119
-        
+            ECAN_TxMSG.data5  = 0;//(uint8_t)((ADC[2]&0xFF00)>>8);//119
             can_frame_no++;
+           // EUSART1_String("CAN Frame 2\r\n");
             break;
-    
-//    else if(can_frame_no == 1)
-//    {
+        
         case 1:
-            ECAN_TxMSG.data0  = 0x02;
+            ECAN_TxMSG.data0  = 0x03;
             ECAN_TxMSG.data1  = (uint8_t)((ADC[4]&0xFF00)>>8);
             ECAN_TxMSG.data2  = (uint8_t)((ADC[4]&0x00FF)>>0);
             ECAN_TxMSG.data3  = (uint8_t)((ADC[5]&0xFF00)>>8);
             ECAN_TxMSG.data4  = (uint8_t)((ADC[5]&0x00FF)>>0);
-            ECAN_TxMSG.data5  = DADC[1];//(uint8_t)((ADC[5]&0xFF00)>>8);
+            ECAN_TxMSG.data5  = 0;//(uint8_t)((ADC[5]&0xFF00)>>8);
             can_frame_no++;
+            //EUSART1_String("CAN Frame 3\r\n");
             break;
     
-//    else if(can_frame_no == 2)
-//    {
         case 2:
-            ECAN_TxMSG.data0  = 0x03;
+            ECAN_TxMSG.data0  = 0x04;
             ECAN_TxMSG.data1  = (uint8_t)((ADC[6]&0xFF00)>>8);
             ECAN_TxMSG.data2  = (uint8_t)((ADC[6]&0x00FF)>>0);
             ECAN_TxMSG.data3  = (uint8_t)((ADC[7]&0xFF00)>>8);
             ECAN_TxMSG.data4  = (uint8_t)((ADC[7]&0x00FF)>>0);
-            ECAN_TxMSG.data5  =  DADC[2];
+            ECAN_TxMSG.data5  =  0;
             can_frame_no++;
+            //EUSART1_String("CAN Frame 4\r\n");
             break;
-    //}
-//    else if(can_frame_no == 3)
-//    {
+    
         case 3:
-            ECAN_TxMSG.data0  = 0x04;
+            ECAN_TxMSG.data0  = 0x05;
             ECAN_TxMSG.data1  = (uint8_t)((ADC[8]&0xFF00)>>8);
             ECAN_TxMSG.data2  = (uint8_t)((ADC[8]&0x00FF)>>0);
             ECAN_TxMSG.data3  = (uint8_t)((ADC[9]&0xFF00)>>8);
             ECAN_TxMSG.data4  = (uint8_t)((ADC[9]&0x00FF)>>0);
             ECAN_TxMSG.data5  = 0;                
             can_frame_no++;
+            //EUSART1_String("CAN Frame 5\r\n");
             break;
-//    }
-//    else if(can_frame_no == 4)      // NRF Data Start
-//    {
+
         case 4:
-            ECAN_TxMSG.data0  = 0x05;
+            ECAN_TxMSG.data0  = 0x06;
             ECAN_TxMSG.data1  = (uint8_t) NRF[0].ID;
-            ECAN_TxMSG.data2  = (uint8_t)((NRF[0].Act_Load & 0xFF00)>>8);
-            ECAN_TxMSG.data3  = (uint8_t)((NRF[0].Act_Load & 0x00FF)>>0);
+            ECAN_TxMSG.data2  = (uint8_t)((NRF[0].Cal_Load & 0xFF00)>>8);
+            ECAN_TxMSG.data3  = (uint8_t)((NRF[0].Cal_Load & 0x00FF)>>0);
             ECAN_TxMSG.data4  = (uint8_t)((NRF[0].Load_Count & 0xFF00)>>8);
             ECAN_TxMSG.data5  = (uint8_t)((NRF[0].Load_Count & 0x00FF)>>0);
-            NRF[0].ID = 0;
-            NRF[0].Act_Load   = 0;
-            NRF[0].Load_Count = 0;
-           // nrf_frame++;
+//            NRF[0].ID = 0;
+//            NRF[0].Cal_Load   = 0;
+//            NRF[0].Load_Count = 0;
             can_frame_no++;
+            //EUSART1_String("CAN Frame 6\r\n");
             break;
-//    }
-//    else if(can_frame_no == 5)      // NRF Data Start
-//    {
+
         case 5:
-            ECAN_TxMSG.data0  = 0x06;
-            ECAN_TxMSG.data1  = (uint8_t)((NRF[0].Bat_Vtg & 0xFF00)>>8);
-            ECAN_TxMSG.data2  = (uint8_t)((NRF[0].Bat_Vtg & 0x00FF)>>0);
+            ECAN_TxMSG.data0  = 0x07;
+            ECAN_TxMSG.data1  = (uint8_t)((NRF[0].Batt_Vtg & 0xFF00)>>8);
+            ECAN_TxMSG.data2  = (uint8_t)((NRF[0].Batt_Vtg & 0x00FF)>>0);
             ECAN_TxMSG.data3  = NRF[0].Status;
             ECAN_TxMSG.data4  = 0;
             ECAN_TxMSG.data5  = 0;
-            NRF[0].Bat_Vtg = 0;
-            NRF[0].Status  = 0;
+//            NRF[0].Batt_Vtg = 0;
+//            NRF[0].Status  = 0;
             can_frame_no++;
+            //EUSART1_String("CAN Frame 7\r\n");
             break;
-//    }
-//    else if(can_frame_no == 6)
-//    {
+
         case 6:
-            ECAN_TxMSG.data0  = 0x07;  
+            ECAN_TxMSG.data0  = 0x08;  
             ECAN_TxMSG.data1  = (uint8_t)NRF[1].ID;
-            ECAN_TxMSG.data2  = (uint8_t)((NRF[1].Act_Load & 0xFF00)>>8);
-            ECAN_TxMSG.data3  = (uint8_t)((NRF[1].Act_Load & 0x00FF)>>0);
+            ECAN_TxMSG.data2  = (uint8_t)((NRF[1].Cal_Load & 0xFF00)>>8);
+            ECAN_TxMSG.data3  = (uint8_t)((NRF[1].Cal_Load & 0x00FF)>>0);
             ECAN_TxMSG.data4  = (uint8_t)((NRF[1].Load_Count & 0xFF00)>>8);
             ECAN_TxMSG.data5  = (uint8_t)((NRF[1].Load_Count & 0x00FF)>>0);
-            NRF[1].ID = 0;
-            NRF[1].Act_Load   = 0;
-            NRF[1].Load_Count = 0;
+//            NRF[1].ID = 0;
+//            NRF[1].Cal_Load   = 0;
+//            NRF[1].Load_Count = 0;
             can_frame_no++;
+            //EUSART1_String("CAN Frame 8\r\n");
             break;
-//    }
-//     else if(can_frame_no == 7)      // NRF Data Start
-//    {
+
         case 7:
-            ECAN_TxMSG.data0  = 0x08;
-            ECAN_TxMSG.data1  = (uint8_t)((NRF[1].Bat_Vtg & 0xFF00)>>8);
-            ECAN_TxMSG.data2  = (uint8_t)((NRF[1].Bat_Vtg & 0x00FF)>>0);
+            ECAN_TxMSG.data0  = 0x09;
+            ECAN_TxMSG.data1  = (uint8_t)((NRF[1].Batt_Vtg & 0xFF00)>>8);
+            ECAN_TxMSG.data2  = (uint8_t)((NRF[1].Batt_Vtg & 0x00FF)>>0);
             ECAN_TxMSG.data3  = NRF[1].Status;
             ECAN_TxMSG.data4  = 0;
             ECAN_TxMSG.data5  = 0;
-            NRF[1].Bat_Vtg = 0;
-            NRF[1].Status  = 0;
-            can_frame_no++;
+//            NRF[1].Batt_Vtg = 0;
+//            NRF[1].Status  = 0;
+            can_frame_no = 0;
+            //EUSART1_String("CAN Frame 9\r\n");
             break;
-//    }
-//    else if(can_frame_no == 8)
-//    {
-        case 8:
-            ECAN_TxMSG.data0  = 0x09;
-            ECAN_TxMSG.data1  = (uint8_t)((ADC[0]&0xFF00)>>8);
-            ECAN_TxMSG.data2  = (uint8_t)((ADC[0]&0x00FF)>>0);
-            ECAN_TxMSG.data3  = (uint8_t)((ADC[1]&0xFF00)>>8);
-            ECAN_TxMSG.data4  = (uint8_t)((ADC[1]&0x00FF)>>0);
-            ECAN_TxMSG.data5  = 0;                     
-            can_frame_no=0;
-            break;
+        
+//        default:
+//            can_frame_no = 0;
+//            break;
     }
      
-    crc = (uint16_t)ECAN_TxMSG.id;
-    crc += (uint16_t)(ECAN_TxMSG.data0+ECAN_TxMSG.data1+ECAN_TxMSG.data2+ECAN_TxMSG.data3+ECAN_TxMSG.data4+ECAN_TxMSG.data5);
-    crc = CRC16_calculate(crc);
-    ECAN_TxMSG.data6 = (uint8_t)((crc&0xFF00)>>8);
-    ECAN_TxMSG.data7 = (uint8_t)((crc&0x00FF)>>0);
-    CAN_transmit(&ECAN_TxMSG);
+    if(can_frame_no < 8)
+    {
+        crc = (uint16_t)ECAN_TxMSG.id;
+        crc += (uint16_t)(ECAN_TxMSG.data0+ECAN_TxMSG.data1+ECAN_TxMSG.data2+ECAN_TxMSG.data3+ECAN_TxMSG.data4+ECAN_TxMSG.data5);
+        crc = CRC16_calculate(crc);
+        ECAN_TxMSG.data6 = (uint8_t)((crc&0xFF00)>>8);
+        ECAN_TxMSG.data7 = (uint8_t)((crc&0x00FF)>>0);
+        CAN_transmit(&ECAN_TxMSG);
+    }
+    else
+    {
+        can_frame_no = 0;
+    }
 }
-
 void CAN_Request_Send(void)
 {
     uint16_t crc = 0;
@@ -543,11 +599,11 @@ void CAN_Request_Send(void)
     ECAN_TxMSG.idType = dSTANDARD_CAN_MSG_ID_2_0B;
     ECAN_TxMSG.dlc    = 8;
     ECAN_TxMSG.id     = CAN_Txpara.CANID;//CAN_Txpara.CANID;
-    ECAN_TxMSG.data0  = 'S';
-    ECAN_TxMSG.data1  = 'T';
-    ECAN_TxMSG.data2  = 'A';
-    ECAN_TxMSG.data3  = 'T';
-    ECAN_TxMSG.data4  = 0;
+    ECAN_TxMSG.data0  = 0;
+    ECAN_TxMSG.data1  = 'S';
+    ECAN_TxMSG.data2  = 'T';
+    ECAN_TxMSG.data3  = 'A';
+    ECAN_TxMSG.data4  = 'T';
     ECAN_TxMSG.data5  = 0;
     ECAN_TxMSG.data6  = 0;
     ECAN_TxMSG.data7  = 0;
@@ -559,13 +615,8 @@ void CAN_Request_Send(void)
     ECAN_TxMSG.data7 = (uint8_t)((crc&0x00FF)>>0);   
     
     CAN_transmit(&ECAN_TxMSG);
-//    CAN_Txpara.CAN_Buf[0] = 'S';
-//    CAN_Txpara.CAN_Buf[1] = 'T';
-//    CAN_Txpara.CAN_Buf[2] = 'A';
-//    CAN_Txpara.CAN_Buf[3] = 'T';   
-//    ECanWriteMessage(0,CAN_Txpara.CANID,8,0,CAN_Txpara.CAN_Buf);  // Put request on CAN bus
-    Delay_Ms(100);
-//    memset(CAN_Txpara.CAN_Buf,0x00,8*sizeof(uint8_t)); 
+     Delay_Ms(100);
+    //memset(CAN_Txpara.CAN_Buf,0x00,8*sizeof(uint8_t)); 
     Yellow_led = false;
     can_timeout = 10000;
 }
@@ -625,7 +676,7 @@ void Data_Process(void)
     }
     for(channel=7;channel<10;channel++)
     {
-        temp_ADC[channel] = ADC_Threshold_Check(temp_ADC[channel],channel);
+        temp_ADC[channel] = ADC_Threshold_Check(temp_ADC[channel],channel-2);
     }
     ADC[2] = temp_ADC[4];
     ADC[3] = temp_ADC[3];
@@ -1145,6 +1196,10 @@ void Data_Process(void)
                     }
                 }
             }
+            else if((CAN_Rxpara.CAN_Buf[0]=='K') && (CAN_Rxpara.CAN_Buf[1]=='S'))
+            {
+                
+            }
             else
             {
                 Yellow_led = false;  
@@ -1165,9 +1220,9 @@ void Data_Process(void)
         }
         Uart1_Frame_Flag = 0;
     }
-    if(Uart2_Frame_Flag == 1)
-    {
-        Uart2_Data_Handler();           // Check UART received data
+//    if(Uart2_Frame_Flag == 1)
+//    {
+//        Uart2_Data_Handler();           // Check UART received data
 //        if(uart2_data_flag == true)
 //        {
 //          Uart1_Data_Send();            //uart2 received data send to uart1
@@ -1178,23 +1233,26 @@ void Data_Process(void)
             if(serial_diagnost == true)
             {
               EUSART1_String("{,LP,");
-              if(frame==0)
-              {
-                sprintf(temp_buf,"%d,%d,%d,%d,%d,}\n",(uint16_t)NRF[0].ID,NRF[0].Act_Load,NRF[0].Load_Count,NRF[0].Bat_Vtg,NRF[0].Status);  
-                frame++;
-              }  
-              else
-              {
-                sprintf(temp_buf,"%d,%d,%d,%d,%d,}\n",(uint16_t)NRF[1].ID,NRF[1].Act_Load,NRF[1].Load_Count,NRF[1].Bat_Vtg,NRF[1].Status);  
-                  frame = 0;
-              }
+              sprintf(temp_buf,"%d,%d,%d,%d,%d,}\n",(uint16_t)NRF[0].ID,NRF[0].Cal_Load,NRF[0].Load_Count,NRF[0].Batt_Vtg,NRF[0].Status);  
+              EUSART1_String(temp_buf);
+              EUSART1_String("{,LP,");
+              sprintf(temp_buf,"%d,%d,%d,%d,%d,}\n",(uint16_t)NRF[1].ID,NRF[1].Cal_Load,NRF[1].Load_Count,NRF[1].Batt_Vtg,NRF[1].Status);  
               EUSART1_String(temp_buf);
             }
-           // memset(CAN_Txpara.CAN_Buf,0x00,8*sizeof(uint8_t));
             nrf_data_flag = false;
+            frame = 0;
         }
-        Uart2_Frame_Flag = 0;
-    }
+        else
+        {
+            frame++;
+            if(frame>5)
+            {
+             Lp1_present = 11;
+             Lp2_present = 11;
+             frame = 5;
+            }
+        }
+//    }
     
     if(NRFP_flag == 1)
     {
@@ -1249,9 +1307,11 @@ void Uart1_Data_Send(void)
 {
     char disp[25]={0};
 
-    sprintf(disp,"{,AD,%d,%d,%d,%d,%d,",ADC[0],ADC[1],ADC[2],ADC[3],ADC[4]);
+    sprintf(disp,"{,AD,%d,%d,%d,",ADC[0],ADC[1],ADC[2]);
     EUSART1_String(disp);
-    sprintf(disp,"%d,%d,%d,%d,%d,",ADC[5],ADC[7],ADC[6],ADC[9],ADC[8]); 
+    sprintf(disp,"%d,%d,%d,",ADC[3],ADC[4],ADC[5]); 
+    EUSART1_String(disp);
+    sprintf(disp,"%d,%d,%d,%d,",ADC[7],ADC[6],ADC[9],ADC[8]); 
     EUSART1_String(disp);
     sprintf(disp,"%d,%d,%d,}\n",DADC[0],DADC[1],DADC[2]); 
     EUSART1_String(disp);

@@ -1,15 +1,15 @@
 /* 
- * File:   CRC.h
+ * File:   CRC16.h
  * Author: rahul.chavan
  *
- * Created on August 30, 2024, 3:09 PM
+ * Created on September 16, 2024, 3:10 PM
  */
 
-#ifndef CRC_H
-#define	CRC_H
+#ifndef CRC16_H
+#define	CRC16_H
 
 uint16_t CRC16_calculate(uint16_t const Sum_data);
-//uint32_t CRC32_calculate(uint32_t const Sum_data);
+
 #ifdef	__cplusplus
 extern "C" {
 #endif
@@ -21,5 +21,5 @@ extern "C" {
 }
 #endif
 
-#endif	/* CRC_H */
+#endif	/* CRC16_H */
 

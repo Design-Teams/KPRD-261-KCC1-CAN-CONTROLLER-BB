@@ -14,7 +14,7 @@ Version 4.0 HI-TECH Software Intermediate Code
 "48 ./DataProcess.h
 [; ;./DataProcess.h: 48: {
 [s S1532 `uc 1 `us 1 `us 1 `us 1 `us 1 ]
-[n S1532 . Status ID Act_Load Load_Count Bat_Vtg ]
+[n S1532 . Status ID Cal_Load Load_Count Batt_Vtg ]
 "24 ./Moving_Filter.h
 [; ;./Moving_Filter.h: 24: {
 [s S1533 `uc 1 `uc 1 `uc 1 `us -> 10 `i `us 1 `ul 1 ]
@@ -1462,7 +1462,17 @@ Version 4.0 HI-TECH Software Intermediate Code
 [; ;./DataProcess.h: 72: volatile uint32_t can_timeout;
 [v _can_timeout `Vul ~T0 @X0 1 e ]
 "73
-[; ;./DataProcess.h: 73: _Bool Yellow_led;
+[; ;./DataProcess.h: 73: static uint8_t Lp1_present=0,Lp2_present=0;
+[v _Lp1_present `uc ~T0 @X0 1 s ]
+[i _Lp1_present
+-> -> 0 `i `uc
+]
+[v _Lp2_present `uc ~T0 @X0 1 s ]
+[i _Lp2_present
+-> -> 0 `i `uc
+]
+"74
+[; ;./DataProcess.h: 74: _Bool Yellow_led;
 [v _Yellow_led `a ~T0 @X0 1 e ]
 "34 ./Moving_Filter.h
 [; ;./Moving_Filter.h: 34: Filter moving_flt[8];

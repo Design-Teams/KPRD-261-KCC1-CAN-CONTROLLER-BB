@@ -20536,9 +20536,9 @@ typedef struct
 {
     uint8_t Status;
     uint16_t ID;
-    uint16_t Act_Load;
+    uint16_t Cal_Load;
     uint16_t Load_Count;
-    uint16_t Bat_Vtg;
+    uint16_t Batt_Vtg;
 }NRF_Para;
 
 OP_HANDLE Doutput;
@@ -20558,6 +20558,7 @@ uint32_t N_Serial;
 volatile uint8_t Uart1_Frame_Flag,Uart2_Frame_Flag,uart1_index,uart2_index;
 char Uart1_array[25],Uart2_array[40];
 volatile uint32_t can_timeout;
+static uint8_t Lp1_present=0,Lp2_present=0;
 _Bool Yellow_led;
 
 void Data_Process(void);
@@ -20570,7 +20571,8 @@ void Digital_Output_Handler(void);
 
 void OSCILLATOR_Initialize(void);
 void System_Initialize(void);
-void Can_Data_Send(void);
+void Can_Analog_Data_Send(void);
+void Can_Digital_Data_Send(void);
 void CAN_Request_Send(void);
 # 24 "./main.h" 2
 
@@ -20587,8 +20589,8 @@ void Eeprom_Read_Array(uint16_t Addr,uint8_t *Data, uint8_t length);
 # 25 "./main.h" 2
 
 
-# 1 "./CRC.h" 1
-# 11 "./CRC.h"
+# 1 "./CRC16.h" 1
+# 11 "./CRC16.h"
 uint16_t CRC16_calculate(uint16_t const Sum_data);
 # 27 "./main.h" 2
 
@@ -20700,13 +20702,13 @@ void System_Initialize(void)
           EUSART1_String("CANID stored at eeprom Success\r\n");
       }
 
-      CAN_Speed = 250;
-      Eeprom_Write(4,'3');Eeprom_Write(5,'3');Eeprom_Write(6,'3');
+      CAN_Speed = 125;
+      Eeprom_Write(4,'2');Eeprom_Write(5,'2');Eeprom_Write(6,'2');
       __asm(" clrwdt");
       eep_read1 = Eeprom_Read(4); eep_read2 = Eeprom_Read(5); eep_read3 = Eeprom_Read(6);
-      if(((eep_read1 != '3')&&(eep_read2 != '3'))||((eep_read2 != '3')&&(eep_read3 != '3'))||((eep_read1 != '3')&&(eep_read3 != '3')))
+      if(((eep_read1 != '2')&&(eep_read2 != '2'))||((eep_read2 != '2')&&(eep_read3 != '2'))||((eep_read1 != '2')&&(eep_read3 != '2')))
       {
-         Eeprom_Write(4,'3');Eeprom_Write(5,'3');Eeprom_Write(6,'3');
+         Eeprom_Write(4,'2');Eeprom_Write(5,'2');Eeprom_Write(6,'2');
          EUSART1_String("CANspeed stored at eeprom failed\r\n");
       }
       else
@@ -20760,7 +20762,7 @@ void System_Initialize(void)
        }
 
     }
-    if((CAN_Txpara.CANID == 409)&&(CAN_Speed == 250))
+    if((CAN_Txpara.CANID == 409)&&(CAN_Speed == 125))
     {
          EUSART1_String("Default Setting\r\n");
     }
@@ -20831,7 +20833,7 @@ void System_Initialize(void)
     EUSART1_String(buf);
     sprintf(buf," CANID=%d",(uint16_t)CAN_Txpara.CANID);
     EUSART1_String(buf);
-    sprintf(buf," CANSpeed=%d\r\n",CAN_Speed);
+    sprintf(buf," CANSpeed=%d\n",CAN_Speed);
     EUSART1_String(buf);
 
     for(eep_read1=0;eep_read1<8;eep_read1++)
@@ -20849,8 +20851,10 @@ void System_Initialize(void)
     CAN_Request_Send();
     EUSART1_String("Program Starts...\r\n");
     __asm(" clrwdt");
+    Lp1_present = 11;
+    Lp2_present = 11;
 }
-# 281 "DataProcess.c"
+# 283 "DataProcess.c"
 void Uart1_Data_Handler(void)
 {
     char* token,token_buf[9][10];
@@ -20872,6 +20876,10 @@ void Uart1_Data_Handler(void)
     else if(memcmp(((char*)Uart1_array+1),",SD,",4) == 0)
     {
         serial_diagnost = 1;
+    }
+    else if(memcmp(((char*)Uart1_array+1),",NM,",4) == 0)
+    {
+        serial_diagnost = 0;
     }
     else if(memcmp(((char*)Uart1_array+1),",SP,",4) == 0)
     {
@@ -20899,12 +20907,13 @@ void Uart1_Data_Handler(void)
 
     }
 }
-# 337 "DataProcess.c"
+# 343 "DataProcess.c"
 void Uart2_Data_Handler(void)
 {
     char* token,token_buf[6][10];
     uint8_t k=0;
     uint16_t temp=0;
+
 
     if(memcmp(((char*)Uart2_array+1),",LP,",4) == 0)
     {
@@ -20920,34 +20929,70 @@ void Uart2_Data_Handler(void)
         if(temp == 201)
         {
             NRF[0].ID = 0;
-            NRF[0].Act_Load = 0;
+            NRF[0].Cal_Load = 0;
             NRF[0].Load_Count = 0;
-            NRF[0].Bat_Vtg = 0;
+            NRF[0].Batt_Vtg = 0;
             NRF[0].Status = 0;
 
             NRF[0].ID = (uint16_t)(atol(token_buf[0]));
-            NRF[0].Act_Load = (uint16_t)(atol(token_buf[1]));
+            NRF[0].Cal_Load = (uint16_t)(atol(token_buf[1]));
             NRF[0].Load_Count = (uint16_t)(atol(token_buf[2]));
-            NRF[0].Bat_Vtg = (uint16_t)(atol(token_buf[3]));
+            NRF[0].Batt_Vtg = (uint16_t)(atol(token_buf[3]));
             NRF[0].Status = (uint8_t)(atol(token_buf[4]));
+            Lp1_present = 0;
+            Lp2_present++;
         }
-        else
+        else if(temp == 202)
         {
             NRF[1].ID = 0;
-            NRF[1].Act_Load = 0;
+            NRF[1].Cal_Load = 0;
             NRF[1].Load_Count = 0;
-            NRF[1].Bat_Vtg = 0;
+            NRF[1].Batt_Vtg = 0;
             NRF[1].Status = 0;
 
             NRF[1].ID = (uint16_t)(atol(token_buf[0]));
-            NRF[1].Act_Load = (uint16_t)(atol(token_buf[1]));
+            NRF[1].Cal_Load = (uint16_t)(atol(token_buf[1]));
             NRF[1].Load_Count = (uint16_t)(atol(token_buf[2]));
-            NRF[1].Bat_Vtg = (uint16_t)(atol(token_buf[3]));
+            NRF[1].Batt_Vtg = (uint16_t)(atol(token_buf[3]));
             NRF[1].Status = (uint8_t)(atol(token_buf[4]));
+            Lp1_present++;
+            Lp2_present = 0;
+        }
+
+        if(Lp1_present>10)
+        {
+            Lp1_present = 11;
+        }
+        if(Lp2_present>10)
+        {
+            Lp2_present = 11;
         }
     }
 
     Uart2_Frame_Flag = 0;
+}
+
+
+void Can_Digital_Data_Send(void)
+{
+    uint16_t crc = 0;
+    ECAN_TxMSG.idType = 1;
+    ECAN_TxMSG.dlc = 8;
+    ECAN_TxMSG.id = CAN_Txpara.CANID;
+
+    ECAN_TxMSG.data0 = 0x01;
+    ECAN_TxMSG.data1 = DADC[0];
+    ECAN_TxMSG.data2 = DADC[1];
+    ECAN_TxMSG.data3 = DADC[2];
+    ECAN_TxMSG.data4 = 0;
+    ECAN_TxMSG.data5 = 0;
+
+    crc = (uint16_t)ECAN_TxMSG.id;
+    crc += (uint16_t)(ECAN_TxMSG.data0+ECAN_TxMSG.data1+ECAN_TxMSG.data2+ECAN_TxMSG.data3);
+    crc = CRC16_calculate(crc);
+    ECAN_TxMSG.data6 = (uint8_t)((crc&0xFF00)>>8);
+    ECAN_TxMSG.data7 = (uint8_t)((crc&0x00FF)>>0);
+    CAN_transmit(&ECAN_TxMSG);
 }
 
 
@@ -20956,7 +21001,7 @@ void Uart2_Data_Handler(void)
 
 
 
-void Can_Data_Send(void)
+void Can_Analog_Data_Send(void)
 {
     static uint8_t can_frame_no = 0;
     uint16_t crc=0;
@@ -20972,136 +21017,149 @@ void Can_Data_Send(void)
      ECAN_TxMSG.data6 = 0;
      ECAN_TxMSG.data7 = 0;
 
-
+     if((ADC[2]<80)&&(ADC[3]<80)&&(can_frame_no == 0))
+     {
+        can_frame_no = 1;
+     }
+     if((ADC[4]<80)&&(ADC[5]<80)&&(can_frame_no == 1))
+     {
+        can_frame_no = 2;
+     }
+     if((ADC[6]<80)&&(ADC[7]<80)&&(can_frame_no == 2))
+     {
+            can_frame_no = 3;
+     }
+     if((ADC[8]<80)&&(ADC[9]<80)&&(can_frame_no == 3))
+     {
+            can_frame_no = 4;
+     }
+     if((Lp1_present>9)&&(can_frame_no == 4))
+     {
+            can_frame_no = 6;
+     }
+     if((Lp2_present>9)&&(can_frame_no == 6))
+     {
+            can_frame_no = 8;
+     }
     switch(can_frame_no)
     {
         case 0:
-            ECAN_TxMSG.data0 = 0x01;
+            ECAN_TxMSG.data0 = 0x02;
             ECAN_TxMSG.data1 = (uint8_t)((ADC[2]&0xFF00)>>8);
             ECAN_TxMSG.data2 = (uint8_t)((ADC[2]&0x00FF)>>0);
             ECAN_TxMSG.data3 = (uint8_t)((ADC[3]&0xFF00)>>8);
             ECAN_TxMSG.data4 = (uint8_t)((ADC[3]&0x00FF)>>0);
-            ECAN_TxMSG.data5 = DADC[0];
-
+            ECAN_TxMSG.data5 = 0;
             can_frame_no++;
+
             break;
 
-
-
         case 1:
-            ECAN_TxMSG.data0 = 0x02;
+            ECAN_TxMSG.data0 = 0x03;
             ECAN_TxMSG.data1 = (uint8_t)((ADC[4]&0xFF00)>>8);
             ECAN_TxMSG.data2 = (uint8_t)((ADC[4]&0x00FF)>>0);
             ECAN_TxMSG.data3 = (uint8_t)((ADC[5]&0xFF00)>>8);
             ECAN_TxMSG.data4 = (uint8_t)((ADC[5]&0x00FF)>>0);
-            ECAN_TxMSG.data5 = DADC[1];
+            ECAN_TxMSG.data5 = 0;
             can_frame_no++;
+
             break;
 
-
-
         case 2:
-            ECAN_TxMSG.data0 = 0x03;
+            ECAN_TxMSG.data0 = 0x04;
             ECAN_TxMSG.data1 = (uint8_t)((ADC[6]&0xFF00)>>8);
             ECAN_TxMSG.data2 = (uint8_t)((ADC[6]&0x00FF)>>0);
             ECAN_TxMSG.data3 = (uint8_t)((ADC[7]&0xFF00)>>8);
             ECAN_TxMSG.data4 = (uint8_t)((ADC[7]&0x00FF)>>0);
-            ECAN_TxMSG.data5 = DADC[2];
+            ECAN_TxMSG.data5 = 0;
             can_frame_no++;
+
             break;
 
-
-
         case 3:
-            ECAN_TxMSG.data0 = 0x04;
+            ECAN_TxMSG.data0 = 0x05;
             ECAN_TxMSG.data1 = (uint8_t)((ADC[8]&0xFF00)>>8);
             ECAN_TxMSG.data2 = (uint8_t)((ADC[8]&0x00FF)>>0);
             ECAN_TxMSG.data3 = (uint8_t)((ADC[9]&0xFF00)>>8);
             ECAN_TxMSG.data4 = (uint8_t)((ADC[9]&0x00FF)>>0);
             ECAN_TxMSG.data5 = 0;
             can_frame_no++;
+
             break;
-
-
 
         case 4:
-            ECAN_TxMSG.data0 = 0x05;
+            ECAN_TxMSG.data0 = 0x06;
             ECAN_TxMSG.data1 = (uint8_t) NRF[0].ID;
-            ECAN_TxMSG.data2 = (uint8_t)((NRF[0].Act_Load & 0xFF00)>>8);
-            ECAN_TxMSG.data3 = (uint8_t)((NRF[0].Act_Load & 0x00FF)>>0);
+            ECAN_TxMSG.data2 = (uint8_t)((NRF[0].Cal_Load & 0xFF00)>>8);
+            ECAN_TxMSG.data3 = (uint8_t)((NRF[0].Cal_Load & 0x00FF)>>0);
             ECAN_TxMSG.data4 = (uint8_t)((NRF[0].Load_Count & 0xFF00)>>8);
             ECAN_TxMSG.data5 = (uint8_t)((NRF[0].Load_Count & 0x00FF)>>0);
-            NRF[0].ID = 0;
-            NRF[0].Act_Load = 0;
-            NRF[0].Load_Count = 0;
+
+
 
             can_frame_no++;
+
             break;
 
-
-
         case 5:
-            ECAN_TxMSG.data0 = 0x06;
-            ECAN_TxMSG.data1 = (uint8_t)((NRF[0].Bat_Vtg & 0xFF00)>>8);
-            ECAN_TxMSG.data2 = (uint8_t)((NRF[0].Bat_Vtg & 0x00FF)>>0);
+            ECAN_TxMSG.data0 = 0x07;
+            ECAN_TxMSG.data1 = (uint8_t)((NRF[0].Batt_Vtg & 0xFF00)>>8);
+            ECAN_TxMSG.data2 = (uint8_t)((NRF[0].Batt_Vtg & 0x00FF)>>0);
             ECAN_TxMSG.data3 = NRF[0].Status;
             ECAN_TxMSG.data4 = 0;
             ECAN_TxMSG.data5 = 0;
-            NRF[0].Bat_Vtg = 0;
-            NRF[0].Status = 0;
+
+
             can_frame_no++;
+
             break;
-
-
 
         case 6:
-            ECAN_TxMSG.data0 = 0x07;
+            ECAN_TxMSG.data0 = 0x08;
             ECAN_TxMSG.data1 = (uint8_t)NRF[1].ID;
-            ECAN_TxMSG.data2 = (uint8_t)((NRF[1].Act_Load & 0xFF00)>>8);
-            ECAN_TxMSG.data3 = (uint8_t)((NRF[1].Act_Load & 0x00FF)>>0);
+            ECAN_TxMSG.data2 = (uint8_t)((NRF[1].Cal_Load & 0xFF00)>>8);
+            ECAN_TxMSG.data3 = (uint8_t)((NRF[1].Cal_Load & 0x00FF)>>0);
             ECAN_TxMSG.data4 = (uint8_t)((NRF[1].Load_Count & 0xFF00)>>8);
             ECAN_TxMSG.data5 = (uint8_t)((NRF[1].Load_Count & 0x00FF)>>0);
-            NRF[1].ID = 0;
-            NRF[1].Act_Load = 0;
-            NRF[1].Load_Count = 0;
+
+
+
             can_frame_no++;
+
             break;
 
-
-
         case 7:
-            ECAN_TxMSG.data0 = 0x08;
-            ECAN_TxMSG.data1 = (uint8_t)((NRF[1].Bat_Vtg & 0xFF00)>>8);
-            ECAN_TxMSG.data2 = (uint8_t)((NRF[1].Bat_Vtg & 0x00FF)>>0);
+            ECAN_TxMSG.data0 = 0x09;
+            ECAN_TxMSG.data1 = (uint8_t)((NRF[1].Batt_Vtg & 0xFF00)>>8);
+            ECAN_TxMSG.data2 = (uint8_t)((NRF[1].Batt_Vtg & 0x00FF)>>0);
             ECAN_TxMSG.data3 = NRF[1].Status;
             ECAN_TxMSG.data4 = 0;
             ECAN_TxMSG.data5 = 0;
-            NRF[1].Bat_Vtg = 0;
-            NRF[1].Status = 0;
-            can_frame_no++;
+
+
+            can_frame_no = 0;
+
             break;
 
 
 
-        case 8:
-            ECAN_TxMSG.data0 = 0x09;
-            ECAN_TxMSG.data1 = (uint8_t)((ADC[0]&0xFF00)>>8);
-            ECAN_TxMSG.data2 = (uint8_t)((ADC[0]&0x00FF)>>0);
-            ECAN_TxMSG.data3 = (uint8_t)((ADC[1]&0xFF00)>>8);
-            ECAN_TxMSG.data4 = (uint8_t)((ADC[1]&0x00FF)>>0);
-            ECAN_TxMSG.data5 = 0;
-            can_frame_no=0;
-            break;
+
     }
 
-    crc = (uint16_t)ECAN_TxMSG.id;
-    crc += (uint16_t)(ECAN_TxMSG.data0+ECAN_TxMSG.data1+ECAN_TxMSG.data2+ECAN_TxMSG.data3+ECAN_TxMSG.data4+ECAN_TxMSG.data5);
-    crc = CRC16_calculate(crc);
-    ECAN_TxMSG.data6 = (uint8_t)((crc&0xFF00)>>8);
-    ECAN_TxMSG.data7 = (uint8_t)((crc&0x00FF)>>0);
-    CAN_transmit(&ECAN_TxMSG);
+    if(can_frame_no < 8)
+    {
+        crc = (uint16_t)ECAN_TxMSG.id;
+        crc += (uint16_t)(ECAN_TxMSG.data0+ECAN_TxMSG.data1+ECAN_TxMSG.data2+ECAN_TxMSG.data3+ECAN_TxMSG.data4+ECAN_TxMSG.data5);
+        crc = CRC16_calculate(crc);
+        ECAN_TxMSG.data6 = (uint8_t)((crc&0xFF00)>>8);
+        ECAN_TxMSG.data7 = (uint8_t)((crc&0x00FF)>>0);
+        CAN_transmit(&ECAN_TxMSG);
+    }
+    else
+    {
+        can_frame_no = 0;
+    }
 }
-
 void CAN_Request_Send(void)
 {
     uint16_t crc = 0;
@@ -21109,11 +21167,11 @@ void CAN_Request_Send(void)
     ECAN_TxMSG.idType = 1;
     ECAN_TxMSG.dlc = 8;
     ECAN_TxMSG.id = CAN_Txpara.CANID;
-    ECAN_TxMSG.data0 = 'S';
-    ECAN_TxMSG.data1 = 'T';
-    ECAN_TxMSG.data2 = 'A';
-    ECAN_TxMSG.data3 = 'T';
-    ECAN_TxMSG.data4 = 0;
+    ECAN_TxMSG.data0 = 0;
+    ECAN_TxMSG.data1 = 'S';
+    ECAN_TxMSG.data2 = 'T';
+    ECAN_TxMSG.data3 = 'A';
+    ECAN_TxMSG.data4 = 'T';
     ECAN_TxMSG.data5 = 0;
     ECAN_TxMSG.data6 = 0;
     ECAN_TxMSG.data7 = 0;
@@ -21125,17 +21183,12 @@ void CAN_Request_Send(void)
     ECAN_TxMSG.data7 = (uint8_t)((crc&0x00FF)>>0);
 
     CAN_transmit(&ECAN_TxMSG);
-
-
-
-
-
-    Delay_Ms(100);
+     Delay_Ms(100);
 
     Yellow_led = 0;
     can_timeout = 10000;
 }
-# 597 "DataProcess.c"
+# 648 "DataProcess.c"
 void Data_Process(void)
 {
     uint8_t channel = 0;
@@ -21167,7 +21220,7 @@ void Data_Process(void)
     }
     for(channel=7;channel<10;channel++)
     {
-        temp_ADC[channel] = ADC_Threshold_Check(temp_ADC[channel],channel);
+        temp_ADC[channel] = ADC_Threshold_Check(temp_ADC[channel],channel-2);
     }
     ADC[2] = temp_ADC[4];
     ADC[3] = temp_ADC[3];
@@ -21177,12 +21230,12 @@ void Data_Process(void)
     ADC[7] = temp_ADC[7];
     ADC[8] = temp_ADC[8];
     ADC[9] = temp_ADC[9];
-# 897 "DataProcess.c"
-    if((temp_ADC[10]>1790) && (temp_ADC[10]<1995))
+# 948 "DataProcess.c"
+    if((temp_ADC[10]>1600) && (temp_ADC[10]<2000))
     {
        DADC[2] |=0x01;
     }
-    else if((temp_ADC[10]>1000) && (temp_ADC[10]<1700))
+    else if((temp_ADC[10]>1000) && (temp_ADC[10]<1500))
     {
         DADC[2] &=~0x01;
         DADC[0] &=~0x01;
@@ -21197,11 +21250,11 @@ void Data_Process(void)
        DADC[1] |=0x01;
     }
 
-    if((temp_ADC[11]>1790) && (temp_ADC[11]<1995))
+    if((temp_ADC[11]>1600) && (temp_ADC[11]<2000))
     {
        DADC[2] |=0x02;
     }
-    else if((temp_ADC[11]>1000) && (temp_ADC[11]<1700))
+    else if((temp_ADC[11]>1000) && (temp_ADC[11]<1500))
     {
         DADC[2] &=~0x02;
         DADC[0] &=~0x02;
@@ -21216,11 +21269,11 @@ void Data_Process(void)
         DADC[1] |=0x02;
     }
 
-    if((temp_ADC[12]>1790) && (temp_ADC[12]<1995))
+    if((temp_ADC[12]>1600) && (temp_ADC[12]<2000))
     {
         DADC[2] |=0x04;
     }
-    else if((temp_ADC[12]>1000) && (temp_ADC[12]<1700))
+    else if((temp_ADC[12]>1000) && (temp_ADC[12]<1500))
     {
         DADC[2] &=~0x04;
         DADC[0] &=~0x04;
@@ -21235,11 +21288,11 @@ void Data_Process(void)
         DADC[1] |=0x04;
     }
 
-    if((temp_ADC[13]>1790) && (temp_ADC[13]<1995))
+    if((temp_ADC[13]>1600) && (temp_ADC[13]<2000))
     {
         DADC[2] |=0x08;
     }
-    else if((temp_ADC[13]>1000) && (temp_ADC[13]<1700))
+    else if((temp_ADC[13]>1000) && (temp_ADC[13]<1500))
     {
         DADC[2] &=~0x08;
         DADC[0] &=~0x08;
@@ -21254,11 +21307,11 @@ void Data_Process(void)
         DADC[1] |=0x08;
     }
 
-    if((temp_ADC[14]>1790) && (temp_ADC[14]<1995))
+    if((temp_ADC[14]>1600) && (temp_ADC[14]<2000))
     {
         DADC[2] |=0x10;
     }
-    else if((temp_ADC[14]>1000) && (temp_ADC[14]<1700))
+    else if((temp_ADC[14]>1000) && (temp_ADC[14]<1500))
     {
         DADC[2] &=~0x10;
         DADC[0] &=~0x10;
@@ -21449,36 +21502,32 @@ void Data_Process(void)
         }
         Uart1_Frame_Flag = 0;
     }
-    if(Uart2_Frame_Flag == 1)
-    {
-        Uart2_Data_Handler();
-
-
-
-
-
+# 1227 "DataProcess.c"
         if(nrf_data_flag == 1)
         {
             if(serial_diagnost == 1)
             {
               EUSART1_String("{,LP,");
-              if(frame==0)
-              {
-                sprintf(temp_buf,"%d,%d,%d,%d,%d,}\n",(uint16_t)NRF[0].ID,NRF[0].Act_Load,NRF[0].Load_Count,NRF[0].Bat_Vtg,NRF[0].Status);
-                frame++;
-              }
-              else
-              {
-                sprintf(temp_buf,"%d,%d,%d,%d,%d,}\n",(uint16_t)NRF[1].ID,NRF[1].Act_Load,NRF[1].Load_Count,NRF[1].Bat_Vtg,NRF[1].Status);
-                  frame = 0;
-              }
+              sprintf(temp_buf,"%d,%d,%d,%d,%d,}\n",(uint16_t)NRF[0].ID,NRF[0].Cal_Load,NRF[0].Load_Count,NRF[0].Batt_Vtg,NRF[0].Status);
+              EUSART1_String(temp_buf);
+              EUSART1_String("{,LP,");
+              sprintf(temp_buf,"%d,%d,%d,%d,%d,}\n",(uint16_t)NRF[1].ID,NRF[1].Cal_Load,NRF[1].Load_Count,NRF[1].Batt_Vtg,NRF[1].Status);
               EUSART1_String(temp_buf);
             }
-
             nrf_data_flag = 0;
+            frame = 0;
         }
-        Uart2_Frame_Flag = 0;
-    }
+        else
+        {
+            frame++;
+            if(frame>5)
+            {
+             Lp1_present = 11;
+             Lp2_present = 11;
+             frame = 5;
+            }
+        }
+
 
     if(NRFP_flag == 1)
     {
@@ -21509,24 +21558,26 @@ void Data_Process(void)
         EUSART2_Write((uint8_t)((N_Serial%100)/10)+0x30);
         EUSART2_Write((uint8_t)(N_Serial%10)+0x30);
         EUSART2_Write('\n');
-# 1236 "DataProcess.c"
+# 1290 "DataProcess.c"
         NRFC_flag = 0;
     }
 }
-# 1248 "DataProcess.c"
+# 1302 "DataProcess.c"
 void Uart1_Data_Send(void)
 {
     char disp[25]={0};
 
-    sprintf(disp,"{,AD,%d,%d,%d,%d,%d,",ADC[0],ADC[1],ADC[2],ADC[3],ADC[4]);
+    sprintf(disp,"{,AD,%d,%d,%d,",ADC[0],ADC[1],ADC[2]);
     EUSART1_String(disp);
-    sprintf(disp,"%d,%d,%d,%d,%d,",ADC[5],ADC[7],ADC[6],ADC[9],ADC[8]);
+    sprintf(disp,"%d,%d,%d,",ADC[3],ADC[4],ADC[5]);
+    EUSART1_String(disp);
+    sprintf(disp,"%d,%d,%d,%d,",ADC[7],ADC[6],ADC[9],ADC[8]);
     EUSART1_String(disp);
     sprintf(disp,"%d,%d,%d,}\n",DADC[0],DADC[1],DADC[2]);
     EUSART1_String(disp);
 
 }
-# 1269 "DataProcess.c"
+# 1325 "DataProcess.c"
 void EUSART1_Receive_ISR(void)
 {
     uint8_t RxdData=0;
@@ -21546,7 +21597,7 @@ void EUSART1_Receive_ISR(void)
         uart1_index = 0;
     }
 }
-# 1297 "DataProcess.c"
+# 1353 "DataProcess.c"
 void EUSART2_Receive_ISR(void)
 {
     uint8_t RxdData = 0;
@@ -21566,7 +21617,7 @@ void EUSART2_Receive_ISR(void)
         uart2_index = 0;
     }
 }
-# 1325 "DataProcess.c"
+# 1381 "DataProcess.c"
 void Digital_Output_Handler(void)
 {
 
