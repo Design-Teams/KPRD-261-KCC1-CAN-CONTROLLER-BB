@@ -16,7 +16,12 @@
 
 #define ADC_Offset_Count 5
 
-#define Firm_Ver 0.6  // version
+#define G_LED_No   0
+#define Y_LED_No   1 
+#define R_LED_No   2 
+
+#define Firm_Ver 0.8  // version
+
 
 typedef struct
 {
@@ -89,6 +94,7 @@ void Can_Analog_Data_Send(void);
 void Can_Digital_Data_Send(void);
 void CAN_Request_Send(void);
 void NRF_ResponCAN_Send(uint8_t data);
+void Send_Soft_Ver_No (uint8_t count);
 #ifdef	__cplusplus
 extern "C" {
 #endif

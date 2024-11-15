@@ -110,12 +110,12 @@ Description             : To read Analog & digital inputs,control digital output
 
 #include"main.h"
 
-#define OUTPUT_ON  1
-#define OUTPUT_OFF 0
-
-#define G_LED   LATCbits.LATC0
-#define Y_LED   LATAbits.LATA1 
-#define R_LED   LATAbits.LATA2 
+//#define OUTPUT_ON  1
+//#define OUTPUT_OFF 0
+//
+//#define G_LED   LATCbits.LATC0
+//#define Y_LED   LATAbits.LATA1 
+//#define R_LED   LATAbits.LATA2 
 
 
 /*=============================================================================
@@ -195,10 +195,8 @@ void __interrupt() INTERRUPT_InterruptManager (void)
     /* Check if TMR0 interrupt is enabled and if the interrupt flag is set */
     if(INTCONbits.TMR0IE == 1 && INTCONbits.TMR0IF == 1)
     {
-        INTCONbits.TMR0IE = 0;
         TMR0_ISR();
-        INTCONbits.TMR0IE = 1;
-        if(Watchdog_count>0)
+         if(Watchdog_count>0)
         {
             Watchdog_count--;
         }
@@ -245,29 +243,21 @@ void __interrupt() INTERRUPT_InterruptManager (void)
     {
         if(PIE1bits.RC1IE == 1 && PIR1bits.RC1IF == 1)
         {
-            PIE1bits.RC1IE = 0;
             EUSART1_Receive_ISR();
             PIR1bits.RC1IF = 0;
-            PIE1bits.RC1IE = 1;
         } 
         if(PIE3bits.RC2IE == 1 && PIR3bits.RC2IF == 1)
         {
-            PIE3bits.RC2IE = 0;
             EUSART2_Receive_ISR();
             PIR3bits.RC2IF = 0;
-            PIE3bits.RC2IE = 1;
         } 
         if(PIE5bits.RXB1IE == 1 && PIR5bits.RXB1IF == 1)
         {
-            PIE5bits.RXB1IE = 0;
             ECAN_RXB1I_ISR();
-            PIE5bits.RXB1IE = 1;
         } 
         if(PIE5bits.RXB0IE == 1 && PIR5bits.RXB0IF == 1)
         {
-            PIE5bits.RXB0IE = 0;
             ECAN_RXB0I_ISR();
-            PIE5bits.RXB0IE = 1;
         } 
     }
 }

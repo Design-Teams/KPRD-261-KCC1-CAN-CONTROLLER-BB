@@ -26,6 +26,16 @@
 //#include "MP3.h"
 #include "CRC.h"
 #include "Moving_Filter.h"
+#include "GPIO.h"
+
+
+#define OUTPUT_ON  1
+#define OUTPUT_OFF 0
+
+#define G_LED   LATCbits.LATC0
+#define Y_LED   LATAbits.LATA1 
+#define R_LED   LATAbits.LATA2 
+
 volatile uint16_t ms_count,can_count,Led_Count,blink_flag,Watchdog_count;
 extern volatile uint32_t can_timeout;
 bool Red_Led,serial_diagnost;

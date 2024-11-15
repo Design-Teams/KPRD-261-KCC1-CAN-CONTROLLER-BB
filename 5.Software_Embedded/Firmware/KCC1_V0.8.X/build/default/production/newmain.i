@@ -1,4 +1,4 @@
-# 1 "Moving_Filter.c"
+# 1 "newmain.c"
 # 1 "<built-in>" 1
 # 1 "<built-in>" 3
 # 288 "<built-in>" 3
@@ -6,7 +6,69 @@
 # 1 "<built-in>" 2
 # 1 "C:/Program Files/Microchip/MPLABX/v5.50/packs/Microchip/PIC18F-K_DFP/1.4.87/xc8\\pic\\include\\language_support.h" 1 3
 # 2 "<built-in>" 2
-# 1 "Moving_Filter.c" 2
+# 1 "newmain.c" 2
+# 51 "newmain.c"
+#pragma config RETEN = OFF
+#pragma config INTOSCSEL = HIGH
+#pragma config SOSCSEL = DIG
+#pragma config XINST = OFF
+
+
+#pragma config FOSC = HS1
+#pragma config PLLCFG = ON
+#pragma config FCMEN = OFF
+#pragma config IESO = OFF
+
+
+#pragma config PWRTEN = OFF
+#pragma config BOREN = SBORDIS
+#pragma config BORV = 2
+#pragma config BORPWR = ZPBORMV
+
+
+#pragma config WDTEN = OFF
+#pragma config WDTPS = 512
+
+
+#pragma config CANMX = PORTB
+#pragma config MSSPMSK = MSK7
+#pragma config MCLRE = ON
+
+
+#pragma config STVREN = ON
+#pragma config BBSIZ = BB2K
+
+
+#pragma config CP0 = OFF
+#pragma config CP1 = OFF
+#pragma config CP2 = OFF
+#pragma config CP3 = OFF
+
+
+#pragma config CPB = OFF
+#pragma config CPD = OFF
+
+
+#pragma config WRT0 = OFF
+#pragma config WRT1 = OFF
+#pragma config WRT2 = OFF
+#pragma config WRT3 = OFF
+
+
+#pragma config WRTC = OFF
+#pragma config WRTB = OFF
+#pragma config WRTD = OFF
+
+
+#pragma config EBTR0 = OFF
+#pragma config EBTR1 = OFF
+#pragma config EBTR2 = OFF
+#pragma config EBTR3 = OFF
+
+
+#pragma config EBTRB = OFF
+
+
 # 1 "./main.h" 1
 # 12 "./main.h"
 # 1 "C:/Program Files/Microchip/MPLABX/v5.50/packs/Microchip/PIC18F-K_DFP/1.4.87/xc8\\pic\\include\\xc.h" 1 3
@@ -20058,10 +20120,10 @@ extern __attribute__((nonreentrant)) void _delay3(unsigned char);
 
 
 
-# 1 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Low_Level/Header\\Timer0.h" 1
-# 21 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Low_Level/Header\\Timer0.h"
-# 1 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Low_Level/Header/Library_Header.h" 1
-# 23 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Low_Level/Header/Library_Header.h"
+# 1 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.2/Low_Level/Header\\Timer0.h" 1
+# 21 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.2/Low_Level/Header\\Timer0.h"
+# 1 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.2/Low_Level/Header/Library_Header.h" 1
+# 23 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.2/Low_Level/Header/Library_Header.h"
 # 1 "C:\\Program Files\\Microchip\\xc8\\v2.45\\pic\\include\\c99\\stdint.h" 1 3
 # 26 "C:\\Program Files\\Microchip\\xc8\\v2.45\\pic\\include\\c99\\stdint.h" 3
 # 1 "C:\\Program Files\\Microchip\\xc8\\v2.45\\pic\\include\\c99\\bits/alltypes.h" 1 3
@@ -20146,10 +20208,10 @@ typedef int32_t int_fast32_t;
 typedef uint16_t uint_fast16_t;
 typedef uint32_t uint_fast32_t;
 # 149 "C:\\Program Files\\Microchip\\xc8\\v2.45\\pic\\include\\c99\\stdint.h" 2 3
-# 23 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Low_Level/Header/Library_Header.h" 2
+# 23 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.2/Low_Level/Header/Library_Header.h" 2
 
 # 1 "C:\\Program Files\\Microchip\\xc8\\v2.45\\pic\\include\\c99\\stdbool.h" 1 3
-# 24 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Low_Level/Header/Library_Header.h" 2
+# 24 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.2/Low_Level/Header/Library_Header.h" 2
 
 # 1 "C:\\Program Files\\Microchip\\xc8\\v2.45\\pic\\include\\c99\\string.h" 1 3
 # 25 "C:\\Program Files\\Microchip\\xc8\\v2.45\\pic\\include\\c99\\string.h" 3
@@ -20208,7 +20270,7 @@ size_t strxfrm_l (char *restrict, const char *restrict, size_t, locale_t);
 
 
 void *memccpy (void *restrict, const void *restrict, int, size_t);
-# 25 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Low_Level/Header/Library_Header.h" 2
+# 25 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.2/Low_Level/Header/Library_Header.h" 2
 
 # 1 "C:\\Program Files\\Microchip\\xc8\\v2.45\\pic\\include\\c99\\stdio.h" 1 3
 # 24 "C:\\Program Files\\Microchip\\xc8\\v2.45\\pic\\include\\c99\\stdio.h" 3
@@ -20362,8 +20424,8 @@ char *ctermid(char *);
 
 
 char *tempnam(const char *, const char *);
-# 26 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Low_Level/Header/Library_Header.h" 2
-# 21 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Low_Level/Header\\Timer0.h" 2
+# 26 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.2/Low_Level/Header/Library_Header.h" 2
+# 21 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.2/Low_Level/Header\\Timer0.h" 2
 
 
 
@@ -20371,39 +20433,39 @@ char *tempnam(const char *, const char *);
 
 
 volatile uint16_t timer0ReloadVal;
-# 38 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Low_Level/Header\\Timer0.h"
+# 38 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.2/Low_Level/Header\\Timer0.h"
 void TMR0_Initialize(uint16_t delay);
-# 47 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Low_Level/Header\\Timer0.h"
+# 47 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.2/Low_Level/Header\\Timer0.h"
 void TMR0_StartTimer(void);
-# 56 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Low_Level/Header\\Timer0.h"
+# 56 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.2/Low_Level/Header\\Timer0.h"
 void TMR0_ISR(void);
 # 15 "./main.h" 2
 
-# 1 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Low_Level/Header\\EUSART.h" 1
-# 36 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Low_Level/Header\\EUSART.h"
+# 1 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.2/Low_Level/Header\\EUSART.h" 1
+# 36 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.2/Low_Level/Header\\EUSART.h"
  void EUSART1_Initialize(uint32_t oscillator,uint32_t baudrate);
-# 46 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Low_Level/Header\\EUSART.h"
+# 46 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.2/Low_Level/Header\\EUSART.h"
 void EUSART1_Write(uint8_t txData);
-# 57 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Low_Level/Header\\EUSART.h"
+# 57 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.2/Low_Level/Header\\EUSART.h"
 void EUSART1_String(char *txData);
-# 70 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Low_Level/Header\\EUSART.h"
+# 70 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.2/Low_Level/Header\\EUSART.h"
 void EUSART2_Initialize(uint32_t oscillator,uint32_t baudrate);
-# 81 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Low_Level/Header\\EUSART.h"
+# 81 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.2/Low_Level/Header\\EUSART.h"
 void EUSART2_Write(uint8_t txData);
-# 92 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Low_Level/Header\\EUSART.h"
+# 92 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.2/Low_Level/Header\\EUSART.h"
 void EUSART2_String(char *txData);
-# 103 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Low_Level/Header\\EUSART.h"
+# 103 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.2/Low_Level/Header\\EUSART.h"
 void Soft_Uart_Initialize(void);
-# 114 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Low_Level/Header\\EUSART.h"
+# 114 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.2/Low_Level/Header\\EUSART.h"
 void Soft_UART_Write(uint8_t Data);
-# 125 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Low_Level/Header\\EUSART.h"
+# 125 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.2/Low_Level/Header\\EUSART.h"
 void Soft_UART_Array(uint8_t *array, uint8_t length);
-# 137 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Low_Level/Header\\EUSART.h"
+# 137 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.2/Low_Level/Header\\EUSART.h"
 extern __attribute__((inline)) void Soft_Uart_Tx(_Bool stat);
 # 16 "./main.h" 2
 
-# 1 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Low_Level/Header\\ecan.h" 1
-# 61 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Low_Level/Header\\ecan.h"
+# 1 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.2/Low_Level/Header\\ecan.h" 1
+# 61 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.2/Low_Level/Header\\ecan.h"
 typedef struct
 {
     uint8_t idType;
@@ -20418,61 +20480,63 @@ typedef struct
     uint8_t data7;
     uint32_t id;
 }uCAN_MSG;
-# 88 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Low_Level/Header\\ecan.h"
+# 88 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.2/Low_Level/Header\\ecan.h"
 volatile uint8_t can_flag;
 
 uint8_t Check_CAN_Interrupt(void);
-# 116 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Low_Level/Header\\ecan.h"
-void ECAN_Initialize(uint16_t bitrate,_Bool filter,uint32_t filter_id);
-# 138 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Low_Level/Header\\ecan.h"
+# 117 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.2/Low_Level/Header\\ecan.h"
+void ECAN_Initialize(uint16_t bitrate,_Bool filter);
+# 139 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.2/Low_Level/Header\\ecan.h"
 void CAN_sleep(void);
-# 159 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Low_Level/Header\\ecan.h"
+# 160 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.2/Low_Level/Header\\ecan.h"
 uint8_t CAN_transmit(uCAN_MSG *tempCanMsg);
-# 183 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Low_Level/Header\\ecan.h"
+# 184 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.2/Low_Level/Header\\ecan.h"
 uint8_t CAN_receive(uCAN_MSG *tempCanMsg);
-# 205 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Low_Level/Header\\ecan.h"
+# 206 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.2/Low_Level/Header\\ecan.h"
 uint8_t CAN_messagesInBuffer(void);
-# 229 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Low_Level/Header\\ecan.h"
+# 230 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.2/Low_Level/Header\\ecan.h"
 uint8_t CAN_isBusOff(void);
-# 253 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Low_Level/Header\\ecan.h"
+# 254 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.2/Low_Level/Header\\ecan.h"
 uint8_t CAN_isRXErrorPassive(void);
-# 277 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Low_Level/Header\\ecan.h"
+# 278 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.2/Low_Level/Header\\ecan.h"
 uint8_t CAN_isTXErrorPassive(void);
-# 317 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Low_Level/Header\\ecan.h"
+# 318 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.2/Low_Level/Header\\ecan.h"
 void ECAN_SetRXB0InterruptHandler(void (*handler)(void));
-# 332 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Low_Level/Header\\ecan.h"
+# 333 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.2/Low_Level/Header\\ecan.h"
 void ECAN_RXB0I_ISR(void);
-# 372 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Low_Level/Header\\ecan.h"
+# 373 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.2/Low_Level/Header\\ecan.h"
 void ECAN_SetRXB1InterruptHandler(void (*handler)(void));
-# 387 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Low_Level/Header\\ecan.h"
+# 388 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.2/Low_Level/Header\\ecan.h"
 void ECAN_RXB1I_ISR(void);
-# 427 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Low_Level/Header\\ecan.h"
+# 428 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.2/Low_Level/Header\\ecan.h"
 void ECAN_SetWakeUpInterruptHandler(void (*handler)(void));
-# 442 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Low_Level/Header\\ecan.h"
+# 443 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.2/Low_Level/Header\\ecan.h"
 void ECAN_WAKI_ISR(void);
+# 457 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.2/Low_Level/Header\\ecan.h"
+extern __attribute__((inline)) void ECAN_Filter_Set(void);
 # 17 "./main.h" 2
 
 
-# 1 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Low_Level/Header\\SPI.h" 1
-# 40 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Low_Level/Header\\SPI.h"
+# 1 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.2/Low_Level/Header\\SPI.h" 1
+# 40 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.2/Low_Level/Header\\SPI.h"
 void SPI_Init_Master(uint8_t mode);
-# 52 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Low_Level/Header\\SPI.h"
+# 52 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.2/Low_Level/Header\\SPI.h"
 uint8_t SPI_Exchange(uint8_t data);
-# 65 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Low_Level/Header\\SPI.h"
+# 65 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.2/Low_Level/Header\\SPI.h"
 void SPI_Write_Cmd(uint8_t cmd, uint16_t data);
 # 19 "./main.h" 2
 
-# 1 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Low_Level/Header\\InternalADC.h" 1
-# 29 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Low_Level/Header\\InternalADC.h"
+# 1 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.2/Low_Level/Header\\InternalADC.h" 1
+# 29 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.2/Low_Level/Header\\InternalADC.h"
 void ADC_Initialize(void);
-# 41 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Low_Level/Header\\InternalADC.h"
+# 41 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.2/Low_Level/Header\\InternalADC.h"
 uint16_t Get_Adc_Data(uint8_t channel,uint16_t samples);
-# 53 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Low_Level/Header\\InternalADC.h"
+# 53 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.2/Low_Level/Header\\InternalADC.h"
 uint16_t Read_adc(uint8_t channel);
 # 20 "./main.h" 2
 
-# 1 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Device_Level/Header\\MC33972.h" 1
-# 23 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Device_Level/Header\\MC33972.h"
+# 1 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.2/Device_Level/Header\\MC33972.h" 1
+# 23 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.2/Device_Level/Header\\MC33972.h"
 typedef enum
 {
     Reset_Cmd = 0x7F,
@@ -20480,22 +20544,22 @@ typedef enum
     Analog_Cmd = 0x06,
     Switch_Bat = 0x01,
 }MC_Init;
-# 42 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Device_Level/Header\\MC33972.h"
+# 42 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.2/Device_Level/Header\\MC33972.h"
 void MC33972_Init(void);
-# 52 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Device_Level/Header\\MC33972.h"
+# 52 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.2/Device_Level/Header\\MC33972.h"
 void MC33972_Read_ADC(uint16_t channel);
 
 extern __attribute__((inline)) void MC33972_CS(_Bool stat);
 # 21 "./main.h" 2
 
-# 1 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Device_Level/Header\\MC33996.h" 1
-# 39 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Device_Level/Header\\MC33996.h"
+# 1 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.2/Device_Level/Header\\MC33996.h" 1
+# 39 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.2/Device_Level/Header\\MC33996.h"
 uint16_t output;
-# 52 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Device_Level/Header\\MC33996.h"
+# 52 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.2/Device_Level/Header\\MC33996.h"
 void MC33996_Digitalwrite(uint8_t pin, uint8_t status);
-# 62 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Device_Level/Header\\MC33996.h"
+# 62 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.2/Device_Level/Header\\MC33996.h"
 void MC33996_Init(void);
-# 74 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Device_Level/Header\\MC33996.h"
+# 74 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.2/Device_Level/Header\\MC33996.h"
 uint8_t MC33996_SPI_Check(void);
 
 extern __attribute__((inline)) void MC33996_CS(_Bool stat);
@@ -20505,7 +20569,7 @@ extern __attribute__((inline)) void MC33996_RST(_Bool stat);
 
 
 # 1 "./DataProcess.h" 1
-# 21 "./DataProcess.h"
+# 26 "./DataProcess.h"
 typedef struct
 {
     uint8_t Output_1:1;
@@ -20577,9 +20641,10 @@ void Can_Analog_Data_Send(void);
 void Can_Digital_Data_Send(void);
 void CAN_Request_Send(void);
 void NRF_ResponCAN_Send(uint8_t data);
+void Send_Soft_Ver_No (uint8_t count);
 # 24 "./main.h" 2
 
-# 1 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.1/Low_Level/Header\\Internal_EEPROM.h" 1
+# 1 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.2/Low_Level/Header\\Internal_EEPROM.h" 1
 
 
 
@@ -20625,75 +20690,146 @@ uint16_t ADC_Filter(uint16_t new_value,uint8_t Channel_no);
 uint16_t ADC_Threshold_Check(uint16_t new_value,uint8_t Channel_no);
 # 28 "./main.h" 2
 
+# 1 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.2/Low_Level/Header\\GPIO.h" 1
+# 57 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.2/Low_Level/Header\\GPIO.h"
+void GPIO_Function(uint8_t port, uint8_t io_num, uint8_t direction, uint8_t stat, uint8_t is_analog);
+# 70 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.2/Low_Level/Header\\GPIO.h"
+void GPIO_Write(uint8_t port, uint8_t io_num, uint8_t stat);
+# 83 "../../../../kprd-999-int-msdi-driver-board/5.Software-Embedded/Firmware/Rahul/PIC18_Library_V0.2/Low_Level/Header\\GPIO.h"
+uint8_t GPIO_Read(uint8_t port, uint8_t io_num);
+# 29 "./main.h" 2
+# 39 "./main.h"
 volatile uint16_t ms_count,can_count,Led_Count,blink_flag,Watchdog_count;
 extern volatile uint32_t can_timeout;
 _Bool Red_Led,serial_diagnost;
 extern _Bool Yellow_led;
 void Delay_Ms(uint16_t delay);
-# 1 "Moving_Filter.c" 2
-
-
-void ADC_Filter_Init(uint8_t Channel_no)
- {
-
-    for (uint8_t i = 0; i < 10; i++)
- {
-        moving_flt[Channel_no].adc_buffer[i] = 0;
-    }
-
-    moving_flt[Channel_no].buffer_index = 0;
-
-    moving_flt[Channel_no].adc_sum = 0;
+# 111 "newmain.c" 2
+# 130 "newmain.c"
+void Delay_Ms(uint16_t delay)
+{
+    ms_count = delay;
+    while(ms_count>0);
 }
 
 
-uint16_t ADC_Filter(uint16_t new_value,uint8_t Channel_no)
+void main(void)
 {
+    uint8_t can_frame = 0;
+    __asm(" clrwdt");
+    System_Initialize();
+    __asm(" clrwdt");
+    blink_flag = 1;
+    Led_Count = 500;
+    can_timeout = 10000;
+    Watchdog_count = 800;
 
-    moving_flt[Channel_no].adc_sum -= moving_flt[Channel_no].adc_buffer[moving_flt[Channel_no].buffer_index];
+    while(1)
+    {
+        Data_Process();
+        if(can_count == 0)
+        {
+            if(serial_diagnost == 1)
+            {
+                Uart1_Data_Send();
+            }
 
-    moving_flt[Channel_no].adc_buffer[moving_flt[Channel_no].buffer_index] = new_value;
-    moving_flt[Channel_no].adc_sum += new_value;
+            if(can_frame == 0)
+            {
+                Can_Digital_Data_Send();
+                can_frame++;
 
-    moving_flt[Channel_no].buffer_index = ((moving_flt[Channel_no].buffer_index + 1) % 10);
+            }
+            else
+            {
+                Can_Analog_Data_Send();
+                can_frame = 0;
 
-
-    return (uint16_t)(moving_flt[Channel_no].adc_sum / 10);
+            }
+            can_count = 100;
+        }
+        if(Uart2_Frame_Flag == 1)
+        {
+            Uart2_Data_Handler();
+            Uart2_Frame_Flag = 0;
+        }
+        if(Watchdog_count == 0)
+        {
+            Watchdog_count = 800;
+            __asm(" clrwdt");
+        }
+    }
+     return;
 }
-
-uint16_t ADC_Threshold_Check(uint16_t new_value,uint8_t Channel_no)
+# 193 "newmain.c"
+void __attribute__((picinterrupt(("")))) INTERRUPT_InterruptManager (void)
 {
-    if(new_value>(moving_flt[Channel_no].prev_adc_sum+80))
+
+    if(INTCONbits.TMR0IE == 1 && INTCONbits.TMR0IF == 1)
     {
-       moving_flt[Channel_no].ADC_PCnt++;
-       if(moving_flt[Channel_no].ADC_PCnt>5)
-       {
-          moving_flt[Channel_no].prev_adc_sum = ADC_Filter(new_value,Channel_no);
-          moving_flt[Channel_no].ADC_PCnt = 0;
-       }
-    }
-    else if(new_value>80)
-    {
-        if(new_value<(moving_flt[Channel_no].prev_adc_sum-80))
+        TMR0_ISR();
+         if(Watchdog_count>0)
         {
-          moving_flt[Channel_no].ADC_NCnt++;
-          if(moving_flt[Channel_no].ADC_NCnt>5)
-          {
-            moving_flt[Channel_no].prev_adc_sum = ADC_Filter(new_value,Channel_no);
-            moving_flt[Channel_no].ADC_NCnt = 0;
-          }
+            Watchdog_count--;
         }
-        else
+        if(ms_count>0)
         {
-          moving_flt[Channel_no].prev_adc_sum = ADC_Filter(new_value,Channel_no);
-          moving_flt[Channel_no].ADC_NCnt = 0;
+            ms_count--;
+        }
+        if(can_count>0)
+        {
+            can_count--;
+        }
+        if(Led_Count>0)
+        {
+            Led_Count--;
+        }
+        if(can_timeout>0)
+        {
+            can_timeout--;
+        }
+        if((blink_flag == 1) &&(Led_Count == 0))
+        {
+            if(Red_Led == 1)
+            {
+                LATCbits.LATC0 = 0;
+                LATAbits.LATA2 =~LATAbits.LATA2;
+            }
+            else
+            {
+                LATAbits.LATA2 = 0;
+                LATCbits.LATC0 =~ LATCbits.LATC0;
+            }
+            if(Yellow_led == 1)
+            {
+               LATAbits.LATA1 =~ LATAbits.LATA1;
+            }
+            else
+            {
+                LATAbits.LATA1 = 0;
+            }
+            Led_Count = 500;
         }
     }
-    else
+    else if(INTCONbits.PEIE == 1)
     {
-        moving_flt[Channel_no].prev_adc_sum = ADC_Filter(new_value,Channel_no);
-        moving_flt[Channel_no].ADC_PCnt = 0;
-        moving_flt[Channel_no].ADC_NCnt = 0;
+        if(PIE1bits.RC1IE == 1 && PIR1bits.RC1IF == 1)
+        {
+            EUSART1_Receive_ISR();
+            PIR1bits.RC1IF = 0;
+        }
+        if(PIE3bits.RC2IE == 1 && PIR3bits.RC2IF == 1)
+        {
+            EUSART2_Receive_ISR();
+            PIR3bits.RC2IF = 0;
+        }
+        if(PIE5bits.RXB1IE == 1 && PIR5bits.RXB1IF == 1)
+        {
+            ECAN_RXB1I_ISR();
+        }
+        if(PIE5bits.RXB0IE == 1 && PIR5bits.RXB0IF == 1)
+        {
+            ECAN_RXB0I_ISR();
+        }
     }
-    return(moving_flt[Channel_no].prev_adc_sum);
 }

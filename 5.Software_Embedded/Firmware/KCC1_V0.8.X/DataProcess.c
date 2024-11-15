@@ -34,7 +34,42 @@ inline void Soft_Uart_Tx(bool stat)
 {
     RS485_Ctrl = stat;
 }
-
+inline void ECAN_Filter_Set(void)
+{
+    if(CAN_Txpara.CANID == 409)
+    {
+        RXM0EIDH = 0xFF;
+        RXM0EIDL = 0xFF;
+        RXM0SIDH = 0xC4;     // 409 + 42 CAN ID
+        RXM0SIDL = 0x83;
+        RXM1EIDH = 0xFF;
+        RXM1EIDL = 0xFF;
+        RXM1SIDH = 0xFF;
+        RXM1SIDL = 0xE3;
+        
+        RXF0EIDH = 0x00;
+        RXF0EIDL = 0x00;
+        RXF0SIDH = 0x24;
+        RXF0SIDL = 0x60;
+    }
+    else if(CAN_Txpara.CANID == 410)
+    {
+        RXM0EIDH = 0xFF;
+        RXM0EIDL = 0xFF;
+        RXM0SIDH = 0xC4;    // 410 + 42 CAN ID
+        RXM0SIDL = 0xE3;
+        RXM1EIDH = 0xFF;
+        RXM1EIDL = 0xFF;
+        RXM1SIDH = 0xFF;
+        RXM1SIDL = 0xE3;
+        
+        RXF0EIDH = 0x00;
+        RXF0EIDL = 0x00;
+        RXF0SIDH = 0x24;
+        RXF0SIDL = 0x60;
+    }
+    
+}
 /*=============================================================================
  * Function     : OSCILLATOR_Initialize.
  * Description  : Used for Oscillator initialize 
@@ -82,10 +117,14 @@ void System_Initialize(void)
 //    PIE5 = 0x00;
     //CS_TRIS = 0;
     TRISCbits.TRISC2 = 0;
+    MC_RST = 0;
     //CS_PIN = 1;
     LATCbits.LATC2 = 1;
     CM1CON = 0x00;
-    TRISCbits.TRISC0 = 0;
+    //TRISCbits.TRISC0 = 0;
+    GPIO_Function(GPIO_PORTC,G_LED_No,GPIO_OUTPUT,GPIO_LOW,DIGITAL_OUTPUT);
+    GPIO_Function(GPIO_PORTA,Y_LED_No,GPIO_OUTPUT,GPIO_LOW,DIGITAL_OUTPUT);
+    GPIO_Function(GPIO_PORTA,R_LED_No,GPIO_OUTPUT,GPIO_LOW,DIGITAL_OUTPUT);
     LATBbits.LATB2 = 1;
      CLRWDT();
     OSCILLATOR_Initialize();            // Oscillator initialize
@@ -106,8 +145,6 @@ void System_Initialize(void)
     
     eep_read1 = Eeprom_Read(7); eep_read2 = Eeprom_Read(8); eep_read3 = Eeprom_Read(9);
     
-    //read = Eeprom_Read(5);  // Read eeprom
-   // if(read != 'R')        // if valid data not found then set default parameter
     if(((eep_read1 != 'R')&&(eep_read2 != 'R'))||((eep_read2 != 'R')&&(eep_read3 != 'R'))||((eep_read1 != 'R')&&(eep_read3 != 'R')))
     {
       CAN_Txpara.CANID = 409;
@@ -138,8 +175,6 @@ void System_Initialize(void)
           EUSART1_String("CANspeed stored at eeprom Success\r\n");
       }
       
-      //Eeprom_Write(1,3);
-      //Eeprom_Write(5,'R');
       Eeprom_Write(7,'R');Eeprom_Write(8,'R');Eeprom_Write(9,'R');
       CLRWDT();
       eep_read1 = Eeprom_Read(7); eep_read2 = Eeprom_Read(8); eep_read3 = Eeprom_Read(9);
@@ -172,7 +207,7 @@ void System_Initialize(void)
        {
            CAN_Speed = 500;
        }
-       //read = Eeprom_Read(2);    // Read CAN ID MAIN/AUX
+       
        eep_read1 = Eeprom_Read(1); eep_read2 = Eeprom_Read(2);eep_read3 = Eeprom_Read(3);    // Read CAN Speed setting
        if(((eep_read1 == '1')&&(eep_read2 == '1'))||((eep_read2 == '1')&&(eep_read3 == '1'))||((eep_read3 == '1')&&(eep_read1 == '1')))//if(read == 1)if(read == 1)
        {
@@ -193,8 +228,9 @@ void System_Initialize(void)
         EUSART1_String("User Setting\r\n"); 
     }
      CLRWDT(); 
-    //Init_Ecan(CAN_Speed,true,(uint16_t)CAN_Txpara.CANID);
-    ECAN_Initialize(CAN_Speed,true,CAN_Txpara.CANID);
+   
+    //ECAN_Initialize(CAN_Speed,true,CAN_Txpara.CANID);
+    ECAN_Initialize(CAN_Speed,true);
     INTCONbits.PEIE = 1;               // Peripheral Interrupt Enable
     INTCONbits.GIE  = 1;               // Global Interrupt Enable
     
@@ -210,37 +246,32 @@ void System_Initialize(void)
         CLRWDT();
         Delay_Ms(500);
     }
-//        CLRWDT();
-//    Delay_Ms(500);
-//    CLRWDT();
-//    Delay_Ms(500);
-//    CLRWDT();
-//    Delay_Ms(500);
-   
+
     if(MC33996_SPI_Check() == 1)        // MC33996 output ic SPI integrity check 
     {
       EUSART1_String("SPI Check OK\r\n"); 
-      LATCbits.LATC0 = 1; // G LED Pin
+      //LATCbits.LATC0 = 1; // G LED Pin
+      GPIO_Write(GPIO_PORTC,G_LED_No,GPIO_HIGH);
       Delay_Ms(300);
       CLRWDT();
-      LATCbits.LATC0 = 0; // G LED Pin
+      //LATCbits.LATC0 = 0; // G LED Pin
+      GPIO_Write(GPIO_PORTC,G_LED_No,GPIO_LOW);
       OP_Driver_Ok = '#';
     }
     else
     {
         OP_Driver_Ok = 0;
         EUSART1_String("SPI Check error\r\n"); 
-        LATAbits.LATA2 = 1; // R LED Pin
+        //LATAbits.LATA2 = 1; // R LED Pin
+        GPIO_Write(GPIO_PORTA,R_LED_No,GPIO_HIGH);
         for(eep_read1=0;eep_read1<2;eep_read1++)
         {
             CLRWDT();
             Delay_Ms(500);
         }
-//        Delay_Ms(500);
-//        CLRWDT();
-//        Delay_Ms(500);
-//        CLRWDT();
-        LATAbits.LATA2 = 1; // R LED Pin
+
+        //LATAbits.LATA2 = 1; // R LED Pin
+        GPIO_Write(GPIO_PORTA,R_LED_No,GPIO_LOW);
     }
     
     MC33996_Init();                         //MC33996 Initialization
@@ -277,6 +308,11 @@ void System_Initialize(void)
     CLRWDT();
     Lp1_present = 11;
     Lp2_present = 11;
+    Send_Soft_Ver_No(1);
+    MC33996_Digitalwrite(16,1);
+    Delay_Ms(500);
+    MC33996_Digitalwrite(16,0);
+    Delay_Ms(500);
 }
 /*=============================================================================
  * Function     : Uart1_Data_Handler.
@@ -352,13 +388,7 @@ void Uart2_Data_Handler(void)
     uint8_t k=0;
     uint16_t temp=0;
     
-   // PIE3bits.RC2IE = 0;
-//    for(k=0;k<59;k++)
-//    {
-//      EUSART1_Write(Uart2_array[k]);  
-//    }
-    //EUSART1_String("\n");
-    if(memcmp(((char*)Uart2_array+1),",LP,",4) == 0)          //Output data {,OD,digital_output,mp3_stat,track_num,}
+      if(memcmp(((char*)Uart2_array+1),",LP,",4) == 0)          //Output data {,OD,digital_output,mp3_stat,track_num,}
     {
         //EUSART1_String("LP detect\n");
         nrf_data_flag = true;
@@ -410,7 +440,6 @@ void Uart2_Data_Handler(void)
             Lp2_present = 0;
             //EUSART1_String("Load 202\n");
         }
-        
         if(Lp1_present>10)
         {
             Lp1_present = 11;
@@ -445,6 +474,7 @@ void Can_Digital_Data_Send(void)
     ECAN_TxMSG.data6 = (uint8_t)((crc&0xFF00)>>8);
     ECAN_TxMSG.data7 = (uint8_t)((crc&0x00FF)>>0);
     CAN_transmit(&ECAN_TxMSG);
+    Delay_Ms(100);
 }
 /*=============================================================================
  * Function     : Can_Data_Send.
@@ -552,15 +582,6 @@ void Can_Analog_Data_Send(void)
             ECAN_TxMSG.data3  = (uint8_t)((NRF[0].Cal_Load & 0x0FF00)>>8);//((NRF[0].Cal_Load & 0x00FF)>>0);
             ECAN_TxMSG.data4  = (uint8_t)((NRF[0].Cal_Load & 0x000FF)>>0);
             ECAN_TxMSG.data5  = 0;
-//            NRF[0].ID = 0;
-//            NRF[0].Cal_Load   = 0;
-//            NRF[0].Load_Count = 0;
-//             binary =(uint8_t) ((0xF0000 & value)>>16);
-//             printf("Binary output = %d\n",binary);
-//             binary =(uint8_t) ((0x0FF00 & value)>>8);
-//             printf("Binary output = %d\n",binary);
-//             binary =(uint8_t) ((0x000FF & value)>>0);
-//             printf("Binary output = %d\n",binary);
             can_frame_no++;
             //EUSART1_String("CAN Frame 6\r\n");
             break;
@@ -572,8 +593,6 @@ void Can_Analog_Data_Send(void)
             ECAN_TxMSG.data3  = (uint8_t)((NRF[0].Batt_Vtg & 0xFF00)>>8);
             ECAN_TxMSG.data4  = (uint8_t)((NRF[0].Batt_Vtg & 0x00FF)>>0);
             ECAN_TxMSG.data5  = NRF[0].Status;
-//            NRF[0].Batt_Vtg = 0;
-//            NRF[0].Status  = 0;
             can_frame_no++;
             //EUSART1_String("CAN Frame 7\r\n");
             break;
@@ -585,9 +604,6 @@ void Can_Analog_Data_Send(void)
             ECAN_TxMSG.data3  = (uint8_t)((NRF[1].Cal_Load & 0x0FF00)>>8);//((NRF[0].Cal_Load & 0x00FF)>>0);
             ECAN_TxMSG.data4  = (uint8_t)((NRF[1].Cal_Load & 0x000FF)>>0);
             ECAN_TxMSG.data5  = 0;
-//            NRF[1].ID = 0;
-//            NRF[1].Cal_Load   = 0;
-//            NRF[1].Load_Count = 0;
             can_frame_no++;
             //EUSART1_String("CAN Frame 8\r\n");
             break;
@@ -599,15 +615,9 @@ void Can_Analog_Data_Send(void)
             ECAN_TxMSG.data3  = (uint8_t)((NRF[1].Batt_Vtg & 0xFF00)>>8);
             ECAN_TxMSG.data4  = (uint8_t)((NRF[1].Batt_Vtg & 0x00FF)>>0);
             ECAN_TxMSG.data5  = NRF[1].Status;
-//            NRF[1].Batt_Vtg = 0;
-//            NRF[1].Status  = 0;
             can_frame_no = 0;
             //EUSART1_String("CAN Frame 9\r\n");
             break;
-        
-//        default:
-//            can_frame_no = 0;
-//            break;
     }
      
     if(can_frame_no < 8)
@@ -618,6 +628,7 @@ void Can_Analog_Data_Send(void)
         ECAN_TxMSG.data6 = (uint8_t)((crc&0xFF00)>>8);
         ECAN_TxMSG.data7 = (uint8_t)((crc&0x00FF)>>0);
         CAN_transmit(&ECAN_TxMSG);
+        Delay_Ms(100);
     }
     else
     {
@@ -641,14 +652,13 @@ void CAN_Request_Send(void)
     ECAN_TxMSG.data7  = 0;
     
     crc = (uint16_t)ECAN_TxMSG.id;
-    crc += (uint16_t)(ECAN_TxMSG.data0+ECAN_TxMSG.data1+ECAN_TxMSG.data2+ECAN_TxMSG.data3);
+    crc += (uint16_t)(ECAN_TxMSG.data1+ECAN_TxMSG.data2+ECAN_TxMSG.data3+ECAN_TxMSG.data4);
     crc = CRC16_calculate(crc);
     ECAN_TxMSG.data6 = (uint8_t)((crc&0xFF00)>>8);
     ECAN_TxMSG.data7 = (uint8_t)((crc&0x00FF)>>0);   
     
     CAN_transmit(&ECAN_TxMSG);
-     Delay_Ms(100);
-    //memset(CAN_Txpara.CAN_Buf,0x00,8*sizeof(uint8_t)); 
+    Delay_Ms(100);
     Yellow_led = false;
     can_timeout = 10000;
 }
@@ -660,19 +670,20 @@ void NRF_ResponCAN_Send(uint8_t data)
     ECAN_TxMSG.idType = dSTANDARD_CAN_MSG_ID_2_0B;
     ECAN_TxMSG.dlc    = 8;
     ECAN_TxMSG.id     = CAN_Txpara.CANID;//CAN_Txpara.CANID;
-    ECAN_TxMSG.data0  = 'N';
-    ECAN_TxMSG.data1  = 'R';
-    ECAN_TxMSG.data2  = 'F';
-    ECAN_TxMSG.data3  = 'S';
+    ECAN_TxMSG.data0  = 0;
+    ECAN_TxMSG.data1  = 'N';
+    ECAN_TxMSG.data2  = 'R';
+    ECAN_TxMSG.data3  = 'F';
+    ECAN_TxMSG.data4  = 'S';
     if(data == 'C')
     {
-        ECAN_TxMSG.data4  = 'C';
+        ECAN_TxMSG.data5  = 'C';
     }
     else
     {
-       ECAN_TxMSG.data4  = 'P'; 
+       ECAN_TxMSG.data5  = 'P'; 
     }
-    ECAN_TxMSG.data5  = 0;
+    //ECAN_TxMSG.data5  = 0;
        
     crc = (uint16_t)ECAN_TxMSG.id;
     crc += (uint16_t)(ECAN_TxMSG.data0+ECAN_TxMSG.data1+ECAN_TxMSG.data2+ECAN_TxMSG.data3+ECAN_TxMSG.data4);
@@ -682,26 +693,52 @@ void NRF_ResponCAN_Send(uint8_t data)
     
     CAN_transmit(&ECAN_TxMSG);
      Delay_Ms(100);
+     CAN_transmit(&ECAN_TxMSG);
+     Delay_Ms(100);
     //memset(CAN_Txpara.CAN_Buf,0x00,8*sizeof(uint8_t)); 
     
 }
-/*=============================================================================
- * Function     : Can_to_Uart_Data.
- * Description  : Receive data from CAN & send to UART1
- * Parameters   : void 
- * Return       : Void.
- * Example      : Can_to_Uart_Data();
-===========================================================================================================================*/
+//=======================================================
+/*
+ * Function Name: Send_Soft_Ver_No
+ * Function Use: Sending software version on CAN
+ * Parameter Pass: unsigned char (0-255) value allow to pass
+ * Return Type: Void/Not return any value
+ * Example:
+ * Send data from CAN Mate/device (frame ID 42 DLC 8 D0-D7 left blank)
+ * Function Send CAN Frame ID 201 DLC 8 
+ * D0   D1  D2  D3  D4  D5  D6  D7
+ * 23   31  32  20  0   0   0   0
+ */
+// CHANGE ON 010224
+//=======================================================
 
-//void Can_to_Uart_Data(void)
-//{
-//    char disp[25]={0};
-//    
-//    sprintf(disp,"{,CD,%d,%d,%d,%d,%d",(uint16_t)CAN_Rxpara.CANID,CAN_Rxpara.CAN_Buf[0],CAN_Rxpara.CAN_Buf[1],CAN_Rxpara.CAN_Buf[2],CAN_Rxpara.CAN_Buf[3]); 
-//    EUSART1_String(disp); 
-//    sprintf(disp,",%d,%d,%d,%d,}\n",CAN_Rxpara.CAN_Buf[4],CAN_Rxpara.CAN_Buf[5],CAN_Rxpara.CAN_Buf[6],CAN_Rxpara.CAN_Buf[7]); 
-//    EUSART1_String(disp);
-//}
+void Send_Soft_Ver_No (uint8_t count)
+{
+    uint8_t firmware=0;
+    firmware = (uint8_t)(Firm_Ver*10);
+    ECAN_TxMSG.idType = dSTANDARD_CAN_MSG_ID_2_0B;
+    ECAN_TxMSG.dlc    = 8;
+    ECAN_TxMSG.id     = CAN_Txpara.CANID;//CAN_Txpara.CANID;
+    ECAN_TxMSG.data0  = '#';
+    ECAN_TxMSG.data1  = (firmware/10);
+    ECAN_TxMSG.data2  = (firmware%10);
+    ECAN_TxMSG.data3  = ' ';
+    ECAN_TxMSG.data4  = 0;
+    ECAN_TxMSG.data5  = 0;
+    ECAN_TxMSG.data6  = 0;
+    ECAN_TxMSG.data7  = 0;
+        
+    while(count>0)
+    {
+        CLRWDT();
+        CAN_transmit(&ECAN_TxMSG); // Send Software Version
+        __delay_ms(300);
+        count--;
+    }
+    
+}
+
 /*=============================================================================
  * Function     : Data_Process.
  * Description  : Process data from inputs & control outputs
@@ -726,12 +763,6 @@ void Data_Process(void)
     ADC[0] = Get_Adc_Data(3,250);                   // Read voltage
     ADC[0] = (uint16_t)((ADC[0]*0.00735)*10);
     Delay_Ms(1);
-//    for(channel=7;channel<22;channel++)            // Read Multiple Analog Channel
-//    {
-//        MC33972_Read_ADC(Analog_Ch0+channel);
-//        Delay_Ms(1);
-//        temp_ADC[channel-7]=Get_Adc_Data(3,100);                // Store adc value to ADC buffer from 0 location
-//    }
     
     for(channel=7;channel<17;channel++)            // Read Multiple Analog Channel
     {
@@ -776,255 +807,6 @@ void Data_Process(void)
     //ADC[7] for Length1
     //ADC[8] for Angle2
     //ADC[9] for Length2
-    /////////////////////////////////////////////
-    //Pressure 1
-//    if(temp_ADC[4]>(ADC[2]+ADC_Offset))
-//    {
-//        ADC_PCnt[0]+=1;
-//        if(ADC_PCnt[0]>ADC_Offset_Count)
-//        {// after ADC_Offset_Count also value is increased then only update value
-//            ADC[2] = temp_ADC[4];
-//            ADC_PCnt[0] = 0;
-//        }
-//    }
-//    else if(ADC[2]>ADC_Offset)  // for less value first make sure that ADC value is greater than offset
-//    {
-//        if(temp_ADC[4]<(ADC[2]-ADC_Offset)) //if adc value sudden decrease then wait & check upto ADC_Offset_Count time
-//        {
-//            ADC_NCnt[0]+=1;
-//            if(ADC_NCnt[0]>ADC_Offset_Count)
-//            {// after ADC_Offset_Count also value is decrease then only update value
-//               ADC[2] = temp_ADC[4];
-//               ADC_NCnt[0] = 0; 
-//            }
-//        }
-//        else
-//        {
-//           ADC[2] = temp_ADC[4];   // update value
-//        }
-//    }
-//    else
-//    {
-//        ADC[2] = temp_ADC[4]; // update value
-//    }
-    /////////////////////////////////////////////
-    //Pressure 2
-//    if(temp_ADC[3]>(ADC[3]+ADC_Offset))
-//    {
-//        ADC_PCnt[1]+=1;
-//        if(ADC_PCnt[1]>ADC_Offset_Count)
-//        {// after ADC_Offset_Count also value is increased then only update value
-//            ADC[3] = temp_ADC[3];
-//            ADC_PCnt[1] = 0;
-//        }
-//    }
-//    else if(ADC[3]>ADC_Offset)  // for less value first make sure that ADC value is greater than offset
-//    {
-//        if(temp_ADC[3]<(ADC[3]-ADC_Offset)) //if adc value sudden decrease then wait & check upto ADC_Offset_Count time
-//        {
-//            ADC_NCnt[1]+=1;
-//            if(ADC_NCnt[1]>ADC_Offset_Count)
-//            {// after ADC_Offset_Count also value is decrease then only update value
-//               ADC[3] = temp_ADC[3];
-//               ADC_NCnt[1] = 0; 
-//            }
-//        }
-//        else
-//        {
-//           ADC[3] = temp_ADC[3];   // update value
-//        }
-//    }
-//    else
-//    {
-//        ADC[3] = temp_ADC[3]; // update value
-//    }
-    ///////////////////////////////////////////////////////
-    //Pressure 3
-//    if(temp_ADC[2]>(ADC[4]+ADC_Offset))
-//    {
-//        ADC_PCnt[2]+=1;
-//        if(ADC_PCnt[2]>ADC_Offset_Count)
-//        {// after ADC_Offset_Count also value is increased then only update value
-//            ADC[4] = temp_ADC[2];
-//            ADC_PCnt[2] = 0;
-//        }
-//    }
-//    else if(ADC[4]>ADC_Offset)  // for less value first make sure that ADC value is greater than offset
-//    {
-//        if(temp_ADC[2]<(ADC[4]-ADC_Offset)) //if adc value sudden decrease then wait & check upto ADC_Offset_Count time
-//        {
-//            ADC_NCnt[2]+=1;
-//            if(ADC_NCnt[2]>ADC_Offset_Count)
-//            {// after ADC_Offset_Count also value is decrease then only update value
-//               ADC[4] = temp_ADC[2];
-//               ADC_NCnt[2] = 0; 
-//            }
-//        }
-//        else
-//        {
-//           ADC[4] = temp_ADC[2];   // update value
-//        }
-//    }
-//    else
-//    {
-//        ADC[4] = temp_ADC[2]; // update value
-//    }
-    ///////////////////////////////////////////////////////
-    //Pressure 4
-//    if(temp_ADC[1]>(ADC[5]+ADC_Offset))
-//    {
-//        ADC_PCnt[3]+=1;
-//        if(ADC_PCnt[3]>ADC_Offset_Count)
-//        {// after ADC_Offset_Count also value is increased then only update value
-//            ADC[5] = temp_ADC[1];
-//            ADC_PCnt[3] = 0;
-//        }
-//    }
-//    else if(ADC[5]>ADC_Offset)  // for less value first make sure that ADC value is greater than offset
-//    {
-//        if(temp_ADC[1]<(ADC[5]-ADC_Offset)) //if adc value sudden decrease then wait & check upto ADC_Offset_Count time
-//        {
-//            ADC_NCnt[3]+=1;
-//            if(ADC_NCnt[3]>ADC_Offset_Count)
-//            {// after ADC_Offset_Count also value is decrease then only update value
-//               ADC[5] = temp_ADC[1];
-//               ADC_NCnt[3] = 0; 
-//            }
-//        }
-//        else
-//        {
-//           ADC[5] = temp_ADC[1];   // update value
-//        }
-//    }
-//    else
-//    {
-//        ADC[5] = temp_ADC[1]; // update value
-//    }
-    //////////////////////////////////////////////////////
-    // Angle 1
-//    if(temp_ADC[0]>(ADC[6]+ADC_Offset))
-//    {
-//        ADC_PCnt[4]+=1;
-//        if(ADC_PCnt[4]>ADC_Offset_Count)
-//        {// after ADC_Offset_Count also value is increased then only update value
-//            ADC[6] = temp_ADC[0];
-//            ADC_PCnt[4] = 0;
-//        }
-//    }
-//    else if(ADC[6]>ADC_Offset)  // for less value first make sure that ADC value is greater than offset
-//    {
-//        if(temp_ADC[0]<(ADC[6]-ADC_Offset)) //if adc value sudden decrease then wait & check upto ADC_Offset_Count time
-//        {
-//            ADC_NCnt[4]+=1;
-//            if(ADC_NCnt[4]>ADC_Offset_Count)
-//            {// after ADC_Offset_Count also value is decrease then only update value
-//               ADC[6] = temp_ADC[0];
-//               ADC_NCnt[4] = 0; 
-//            }
-//        }
-//        else
-//        {
-//           ADC[6] = temp_ADC[0];   // update value
-//        }
-//    }
-//    else
-//    {
-//        ADC[6] = temp_ADC[0]; // update value
-//    }
-    //////////////////////////////////////////////////
-    // Length 1
-//    if(temp_ADC[7]>(ADC[7]+ADC_Offset))
-//    {
-//        ADC_PCnt[5]+=1;
-//        if(ADC_PCnt[5]>ADC_Offset_Count)
-//        {// after ADC_Offset_Count also value is increased then only update value
-//            ADC[7] = temp_ADC[7];
-//            ADC_PCnt[5] = 0;
-//        }
-//    }
-//    else if(ADC[7]>ADC_Offset)  // for less value first make sure that ADC value is greater than offset
-//    {
-//        if(temp_ADC[7]<(ADC[7]-ADC_Offset)) //if adc value sudden decrease then wait & check upto ADC_Offset_Count time
-//        {
-//            ADC_NCnt[5]+=1;
-//            if(ADC_NCnt[5]>ADC_Offset_Count)
-//            {// after ADC_Offset_Count also value is decrease then only update value
-//               ADC[7] = temp_ADC[7];
-//               ADC_NCnt[5] = 0; 
-//            }
-//        }
-//        else
-//        {
-//           ADC[7] = temp_ADC[7];   // update value
-//        }
-//    }
-//    else
-//    {
-//        ADC[7] = temp_ADC[7]; // update value
-//    }
-    //////////////////////////////////////////////////
-    //Angle 2
-//    if(temp_ADC[8]>(ADC[8]+ADC_Offset))
-//    {
-//        ADC_PCnt[6]+=1;
-//        if(ADC_PCnt[6]>ADC_Offset_Count)
-//        {// after ADC_Offset_Count also value is increased then only update value
-//            ADC[8] = temp_ADC[8];
-//            ADC_PCnt[6] = 0;
-//        }
-//    }
-//    else if(ADC[8]>ADC_Offset)  // for less value first make sure that ADC value is greater than offset
-//    {
-//        if(temp_ADC[8]<(ADC[8]-ADC_Offset)) //if adc value sudden decrease then wait & check upto ADC_Offset_Count time
-//        {
-//            ADC_NCnt[6]+=1;
-//            if(ADC_NCnt[6]>ADC_Offset_Count)
-//            {// after ADC_Offset_Count also value is decrease then only update value
-//               ADC[8] = temp_ADC[8];
-//               ADC_NCnt[6] = 0; 
-//            }
-//        }
-//        else
-//        {
-//           ADC[8] = temp_ADC[8];   // update value
-//        }
-//    }
-//    else
-//    {
-//        ADC[8] = temp_ADC[8]; // update value
-//    }
-    //////////////////////////////////////////////////
-    // Length 2
-//    if(temp_ADC[9]>(ADC[9]+ADC_Offset))
-//    {
-//        ADC_PCnt[7]+=1;
-//        if(ADC_PCnt[7]>ADC_Offset_Count)
-//        {// after ADC_Offset_Count also value is increased then only update value
-//            ADC[9] = temp_ADC[9];
-//            ADC_PCnt[7] = 0;
-//        }
-//    }
-//    else if(ADC[9]>ADC_Offset)  // for less value first make sure that ADC value is greater than offset
-//    {
-//        if(temp_ADC[9]<(ADC[9]-ADC_Offset)) //if adc value sudden decrease then wait & check upto ADC_Offset_Count time
-//        {
-//            ADC_NCnt[7]+=1;
-//            if(ADC_NCnt[7]>ADC_Offset_Count)
-//            {// after ADC_Offset_Count also value is decrease then only update value
-//               ADC[9] = temp_ADC[9];
-//               ADC_NCnt[7] = 0; 
-//            }
-//        }
-//        else
-//        {
-//           ADC[9] = temp_ADC[9];   // update value
-//        }
-//    }
-//    else
-//    {
-//        ADC[9] = temp_ADC[9]; // update value
-//    }
-    //////////////////////////////////////////////////
     if((temp_ADC[10]>Wire_Break_min) && (temp_ADC[10]<Wire_Break_max))  //ADC[4]           
     {
        DADC[2] |=0x01; //8
@@ -1377,6 +1159,10 @@ void Data_Process(void)
                 Yellow_led = false;  
             }
         }
+        else if(CAN_Rxpara.CANID == 'B')
+        {
+           Send_Soft_Ver_No(30); 
+        }
         CAN_RStatus = 0;
         memset(CAN_Rxpara.CAN_Buf,0x00,8*sizeof(uint16_t)); 
     }
@@ -1392,14 +1178,7 @@ void Data_Process(void)
         }
         Uart1_Frame_Flag = 0;
     }
-//    if(Uart2_Frame_Flag == 1)
-//    {
-//        Uart2_Data_Handler();           // Check UART received data
-//        if(uart2_data_flag == true)
-//        {
-//          Uart1_Data_Send();            //uart2 received data send to uart1
-//          uart2_data_flag = false;
-//        }
+
         if(nrf_data_flag == 1)
         {
             checksum = (uint32_t)NRF[0].ID;
@@ -1451,7 +1230,6 @@ void Data_Process(void)
              frame = 5;
             }
         }
-//    }
     
     if(NRFP_flag == 1)
     {
@@ -1483,13 +1261,7 @@ void Data_Process(void)
         EUSART2_Write((uint8_t)(N_Serial%10)+0x30);
         EUSART2_Write('\n');
         
-//        EUSART1_String("B4");
-//        EUSART1_Write((uint8_t)(N_Serial/10000)+0x30);
-//        EUSART1_Write((uint8_t)((N_Serial%10000)/1000)+0x30);
-//        EUSART1_Write((uint8_t)((N_Serial%1000)/100)+0x30);
-//        EUSART1_Write((uint8_t)((N_Serial%100)/10)+0x30);
-//        EUSART1_Write((uint8_t)(N_Serial%10)+0x30);
-//        EUSART1_Write('\n');
+
         NRFC_flag = false;
     }
 }
@@ -1514,6 +1286,13 @@ void Uart1_Data_Send(void)
     EUSART1_String(disp);
     sprintf(disp,"%d,%d,%d,}\n",DADC[0],DADC[1],DADC[2]); 
     EUSART1_String(disp);
+//    sprintf(disp,"{,%d,%d,%d,",temp_ADC[10],temp_ADC[11],temp_ADC[12]); 
+//    EUSART1_String(disp);
+//    sprintf(disp,"%d,%d,",temp_ADC[13],temp_ADC[14]); 
+//    EUSART1_String(disp);
+//    sprintf(disp,"%d,%d,%d,}\n",DADC[0],DADC[1],DADC[2]); 
+//    EUSART1_String(disp);
+    //DADC[2]
 
 }
 
